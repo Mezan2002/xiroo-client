@@ -3,6 +3,7 @@
 import { Search, ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Structure of our dynamical nav items
@@ -80,6 +81,7 @@ const MENUS_DATA = {
 };
 
 export function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   // Replaced boolean hoveredMenu with a string state tracking exactly WHICH menu is active
   const [activeMenu, setActiveMenu] = useState(null);
@@ -98,8 +100,9 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Use a solid (white) navbar when scrolled OR whenever any mega menu is active
-  const isSolid = scrolled || activeMenu !== null;
+  // Require solid navbar everywhere except the exact homepage root
+  const isHomePage = pathname === "/";
+  const isSolid = !isHomePage || scrolled || activeMenu !== null;
 
   // Retrieve data for the currently hovered menu. Default to "collections" to avoid
   // undefined mappings during the fade-out closing animation.
@@ -110,9 +113,7 @@ export function Navbar() {
   return (
     <nav
       className={`fixed top-0 z-50 w-full h-[72px] transition-colors duration-300 ${
-        isSolid
-          ? "text-black shadow-sm delay-0"
-          : "text-white border-b border-white/10 delay-500"
+        isSolid ? "text-black delay-0" : "text-white"
       }`}
     >
       {/* Top-to-Bottom White Background Animation Layer */}
