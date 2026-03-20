@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CartSidebar } from "./CartSidebar";
 
 // Structure of our dynamical nav items
 const NAV_ITEMS = [
@@ -85,6 +86,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   // Replaced boolean hoveredMenu with a string state tracking exactly WHICH menu is active
   const [activeMenu, setActiveMenu] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Fake auth state for conditional rendering
   const isLoggedIn = false;
@@ -233,6 +235,7 @@ export function Navbar() {
           <button
             className="hover:opacity-70 transition-opacity"
             aria-label="Shopping Bag"
+            onClick={() => setIsCartOpen(true)}
           >
             <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
           </button>
@@ -258,6 +261,8 @@ export function Navbar() {
           )}
         </div>
       </div>
+
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );
 }

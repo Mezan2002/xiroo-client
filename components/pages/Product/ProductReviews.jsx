@@ -636,9 +636,6 @@ export default function ProductReviews() {
         {/* ── Top row ── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <p className="text-[10px] font-black tracking-[0.22em] uppercase text-gray-400 mb-3">
-              Real People · Real Rooms
-            </p>
             <h2 className="text-[32px] md:text-[44px] font-black tracking-tight text-black leading-none">
               What customers
               <br />
@@ -665,7 +662,7 @@ export default function ProductReviews() {
                 <div
                   key={i}
                   onClick={() => setSelectedReview(r)}
-                  className="w-[84px] h-[84px] shrink-0 rounded-[4px] overflow-hidden bg-gray-100 cursor-pointer hover:opacity-75 transition-opacity"
+                  className="w-[84px] h-[84px] shrink-0 overflow-hidden bg-gray-100 cursor-pointer hover:opacity-75 transition-opacity"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img

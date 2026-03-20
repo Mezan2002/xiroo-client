@@ -7,9 +7,9 @@ import {
   Minus,
   Plus,
   ShoppingBag,
-  ShoppingCart,
   Truck,
 } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 
 const bundles = [
@@ -60,7 +60,7 @@ export default function ProductInfo({ product, cartRef }) {
     <div className="flex flex-col w-full pb-20 px-0 md:px-6 lg:px-10">
       {/* Top Main Entry */}
       <div className="flex flex-col items-center text-center w-full mb-10 font-mono pt-4 lg:pt-8">
-        <h1 className="text-[26px] md:text-[34px] xl:text-[40px] font-normal tracking-tight text-[#111] leading-[1.3] mb-4 max-w-[95%]">
+        <h1 className="text-[26px] md:text-4xl lg:text-5xl font-normal tracking-tight text-[#111] leading-[1.3] mb-4 max-w-[95%]">
           {product.title}
         </h1>
         <div className="flex items-center justify-center gap-2 mb-1">
@@ -80,7 +80,7 @@ export default function ProductInfo({ product, cartRef }) {
       <div className="w-full mb-10 px-[2px]">
         {/* Added Native Heading and Subheading Elements */}
         <div className="flex flex-col text-left w-full mb-6 py-[2px]">
-          <h3 className="text-[14px] md:text-[15px] font-black tracking-[0.1em] text-black uppercase">
+          <h3 className="text-[14px] md:text-[15px] font-black tracking-widest text-black uppercase">
             Choose Your Bundle
           </h3>
           <p className="text-[12px] md:text-[13px] text-gray-500 mt-[6px]">
@@ -142,7 +142,7 @@ export default function ProductInfo({ product, cartRef }) {
                       </span>
                       {bundle.discount && (
                         <span
-                          className={`px-[6px] py-[3px] text-[9px] md:text-[10px] font-black tracking-widest leading-none mt-[1px] md:mt-0 ${
+                          className={`px-[6px] py-[3px] text-[9px] md:text-[10px] font-black tracking-widest leading-none mt-px md:mt-0 ${
                             isSelected
                               ? "bg-black text-white"
                               : "bg-gray-100 text-black border border-gray-200"
@@ -175,7 +175,7 @@ export default function ProductInfo({ product, cartRef }) {
                       isSelected ? "text-gray-500" : "text-gray-400"
                     }`}
                   >
-                    <span className="mr-[1px]">৳</span>
+                    <span className="mr-px">৳</span>
                     {bundle.unitPrice} / UNIT
                   </span>
                 </div>
@@ -186,7 +186,7 @@ export default function ProductInfo({ product, cartRef }) {
 
         {/* Dynamic Adjust Quantity Terminal Row */}
         <div className="flex items-center justify-between w-full mt-4 md:mt-8 pt-6 pb-2 border-t border-gray-200">
-          <div className="text-[11px] md:text-[12px] font-black tracking-[0.1em] text-black uppercase">
+          <div className="text-[11px] md:text-[12px] font-black tracking-widest text-black uppercase">
             Adjust Quantity
           </div>
           <div className="flex items-center border border-gray-300 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
@@ -210,7 +210,7 @@ export default function ProductInfo({ product, cartRef }) {
       </div>
 
       {/* Creative Brutalist Ticket Stepper */}
-      <div className="flex flex-col w-full mb-10 mt-6 overflow-hidden border-[2px] border-black bg-white shadow-[4px_4px_0px_#000]">
+      <div className="flex flex-col w-full mb-10 mt-6 overflow-hidden border-2 border-black bg-white shadow-[4px_4px_0px_#000]">
         {/* Ticket Banner Header */}
         <div className="flex flex-col md:flex-row items-center justify-between w-full bg-black text-white px-4 md:px-5 py-[14px] gap-2 md:gap-0">
           <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-start">
@@ -228,7 +228,7 @@ export default function ProductInfo({ product, cartRef }) {
         </div>
 
         {/* 3-Column Ticket Grid */}
-        <div className="grid grid-cols-3 divide-x-[2px] divide-black w-full bg-white">
+        <div className="grid grid-cols-3 divide-x-2 divide-black w-full bg-white">
           <div className="flex flex-col items-center text-center p-3 md:p-4 py-8 hover:bg-gray-50 transition-colors">
             <ShoppingBag
               size={24}
@@ -245,7 +245,7 @@ export default function ProductInfo({ product, cartRef }) {
 
           <div className="flex flex-col items-center text-center p-3 md:p-4 py-8 bg-gray-50 transition-colors relative">
             {/* Active Indicator Arrow */}
-            <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-black"></div>
+            <div className="absolute -top-px left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-black"></div>
             <Truck
               size={24}
               strokeWidth={1.5}
@@ -295,7 +295,7 @@ export default function ProductInfo({ product, cartRef }) {
 
       {/* Product Details Tabs (Description & Specifications) */}
       <div className="w-full mt-2 flex flex-col bg-white">
-        <div className="flex items-center gap-6 md:gap-10 border-b-[2px] border-gray-100">
+        <div className="flex items-center gap-6 md:gap-10 border-b-2 border-gray-100">
           <button
             onClick={() => setActiveTab("description")}
             className={`pb-3 text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative ${activeTab === "description" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
@@ -319,7 +319,7 @@ export default function ProductInfo({ product, cartRef }) {
         <div className="pt-6 pb-12 w-full">
           {activeTab === "description" && (
             <div className="flex flex-col text-[13px] md:text-[14px] text-gray-600 leading-[1.8]">
-              <p className="mb-6 leading-[2] text-gray-700">
+              <p className="mb-6 leading-loose text-gray-700">
                 {product.description ||
                   "Designed with minimal aesthetics and premium materials, this product blends seamlessly into your modern lifestyle. Featuring robust construction and an elegant silhouette, it guarantees both durability and timeless style."}
               </p>
@@ -356,26 +356,29 @@ export default function ProductInfo({ product, cartRef }) {
               {/* Detailed Product Images Structure */}
               <div className="mt-8 flex flex-col gap-4 w-full">
                 {/* Full Width Detail Wrap */}
-                <div className="relative w-full aspect-[4/3] md:aspect-[16/9] bg-[#f8f8f8] overflow-hidden rounded-[4px]">
-                  <img
+                <div className="relative w-full aspect-4/3 md:aspect-video bg-[#f8f8f8] overflow-hidden rounded-[4px]">
+                  <Image
                     src="/images/comparison-dark.png"
                     alt="Detailed View"
+                    fill
                     className="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-700"
                   />
                 </div>
                 {/* Split Detail Structure */}
                 <div className="grid grid-cols-2 gap-4 w-full">
-                  <div className="relative w-full aspect-[4/5] md:aspect-square bg-[#f8f8f8] overflow-hidden rounded-[4px]">
-                    <img
+                  <div className="relative w-full aspect-4/5 md:aspect-square bg-[#f8f8f8] overflow-hidden rounded-[4px]">
+                    <Image
                       src="/images/comparison-light.png"
+                      fill
                       alt="Detailed Structure Focus"
                       className="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-700"
                     />
                   </div>
-                  <div className="relative w-full aspect-[4/5] md:aspect-square bg-[#f8f8f8] overflow-hidden rounded-[4px]">
-                    <img
+                  <div className="relative w-full aspect-4/5 md:aspect-square bg-[#f8f8f8] overflow-hidden rounded-[4px]">
+                    <Image
                       src="/images/comparison-dark.png"
                       alt="Detailed Material Focus"
+                      fill
                       className="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-700"
                     />
                   </div>
