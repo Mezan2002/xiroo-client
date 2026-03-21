@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { ArrowRight, Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 
 export default function Footer() {
@@ -26,9 +27,16 @@ export default function Footer() {
                 className="w-full bg-transparent text-[10px] md:text-[11px] tracking-widest placeholder-gray-500 focus:outline-none uppercase text-white"
                 required
               />
-              <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all" aria-label="Subscribe">
+              <Button 
+                type="submit" 
+                variant="ghost"
+                size="icon"
+                showHoverIcon={false}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all" 
+                aria-label="Subscribe"
+              >
                 <ArrowRight size={16} strokeWidth={1.5} />
-              </button>
+              </Button>
             </form>
           </div>
 

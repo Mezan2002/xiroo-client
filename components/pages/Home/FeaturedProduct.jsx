@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { ArrowLeft, ArrowRight, Plus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 
@@ -42,22 +43,31 @@ export default function FeaturedProduct() {
             />
 
             {/* Subtle Gallery Arrows */}
-            <button
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors h-auto w-auto p-0 hover:bg-transparent"
               aria-label="Previous image"
             >
               <ArrowLeft strokeWidth={1} size={24} />
-            </button>
-            <button
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors h-auto w-auto p-0 hover:bg-transparent"
               aria-label="Next image"
             >
               <ArrowRight strokeWidth={1} size={24} />
-            </button>
+            </Button>
 
             {/* Quick Add to Cart Button */}
-            <button
-              className="absolute right-4 bottom-4 lg:right-6 lg:bottom-6 w-11 h-11 lg:w-[48px] lg:h-[48px] bg-white rounded-full flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all group/btn"
+            <Button
+              variant="white"
+              size="icon"
+              showHoverIcon={false}
+              className="absolute right-4 bottom-4 lg:right-6 lg:bottom-6 w-11 h-11 lg:w-[48px] lg:h-[48px] rounded-full shadow-md hover:scale-105 active:scale-95 transition-all group/btn"
               aria-label="Add to cart"
             >
               <div className="relative flex items-center justify-center">
@@ -71,7 +81,7 @@ export default function FeaturedProduct() {
                   <Plus strokeWidth={3} size={10} className="text-black" />
                 </div>
               </div>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

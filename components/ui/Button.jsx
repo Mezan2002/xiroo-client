@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 // Simple helper to cleanly concatenate class strings
@@ -11,32 +12,34 @@ export function Button({
   size = "default",
   className = "",
   href,
+  icon: Icon = ChevronRight,
+  showHoverIcon = true,
   ...props
 }) {
-  // Base core styles with group tracking and hidden overflow for the nested sliding background
-  const baseStyles =
-    "group relative inline-flex items-center justify-center font-semibold tracking-[0.15em] leading-none uppercase transition-colors duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden";
+  // Base core styles - only include relative if absolute/fixed is not provided in className
+  const isPositioned = /absolute|fixed|sticky/.test(className);
+  const baseStyles = cn(
+    "group inline-flex items-center justify-center font-bold tracking-[0.1em] uppercase transition-all duration-300 ease-out focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden rounded-none active:scale-[0.98]",
+    !isPositioned && "relative"
+  );
 
   // Pre-configured style variants
   const variants = {
-    primary: "bg-black text-white hover:bg-zinc-800",
-    secondary: "bg-gray-100 text-black hover:bg-gray-200",
-    white: "bg-white text-black hover:text-white",
-    outline: "border border-black text-black hover:text-white",
-    ghost: "bg-transparent text-black hover:bg-gray-100",
-  };
-
-  // Determines which variants receive the absolute top-to-bottom sliding background overlay
-  const slideVariants = {
-    white: "bg-black",
-    outline: "bg-black",
+    primary: "bg-black text-white hover:bg-zinc-800 border border-black",
+    outline: "border border-zinc-200 bg-transparent text-black hover:border-black hover:bg-black hover:text-white",
+    secondary: "bg-zinc-100 text-black hover:bg-zinc-200 border border-zinc-100",
+    white: "bg-white text-black hover:bg-zinc-50 border border-white",
+    ghost: "bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-black",
+    link: "bg-transparent text-zinc-900 underline underline-offset-4 hover:text-black p-0 h-auto",
+    danger: "bg-red-600 text-white hover:bg-red-700 border border-red-600",
+    warning: "bg-amber-500 text-black hover:bg-amber-600 border border-amber-500",
   };
 
   // Pre-configured sizing specifications
   const sizes = {
-    default: "px-8 py-4 text-[11px]",
-    sm: "px-5 py-3 text-[10px]",
-    lg: "px-10 py-[18px] text-[11px]",
+    default: "px-8 py-4 text-[11px] h-12",
+    sm: "px-5 py-2.5 text-[10px] h-10",
+    lg: "px-10 py-5 text-[12px] h-14",
     icon: "w-10 h-10 flex items-center justify-center p-0",
   };
 
@@ -47,24 +50,17 @@ export function Button({
     className
   );
 
-  const slidingLayerBg = slideVariants[variant];
-
-  // We wrap children in a z-10 span so they sit cleanly on top of the absolutely positioned sliding layer
   const content = (
-    <>
-      {slidingLayerBg && (
-        <span
-          className={cn(
-            "absolute inset-0 origin-top scale-y-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-y-100 pointer-events-none",
-            slidingLayerBg
-          )}
-        />
+    <span className="relative z-10 flex items-center justify-center gap-2">
+      <span className="flex items-center">{children}</span>
+      {showHoverIcon && variant !== "link" && variant !== "icon" && (
+        <span className="flex items-center w-0 opacity-0 -translate-x-2 group-hover:w-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out">
+          <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+        </span>
       )}
-      <span className="relative z-10">{children}</span>
-    </>
+    </span>
   );
 
-  // Switch dynamically between rendering an anchor tag or button depending on the 'href'
   if (href) {
     return (
       <Link href={href} className={finalClasses} {...props}>

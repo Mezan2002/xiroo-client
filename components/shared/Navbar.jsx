@@ -1,11 +1,12 @@
-"use client";
-
+import { Button } from "@/components/ui/Button";
 import { Search, ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CartSidebar } from "./CartSidebar";
+import { SearchOverlay } from "./SearchOverlay";
+import { UserAccountDrawer } from "./UserAccountDrawer";
 
 // Structure of our dynamical nav items
 const NAV_ITEMS = [
@@ -87,6 +88,8 @@ export function Navbar() {
   // Replaced boolean hoveredMenu with a string state tracking exactly WHICH menu is active
   const [activeMenu, setActiveMenu] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isUserOpen, setIsUserOpen] = useState(false);
 
   // Fake auth state for conditional rendering
   const isLoggedIn = false;
@@ -113,156 +116,181 @@ export function Navbar() {
     : MENUS_DATA["collections"];
 
   return (
-    <nav
-      className={`fixed top-0 z-50 w-full h-[72px] transition-colors duration-300 ${
-        isSolid ? "text-black delay-0" : "text-white"
-      }`}
-    >
-      {/* Top-to-Bottom White Background Animation Layer */}
-      <div
-        className={`absolute inset-0 bg-white origin-top transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] -z-10 ${
-          isSolid ? "scale-y-100 delay-0" : "scale-y-0 delay-500"
+    <>
+      <nav
+        className={`fixed top-0 z-50 w-full h-[72px] transition-colors duration-300 ${
+          isSolid ? "text-black delay-0" : "text-white"
         }`}
-      />
-
-      {/* Wrapping content to keep padding structure intact */}
-      <div className="w-full h-full px-6 lg:px-12 flex items-center justify-between">
-        {/* Left side links with hover wrapper for mega menu */}
+      >
+        {/* Top-to-Bottom White Background Animation Layer */}
         <div
-          className="flex items-center gap-8 md:flex w-[250px] h-full"
-          onMouseLeave={() => setActiveMenu(null)}
-        >
-          {NAV_ITEMS.map((item) => (
+          className={`absolute inset-0 bg-white origin-top transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] -z-10 ${
+            isSolid ? "scale-y-100 delay-0" : "scale-y-0 delay-500"
+          }`}
+        />
+
+        {/* Wrapping content to keep padding structure intact */}
+        <div className="w-full h-full px-6 lg:px-12 flex items-center justify-between">
+          {/* Left side links with hover wrapper for mega menu */}
+          <div
+            className="flex items-center gap-8 md:flex w-[250px] h-full"
+            onMouseLeave={() => setActiveMenu(null)}
+          >
+            {NAV_ITEMS.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center h-full cursor-pointer"
+                onMouseEnter={() => setActiveMenu(item.id)}
+              >
+                <Link
+                  href={`/${item.id}`}
+                  className={`text-[11px] font-semibold transition-opacity ${
+                    activeMenu === item.id ? "opacity-70" : "hover:opacity-70"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              </div>
+            ))}
+
+            {/* Dynamic Mega Menu Dropdown */}
             <div
-              key={item.id}
-              className="flex items-center h-full cursor-pointer"
-              onMouseEnter={() => setActiveMenu(item.id)}
+              className={`absolute top-[72px] left-0 w-full cursor-default ${
+                activeMenu !== null
+                  ? "pointer-events-auto"
+                  : "pointer-events-none"
+              }`}
             >
-              <Link
-                href={`/${item.id}`}
-                className={`text-[11px] font-semibold transition-opacity ${
-                  activeMenu === item.id ? "opacity-70" : "hover:opacity-70"
+              {/* Top-to-Bottom Sliding Background Layer for Mega Menu */}
+              <div
+                className={`absolute inset-0 bg-white border-t border-gray-100 origin-top transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] -z-10 ${
+                  activeMenu !== null
+                    ? `scale-y-100 shadow-xl ${!scrolled ? "delay-300" : "delay-0"}`
+                    : "scale-y-0 shadow-none delay-200"
+                }`}
+              />
+
+              {/* Mega menu content max width to match navbar flow, fading in on delay */}
+              <div
+                className={`flex justify-between px-6 lg:px-12 py-10 w-full max-w-[1600px] mx-auto transition-opacity duration-300 ${
+                  activeMenu !== null
+                    ? `opacity-100 ${!scrolled ? "delay-600" : "delay-300"}`
+                    : "opacity-0 delay-0"
                 }`}
               >
-                {item.label}
-              </Link>
-            </div>
-          ))}
+                {/* Left: Mega Menu Categories */}
+                <div className="flex flex-col gap-6 min-w-[250px]">
+                  {currentMenuData.categories.map((category) => (
+                    <Link
+                      key={category}
+                      href={`/collections/${category.toLowerCase().replace(/ /g, "-")}`}
+                      className="text-[15px] font-medium tracking-wide text-gray-800 hover:text-black hover:translate-x-1 transition-transform"
+                    >
+                      {category}
+                    </Link>
+                  ))}
+                </div>
 
-          {/* Dynamic Mega Menu Dropdown */}
-          <div
-            className={`absolute top-[72px] left-0 w-full cursor-default ${
-              activeMenu !== null
-                ? "pointer-events-auto"
-                : "pointer-events-none"
-            }`}
-          >
-            {/* Top-to-Bottom Sliding Background Layer for Mega Menu */}
-            <div
-              className={`absolute inset-0 bg-white border-t border-gray-100 origin-top transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] -z-10 ${
-                activeMenu !== null
-                  ? `scale-y-100 shadow-xl ${!scrolled ? "delay-300" : "delay-0"}`
-                  : "scale-y-0 shadow-none delay-200"
-              }`}
-            />
-
-            {/* Mega menu content max width to match navbar flow, fading in on delay */}
-            <div
-              className={`flex justify-between px-6 lg:px-12 py-10 w-full max-w-[1600px] mx-auto transition-opacity duration-300 ${
-                activeMenu !== null
-                  ? `opacity-100 ${!scrolled ? "delay-600" : "delay-300"}`
-                  : "opacity-0 delay-0"
-              }`}
-            >
-              {/* Left: Mega Menu Categories */}
-              <div className="flex flex-col gap-6 min-w-[250px]">
-                {currentMenuData.categories.map((category) => (
-                  <Link
-                    key={category}
-                    href={`/collections/${category.toLowerCase().replace(/ /g, "-")}`}
-                    className="text-[15px] font-medium tracking-wide text-gray-800 hover:text-black hover:translate-x-1 transition-transform"
-                  >
-                    {category}
-                  </Link>
-                ))}
-              </div>
-
-              {/* Right: Featured Products Placeholder Grid */}
-              <div className="flex gap-6">
-                {currentMenuData.products.map((product, idx) => (
-                  <div key={idx} className="w-[200px] group cursor-pointer">
-                    <div className="aspect-4/5 bg-gray-100 relative overflow-hidden mb-4 rounded-sm">
-                      {/* Place image here if available */}
-                      <div className="absolute inset-0 bg-gray-200 transition-transform duration-500 group-hover:scale-105"></div>
+                {/* Right: Featured Products Placeholder Grid */}
+                <div className="flex gap-6">
+                  {currentMenuData.products.map((product, idx) => (
+                    <div key={idx} className="w-[200px] group cursor-pointer">
+                      <div className="aspect-4/5 bg-gray-100 relative overflow-hidden mb-4 rounded-sm">
+                        {/* Place image here if available */}
+                        <div className="absolute inset-0 bg-gray-200 transition-transform duration-500 group-hover:scale-105"></div>
+                      </div>
+                      <h3 className="text-[13px] font-medium leading-relaxed text-gray-900 line-clamp-2 group-hover:underline">
+                        {product.title}
+                      </h3>
+                      <p className="text-[13px] text-gray-500 mt-1">
+                        {product.price}
+                      </p>
                     </div>
-                    <h3 className="text-[13px] font-medium leading-relaxed text-gray-900 line-clamp-2 group-hover:underline">
-                      {product.title}
-                    </h3>
-                    <p className="text-[13px] text-gray-500 mt-1">
-                      {product.price}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Center Logo */}
-        <div className="flex items-center justify-center">
-          <Link href="/">
-            <Image
-              src="/images/logo.png"
-              alt="Xiroo Shop Logo"
-              width={130}
-              height={130}
-              className={`transition-all duration-300 ${
-                isSolid ? "delay-0" : "brightness-0 invert delay-500"
-              }`}
-            />
-          </Link>
-        </div>
+          {/* Center Logo */}
+          <div className="flex items-center justify-center">
+            <Link href="/">
+              <Image
+                src="/images/logo.png"
+                alt="Xiroo Shop Logo"
+                width={130}
+                height={130}
+                className={`transition-all duration-300 ${
+                  isSolid ? "delay-0" : "brightness-0 invert delay-500"
+                }`}
+              />
+            </Link>
+          </div>
 
-        {/* Right side actions */}
-        <div className="flex items-center justify-end gap-6 w-[250px]">
-          <button
-            className="hover:opacity-70 transition-opacity"
-            aria-label="Search"
-          >
-            <Search className="w-[18px] h-[18px] stroke-[1.5]" />
-          </button>
-
-          <button
-            className="hover:opacity-70 transition-opacity"
-            aria-label="Shopping Bag"
-            onClick={() => setIsCartOpen(true)}
-          >
-            <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
-          </button>
-
-          {isLoggedIn && currentUser ? (
-            <button
-              className={`flex items-center justify-center size-7 rounded-full font-medium text-[11px] tracking-wider transition-colors duration-300 ${
-                isSolid
-                  ? "bg-black text-white hover:bg-gray-800 delay-0"
-                  : "bg-white text-black hover:bg-gray-300 delay-500"
-              }`}
-              aria-label="User Account"
+          {/* Right side actions */}
+          <div className="flex items-center justify-end gap-3 md:gap-6 w-[250px]">
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
+              className="hover:bg-transparent! transition-all duration-300 text-inherit!"
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}
             >
-              {`${currentUser.firstName.charAt(0)}${currentUser.lastName.charAt(0)}`.toUpperCase()}
-            </button>
-          ) : (
-            <button
-              className="hover:opacity-70 transition-opacity"
-              aria-label="User Account"
+              <Search className="w-[18px] h-[18px] stroke-[1.5]" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
+              className="hover:bg-transparent! transition-all duration-300 text-inherit!"
+              aria-label="Shopping Bag"
+              onClick={() => setIsCartOpen(true)}
             >
-              <User className="w-[18px] h-[18px] stroke-[1.5]" />
-            </button>
-          )}
+              <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
+            </Button>
+
+            {isLoggedIn && currentUser ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                showHoverIcon={false}
+                className={`flex items-center justify-center size-7 rounded-full font-bold text-[10px] tracking-wider transition-all duration-300 ${
+                  isSolid
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-white text-black hover:bg-gray-300"
+                }`}
+                aria-label="User Account"
+                onClick={() => setIsUserOpen(true)}
+              >
+                {`${currentUser.firstName.charAt(0)}${currentUser.lastName.charAt(0)}`.toUpperCase()}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                showHoverIcon={false}
+                className="hover:bg-transparent! transition-all duration-300 text-inherit!"
+                aria-label="User Account"
+                onClick={() => setIsUserOpen(true)}
+              >
+                <User className="w-[18px] h-[18px] stroke-[1.5]" />
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </nav>
 
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-    </nav>
+      <SearchOverlay
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
+      <UserAccountDrawer
+        isOpen={isUserOpen}
+        onClose={() => setIsUserOpen(false)}
+      />
+    </>
   );
 }

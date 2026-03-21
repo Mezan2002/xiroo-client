@@ -1,6 +1,7 @@
 "use client";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import ProductCard from "@/components/ui/ProductCard";
+import { Button } from "@/components/ui/Button";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -235,7 +236,10 @@ export default function CategoryView({ category }) {
 
           {/* Active Filters Clear Button */}
           {isFiltering && (
-            <button
+            <Button
+              variant="link"
+              size="sm"
+              showHoverIcon={false}
               onClick={() => {
                 setSearchQuery("");
                 setInStockOnly(false);
@@ -243,10 +247,10 @@ export default function CategoryView({ category }) {
                 setMinPrice("");
                 setMaxPrice("");
               }}
-              className="mt-2 text-left text-[10px] text-black uppercase tracking-widest font-bold underline underline-offset-4 decoration-1 hover:text-gray-500 transition-colors w-fit"
+              className="mt-2 text-left text-[10px] text-zinc-400 hover:text-black transition-colors w-fit underline underline-offset-4"
             >
               Clear Filters
-            </button>
+            </Button>
           )}
         </div>
 
@@ -272,7 +276,8 @@ export default function CategoryView({ category }) {
               <p className="text-[11px] font-medium text-gray-500 tracking-wider mb-6">
                 Modify your active constraints to discover more products.
               </p>
-              <button
+              <Button
+                variant="primary"
                 onClick={() => {
                   setSearchQuery("");
                   setInStockOnly(false);
@@ -280,10 +285,10 @@ export default function CategoryView({ category }) {
                   setMinPrice("");
                   setMaxPrice("");
                 }}
-                className="text-[10px] font-bold px-8 py-3 border border-black bg-black text-white hover:bg-white hover:text-black transition-colors uppercase tracking-widest"
+                className="mt-4"
               >
                 Clear Sidebar Filters
-              </button>
+              </Button>
             </div>
           )}
         </div>

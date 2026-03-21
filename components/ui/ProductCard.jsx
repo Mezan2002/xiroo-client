@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/Button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -59,49 +61,39 @@ export default function ProductCard({ id, title, price, image, hoverImage }) {
           {/* Navigation Arrows */}
           {hasMultipleImages && (
             <>
-              <button
+              <Button
+                variant="white"
+                size="icon"
+                showHoverIcon={false}
                 onClick={prevImage}
-                className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 hover:text-black transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center justify-center bg-white/50 hover:bg-white rounded-full p-2 backdrop-blur-sm ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
+                className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-full border-none shadow-sm backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                  isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                }`}
                 aria-label="Previous image"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
+                <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+              </Button>
+              <Button
+                variant="white"
+                size="icon"
+                showHoverIcon={false}
                 onClick={nextImage}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 hover:text-black transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center justify-center bg-white/50 hover:bg-white rounded-full p-2 backdrop-blur-sm ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"}`}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-full border-none shadow-sm backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                  isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+                }`}
                 aria-label="Next image"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </button>
+                <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+              </Button>
             </>
           )}
         </div>
 
         {/* Floating Cart Button Inside Image Bounds */}
-        <button
-          className="absolute right-3 bottom-3 md:bottom-4 h-[34px] md:h-[36px] w-max max-w-[34px] md:max-w-[36px] hover:max-w-[128px] overflow-hidden bg-white/60 backdrop-blur-md border-2 border-gray-500/50 rounded-full flex items-center shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:bg-white/95 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] z-20 group/btn"
+        <Button
+          variant="white"
+          showHoverIcon={false}
+          className="absolute right-3 bottom-3 md:bottom-4 h-[34px] md:h-[36px] w-max max-w-[34px] md:max-w-[36px] hover:max-w-[128px] overflow-hidden bg-white/60 backdrop-blur-md border border-gray-200 rounded-full flex items-center shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:bg-white/95 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] z-20 px-0 group/btn"
           aria-label="Add to cart"
           onClick={(e) => {
             e.preventDefault();
@@ -123,7 +115,7 @@ export default function ProductCard({ id, title, price, image, hoverImage }) {
           <span className="whitespace-nowrap text-[9px] md:text-[10px] font-bold tracking-[0.14em] text-black pr-4 opacity-0 -translate-x-3 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
             {buttonText}
           </span>
-        </button>
+        </Button>
       </div>
 
       {/* Details Area */}

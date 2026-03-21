@@ -190,21 +190,27 @@ export default function ProductInfo({ product, cartRef }) {
             Adjust Quantity
           </div>
           <div className="flex items-center border border-gray-300 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               className="w-10 md:w-12 h-[38px] md:h-12 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-50 transition-colors"
             >
               <Minus size={14} />
-            </button>
+            </Button>
             <div className="w-10 md:w-14 h-[38px] md:h-12 flex items-center justify-center border-l border-r border-gray-200 text-black text-[13px] font-bold tracking-widest">
               {quantity < 10 ? `0${quantity}` : quantity}
             </div>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
               onClick={() => setQuantity(quantity + 1)}
               className="w-10 md:w-12 h-[38px] md:h-12 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-50 transition-colors"
             >
               <Plus size={14} />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -281,13 +287,15 @@ export default function ProductInfo({ product, cartRef }) {
       <div ref={cartRef} className="flex flex-col gap-3 w-full mb-10">
         <Button
           variant="primary"
-          className="w-full h-[52px] text-[13px] font-bold tracking-widest bg-black text-white hover:bg-gray-900 transition-colors shadow-lg shadow-black/10"
+          size="lg"
+          className="w-full shadow-lg shadow-black/10"
         >
           ADD TO CART
         </Button>
         <Button
           variant="outline"
-          className="w-full h-[52px] text-[13px] font-bold tracking-widest border border-gray-300 bg-white hover:bg-gray-50 transition-colors text-black"
+          size="lg"
+          className="w-full shadow-sm"
         >
           BUY IT NOW
         </Button>
@@ -296,24 +304,28 @@ export default function ProductInfo({ product, cartRef }) {
       {/* Product Details Tabs (Description & Specifications) */}
       <div className="w-full mt-2 flex flex-col bg-white">
         <div className="flex items-center gap-6 md:gap-10 border-b-2 border-gray-100">
-          <button
+          <Button
+            variant="ghost"
+            showHoverIcon={false}
             onClick={() => setActiveTab("description")}
-            className={`pb-3 text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative ${activeTab === "description" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
+            className={`pb-3 rounded-none text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative h-auto px-0 hover:bg-transparent ${activeTab === "description" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
           >
             Description
             {activeTab === "description" && (
               <div className="absolute bottom-[-2px] left-0 w-full h-[2px] bg-black"></div>
             )}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            showHoverIcon={false}
             onClick={() => setActiveTab("specifications")}
-            className={`pb-3 text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative ${activeTab === "specifications" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
+            className={`pb-3 rounded-none text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative h-auto px-0 hover:bg-transparent ${activeTab === "specifications" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
           >
             Specifications
             {activeTab === "specifications" && (
               <div className="absolute bottom-[-2px] left-0 w-full h-[2px] bg-black"></div>
             )}
-          </button>
+          </Button>
         </div>
 
         <div className="pt-6 pb-12 w-full">

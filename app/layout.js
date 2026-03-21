@@ -1,10 +1,13 @@
-import Footer from "@/components/shared/Footer";
-import { Navbar } from "@/components/shared/Navbar";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -16,13 +19,13 @@ export const metadata = {
   },
 };
 
+import ConditionalLayout from "@/components/shared/ConditionalLayout";
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${montserrat.variable} antialiased`}>
-      <body className="flex flex-col min-h-screen selection:bg-black selection:text-white">
-        <Navbar />
-        <main className="grow">{children}</main>
-        <Footer />
+    <html lang="en" className={`${montserrat.variable} ${playfair.variable} antialiased`}>
+      <body className="min-h-screen selection:bg-black selection:text-white">
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

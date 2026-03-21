@@ -150,20 +150,26 @@ function PhotoLightbox({ photos, initialIndex, onClose }) {
       className="fixed inset-0 z-10000 bg-black/90 backdrop-blur-md flex items-center justify-center pt-24 pb-12 px-6 md:px-12"
       onClick={onClose}
     >
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
+        showHoverIcon={false}
         onClick={onClose}
-        className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2"
+        className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2 h-auto w-auto"
       >
         <X size={28} />
-      </button>
+      </Button>
 
       {/* Prev */}
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
+        showHoverIcon={false}
         onClick={handlePrev}
         className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors"
       >
         <ChevronLeft size={24} />
-      </button>
+      </Button>
 
       {/* Main Image */}
       <div
@@ -179,12 +185,15 @@ function PhotoLightbox({ photos, initialIndex, onClose }) {
       </div>
 
       {/* Next */}
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
+        showHoverIcon={false}
         onClick={handleNext}
         className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors"
       >
         <ChevronRight size={24} />
-      </button>
+      </Button>
 
       {/* Counter */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[11px] font-black tracking-[0.3em] uppercase text-white/40">
@@ -316,12 +325,15 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
         <div className="flex flex-col flex-1 p-7 overflow-y-auto">
           <div className="flex items-start justify-between mb-5">
             <Stars count={review.rating} size={14} />
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
+              showHoverIcon={false}
               onClick={onClose}
-              className="text-gray-400 hover:text-black transition-colors p-1 -mt-1 -mr-1"
+              className="text-gray-400 hover:text-black transition-colors p-1 -mt-1 -mr-1 h-auto w-auto"
             >
               <X size={18} />
-            </button>
+            </Button>
           </div>
 
           <h3 className="text-[22px] font-black text-black leading-snug mb-4 tracking-tight">
@@ -350,21 +362,25 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
 
           {/* Prev / Next */}
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-            <button
+            <Button
+              variant="ghost"
+              showHoverIcon={false}
               onClick={onPrev}
-              className="flex items-center gap-1 text-[11px] font-black text-gray-400 hover:text-black transition-colors uppercase tracking-wider"
+              className="flex items-center gap-1 text-[11px] font-black text-gray-400 hover:text-black transition-colors uppercase tracking-wider h-auto px-0 hover:bg-transparent"
             >
               <ChevronLeft size={14} /> Prev
-            </button>
+            </Button>
             <span className="text-[10px] text-gray-300 font-bold tracking-widest uppercase">
               Review
             </span>
-            <button
+            <Button
+              variant="ghost"
+              showHoverIcon={false}
               onClick={onNext}
-              className="flex items-center gap-1 text-[11px] font-black text-gray-400 hover:text-black transition-colors uppercase tracking-wider"
+              className="flex items-center gap-1 text-[11px] font-black text-gray-400 hover:text-black transition-colors uppercase tracking-wider h-auto px-0 hover:bg-transparent"
             >
               Next <ChevronRight size={14} />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -424,12 +440,15 @@ function ReviewFormModal({ onClose }) {
               Share your honest experience
             </p>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
+            showHoverIcon={false}
             onClick={onClose}
-            className="text-gray-400 hover:text-black transition-colors"
+            className="text-gray-400 hover:text-black transition-colors h-auto w-auto"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         {submitted ? (
@@ -441,12 +460,15 @@ function ReviewFormModal({ onClose }) {
             <p className="text-[13px] text-gray-500">
               Your review has been submitted for moderation.
             </p>
-            <button
+            <Button
+              variant="link"
+              size="sm"
+              showHoverIcon={false}
               onClick={onClose}
-              className="mt-4 text-[11px] font-black tracking-widest uppercase underline underline-offset-4 text-gray-400 hover:text-black transition-colors"
+              className="mt-4 text-gray-400 hover:text-black"
             >
               Close
-            </button>
+            </Button>
           </div>
         ) : (
           <form
@@ -460,13 +482,16 @@ function ReviewFormModal({ onClose }) {
               </label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <button
+                  <Button
                     key={i}
                     type="button"
+                    variant="ghost"
+                    size="icon"
+                    showHoverIcon={false}
                     onMouseEnter={() => setHoveredRating(i)}
                     onMouseLeave={() => setHoveredRating(0)}
                     onClick={() => setRating(i)}
-                    className="p-1"
+                    className="p-1 h-auto w-auto hover:bg-transparent"
                   >
                     <Star
                       size={24}
@@ -478,7 +503,7 @@ function ReviewFormModal({ onClose }) {
                           : "text-gray-300"
                       }
                     />
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -566,18 +591,23 @@ function ReviewFormModal({ onClose }) {
                       alt=""
                       className="w-full h-full object-cover"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      showHoverIcon={false}
                       onClick={() => removeImage(idx)}
-                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-0 h-auto w-auto hover:bg-black/60"
                     >
                       <X size={14} className="text-white" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
                 {imageFiles.length < 6 && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    showHoverIcon={false}
                     onClick={() => fileInputRef.current?.click()}
                     className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-[4px] flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-black hover:text-black transition-colors"
                   >
@@ -585,7 +615,7 @@ function ReviewFormModal({ onClose }) {
                     <span className="text-[8px] font-black tracking-wider">
                       ADD
                     </span>
-                  </button>
+                  </Button>
                 )}
               </div>
               <input
@@ -598,11 +628,13 @@ function ReviewFormModal({ onClose }) {
               />
             </div>
 
-            <Button>
-              <div className="flex items-center gap-2">
-                <Send size={14} />
-                Submit Review
-              </div>
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full"
+              icon={<Send size={14} />}
+            >
+              Submit Review
             </Button>
           </form>
         )}
@@ -643,10 +675,12 @@ export default function ProductReviews() {
             </h2>
           </div>
           <Button
+            variant="primary"
+            size="lg"
             onClick={() => setShowForm(true)}
-            className="h-[44px] px-8 bg-black text-white text-[11px] font-black tracking-widest hover:bg-gray-900 transition-colors rounded-none self-start md:self-auto shrink-0"
+            className="self-start md:self-auto shrink-0"
           >
-            Write a Review <ArrowRight size={13} className="ml-2 inline" />
+            Write a Review
           </Button>
         </div>
 
@@ -747,16 +781,18 @@ export default function ProductReviews() {
 
         {/* ── View all / Load more ── */}
         <div className={`flex justify-center ${showAll ? "mt-4" : "mt-8"}`}>
-          <button
+          <Button
+            variant="ghost"
+            showHoverIcon={false}
             onClick={() => setShowAll(!showAll)}
-            className="group flex items-center gap-3 text-[12px] font-black tracking-widest uppercase text-black hover:text-gray-500 transition-colors"
+            className="group flex items-center gap-3 text-[12px] font-black tracking-widest uppercase text-black hover:text-gray-500 transition-colors h-auto p-0 hover:bg-transparent"
           >
             {showAll ? "Show less" : "View all 104 reviews"}
             <ArrowRight
               size={14}
               className={`transition-transform ${showAll ? "-rotate-90" : "group-hover:translate-x-1"}`}
             />
-          </button>
+          </Button>
         </div>
       </div>
 
