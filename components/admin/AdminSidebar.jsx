@@ -1,44 +1,46 @@
 "use client";
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { 
-  BarChart3, 
-  Palette, 
-  Package, 
-  Settings, 
-  Users, 
+import {
+  BarChart3,
+  ChevronDown,
+  Home,
+  Inbox,
+  Layers,
+  LayoutGrid,
+  LineChart,
+  Mail,
+  Package,
+  Palette,
+  Search,
+  Settings,
   ShieldCheck,
   ShoppingBag,
   Tag,
-  Mail,
-  LineChart,
-  Layers,
-  LayoutGrid,
-  Search,
-  Home,
-  Inbox,
-  ChevronDown,
-  Plus
+  Users,
+  Bell,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", icon: BarChart3 },
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Categories", href: "/admin/categories", icon: LayoutGrid },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Discounts", href: "/admin/discounts", icon: Tag },
   { label: "Newsletters", href: "/admin/newsletters", icon: Mail },
   { label: "Analytics", href: "/admin/analytics", icon: LineChart },
   { label: "Branding", href: "/admin/branding", icon: Palette },
   { label: "Store Layout", href: "/admin/layout", icon: Layers },
   { label: "Settings", href: "/admin/settings", icon: Settings },
-  { label: "Customers", href: "/admin/customers", icon: Users },
-  { label: "Security", href: "/admin/security", icon: ShieldCheck },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+
+  const handleOpenSearch = () => {
+    window.dispatchEvent(new CustomEvent('open-admin-search'));
+  };
 
   return (
     <aside className="w-64 h-screen bg-[#F7F7F5] border-r border-[#EDECE9] flex flex-col sticky top-0 shrink-0 select-none font-montserrat antialiased overflow-hidden">
@@ -50,10 +52,17 @@ export default function AdminSidebar() {
           </div>
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[13px] font-bold text-[#37352F] truncate">Xiroo HQ</span>
-              <ChevronDown size={12} className="text-[#37352F40] group-hover:text-[#37352F80] transition-colors" />
+              <span className="text-[13px] font-bold text-[#37352F] truncate">
+                Xiroo HQ
+              </span>
+              <ChevronDown
+                size={12}
+                className="text-[#37352F40] group-hover:text-[#37352F80] transition-colors"
+              />
             </div>
-            <span className="text-[10px] text-[#91918E] font-medium tracking-tight truncate">Commerce Hub</span>
+            <span className="text-[10px] text-[#91918E] font-medium tracking-tight truncate">
+              Commerce Hub
+            </span>
           </div>
         </div>
       </div>
@@ -61,24 +70,49 @@ export default function AdminSidebar() {
       {/* Primary Items */}
       <div className="px-3 space-y-px">
         {[
-          { icon: Search, label: "Search" },
-          { icon: Home, label: "Home", href: "/admin" },
-          { icon: Inbox, label: "Inbox", badge: 3 },
-        ].map((item, idx) => (
-          <Link
-            key={idx}
-            href={item.href || "#"}
-            className={`flex items-center gap-2.5 px-3 py-1 text-[14px] font-medium transition-all group rounded-md ${
-              pathname === item.href 
-                ? "bg-[#EBEBE9] text-[#37352F]" 
-                : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
-            }`}
-          >
-            <item.icon size={16} className={pathname === item.href ? "text-[#37352F]" : "text-[#37352F80]"} />
-            <span className="flex-1">{item.label}</span>
-            {item.badge && <span className="text-[11px] font-bold text-[#37352F40] mr-1">{item.badge}</span>}
-          </Link>
-        ))}
+          { icon: Search, label: "Search", onClick: handleOpenSearch },
+          { icon: Inbox, label: "Inbox", href: "/admin/inbox", badge: 2 },
+          { icon: Bell, label: "Notifications", href: "/admin/notifications", badge: 3 },
+        ].map((item, idx) => {
+          const Icon = item.icon;
+          const isActive = item.href && pathname === item.href;
+          
+          if (item.onClick) {
+            return (
+              <button
+                key={idx}
+                onClick={item.onClick}
+                className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-md text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] outline-none"
+              >
+                <Icon size={16} className="text-[#37352F80] group-hover:text-[#37352F]" />
+                <span className="flex-1 text-left">{item.label}</span>
+              </button>
+            );
+          }
+          
+          return (
+            <Link
+              key={idx}
+              href={item.href || "#"}
+              className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-md ${
+                isActive
+                  ? "bg-[#EBEBE9] text-[#37352F]"
+                  : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
+              }`}
+            >
+              <Icon
+                size={16}
+                className={isActive ? "text-[#37352F]" : "text-[#37352F80]"}
+              />
+              <span className="flex-1">{item.label}</span>
+              {item.badge && (
+                <span className="text-[11px] font-bold text-[#37352F40] mr-1">
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Main Navigation */}
@@ -89,21 +123,26 @@ export default function AdminSidebar() {
           </h4>
           <nav className="space-y-px">
             {NAV_ITEMS.map((item) => {
-              const isActive = (item.label === "Products" || item.label === "Orders")
-                ? (pathname === item.href || pathname?.startsWith(item.href + "/"))
-                : pathname === item.href;
+              const isActive =
+                item.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname === item.href ||
+                    pathname?.startsWith(item.href + "/");
               const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2.5 px-3 py-1 text-[14px] font-medium transition-all group rounded-md ${
-                    isActive 
-                      ? "bg-[#EBEBE9] text-[#37352F]" 
+                  className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-md ${
+                    isActive
+                      ? "bg-[#EBEBE9] text-[#37352F]"
                       : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
                   }`}
                 >
-                  <Icon size={16} className={isActive ? "text-[#37352F]" : "text-[#37352F80]"} />
+                  <Icon
+                    size={16}
+                    className={isActive ? "text-[#37352F]" : "text-[#37352F80]"}
+                  />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -114,7 +153,7 @@ export default function AdminSidebar() {
 
       {/* Footer / Back to Store */}
       <div className="px-3 py-4 border-t border-[#EDECE9]">
-        <Link 
+        <Link
           href="/"
           className="flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] rounded-md transition-all"
         >

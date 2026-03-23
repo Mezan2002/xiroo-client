@@ -33,28 +33,28 @@ export function Select({
   }, []);
 
   const variants = {
-    default: "bg-white border border-zinc-200 hover:border-black text-black",
+    default: "bg-white border border-gray-100 hover:border-black text-black",
     black: "bg-black text-white border-black hover:bg-zinc-800",
     ghost: "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50 border-transparent",
   };
 
   return (
-    <div ref={containerRef} className="relative inline-block w-full min-w-[160px]">
+    <div ref={containerRef} className="relative inline-block w-full">
       {/* Trigger */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center justify-between w-full h-12 px-5 
-          text-[11px] font-bold uppercase tracking-[0.2em]
+          flex items-center justify-between w-full h-14 px-6
+          text-[10px] font-bold uppercase tracking-[0.2em]
           transition-all duration-300 rounded-none outline-none
           ${variants[variant]}
           ${className}
         `}
       >
-        <div className="flex items-center gap-3 truncate mr-2">
+        <div className="flex items-center gap-3 truncate mr-2 text-left">
           {selectedOption?.icon && (
-            <selectedOption.icon size={14} strokeWidth={1.5} className="shrink-0 opacity-60" />
+            <selectedOption.icon size={14} strokeWidth={2} className="shrink-0" />
           )}
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
@@ -62,14 +62,14 @@ export function Select({
         </div>
         <ChevronDown 
           size={14} 
-          className={`shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} 
+          className={`shrink-0 transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`} 
         />
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 right-0 z-50 mt-1 bg-white border border-zinc-100 animate-in fade-in slide-in-from-top-2 duration-200 rounded-none overflow-hidden">
-          <div className="max-h-60 overflow-y-auto py-1">
+        <div className="absolute left-0 right-0 z-50 -mt-px bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden">
+          <div className="max-h-60 overflow-y-auto py-0">
             {options.map((option) => (
               <button
                 key={option.value}
@@ -79,23 +79,23 @@ export function Select({
                   setIsOpen(false);
                 }}
                 className={`
-                  flex items-center justify-between w-full px-5 py-3.5
+                  flex items-center justify-between w-full px-6 py-4
                   text-[10px] font-bold uppercase tracking-[0.2em] text-left
-                  transition-colors duration-150
-                  ${value === option.value ? "bg-zinc-50 text-black" : "text-zinc-400 hover:bg-zinc-50 hover:text-black"}
+                  transition-all duration-200 border-b border-gray-50 last:border-none
+                  ${value === option.value ? "bg-black text-white" : "text-zinc-400 hover:bg-gray-50 hover:text-black"}
                 `}
               >
                 <div className="flex items-center gap-3">
-                  {option.icon && <option.icon size={14} strokeWidth={1.5} />}
+                  {option.icon && <option.icon size={12} strokeWidth={2} />}
                   <span>{option.label}</span>
                 </div>
-                {value === option.value && <Check size={12} className="text-black" />}
+                {value === option.value && <Check size={12} className="text-white" />}
               </button>
             ))}
             {options.length === 0 && (
-              <div className="px-5 py-8 text-center bg-zinc-50/50">
-                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest italic">
-                  No options available
+              <div className="px-6 py-10 text-center">
+                <span className="text-[10px] font-bold text-zinc-200 uppercase tracking-widest">
+                  No options registry
                 </span>
               </div>
             )}

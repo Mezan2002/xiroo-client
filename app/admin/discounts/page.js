@@ -1,8 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
+import ConfirmModal from "@/components/admin/shared/ConfirmModal";
 import { Plus, Percent } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const MOCK_DISCOUNTS = [
   { id: 1, code: "XIROO20", type: "Percentage", value: "20%", usage: "142", expiry: "Apr 30, 2024", status: "Active" },
@@ -21,6 +23,26 @@ const COLUMNS = [
 ];
 
 export default function AdminDiscounts() {
+  const router = useRouter();
+  const [discounts, setDiscounts] = useState(MOCK_DISCOUNTS);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedDiscount, setSelectedDiscount] = useState(null);
+
+  const handleDelete = (row) => {
+    setSelectedDiscount(row);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    setDiscounts(prev => prev.filter(d => d.id !== selectedDiscount.id));
+    setIsDeleteModalOpen(false);
+    setSelectedDiscount(null);
+  };
+
+  const handleEdit = (row) => {
+    router.push(`/admin/discounts/${row.id}/edit`);
+  };
+
   return (
     <div className="space-y-6">
       <ModuleHeader 
@@ -33,13 +55,23 @@ export default function AdminDiscounts() {
         primaryAction={{
           label: "Create Coupon",
           icon: Plus,
-          onClick: () => console.log("Create Coupon")
+          onClick: () => router.push("/admin/discounts/new")
         }}
       />
       
       <DataTable 
         columns={COLUMNS}
-        data={MOCK_DISCOUNTS}
+        data={discounts}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <ConfirmModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Promotional Logic"
+        message={`Are you absolutely sure you want to delete the ${selectedDiscount?.code} coupon? This action will permanently remove the promotional rule from the registry.`}
       />
     </div>
   );
