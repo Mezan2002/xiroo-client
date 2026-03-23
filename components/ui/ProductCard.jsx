@@ -1,18 +1,31 @@
+"use client";
+
 import { Button } from "@/components/ui/Button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function ProductCard({ id, title, price, image, hoverImage }) {
+export default function ProductCard({
+  id,
+  title,
+  price,
+  image,
+  hoverImage,
+  showRemove = false,
+  onRemove = null,
+}) {
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = hoverImage ? [image, hoverImage] : [image];
-  // Determine variant string locally referencing IDs for demo rendering map
   const hasVariants = parseInt((id || "0").replace(/\D/g, "") || "0") % 2 !== 0;
   const buttonText = hasVariants ? "CHOOSE" : "ADD";
   const hasMultipleImages = images.length > 1;
+
+  // Format price to use BDT symbol if it currently uses $
+  const formattedPrice =
+    typeof price === "string" ? price.replace("$", "৳") : `৳${price}`;
 
   const nextImage = (e) => {
     e.preventDefault();
@@ -28,37 +41,52 @@ export default function ProductCard({ id, title, price, image, hoverImage }) {
 
   return (
     <div
-      className="group flex flex-col w-full relative"
+      className="group flex flex-col w-full relative font-montserrat"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
         setCurrentImageIndex(0);
       }}
     >
-      {/* Image Block wrapper to allow the button to overlap absolutely relative to this box */}
-      <div className="relative w-full mb-3">
-        {/* Aspect Ratio Box with overflow hidden for images ONLY */}
-        <div className="relative w-full aspect-4/5 sm:aspect-square md:aspect-4/5 bg-[#f8f8f8] overflow-hidden">
+      {/* Image Block wrapper */}
+      <div className="relative w-full mb-4 overflow-hidden bg-white border border-zinc-100 group-hover:border-zinc-200 transition-colors duration-500">
+        {/* Status Badge (Minimal Editorial) */}
+        {!showRemove && (
+          <div className="absolute top-0 left-0 z-30 px-2 py-1 bg-white border-r border-b border-zinc-100">
+            <p className="text-[8px] font-bold tracking-[0.2em] text-black uppercase">
+              NEW
+            </p>
+          </div>
+        )}
+
+        {/* Aspect Ratio Box Image ONLY */}
+        <div className="relative w-full aspect-4/5 sm:aspect-square md:aspect-4/5 overflow-hidden">
           <Link
             href={`/product/${id}`}
             className="absolute w-full h-full block"
           >
             {images.map((img, idx) => (
-              <Image
+              <div
                 key={idx}
-                src={img}
-                alt={`${title} view ${idx + 1}`}
-                fill
-                className={`object-cover object-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
-                  idx === currentImageIndex
-                    ? "opacity-100 scale-100"
-                    : "opacity-0 scale-[1.02]"
-                }`}
-              />
+                className="absolute inset-0 w-full h-full transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
+              >
+                <Image
+                  src={img}
+                  alt={`${title} view ${idx + 1}`}
+                  fill
+                  className={`object-cover object-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                    idx === currentImageIndex
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-[1.02]"
+                  }`}
+                />
+              </div>
             ))}
+            {/* Subtle overlay on hover */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.02] transition-colors duration-500" />
           </Link>
 
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows (Premium Minimalist) */}
           {hasMultipleImages && (
             <>
               <Button
@@ -66,68 +94,99 @@ export default function ProductCard({ id, title, price, image, hoverImage }) {
                 size="icon"
                 showHoverIcon={false}
                 onClick={prevImage}
-                className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-full border-none shadow-sm backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
-                  isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-none border-none bg-white/40 hover:bg-white/80 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+                  isHovered
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-2"
                 }`}
                 aria-label="Previous image"
               >
-                <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+                <ChevronLeft className="w-4 h-4 text-black stroke-[1.2]" />
               </Button>
               <Button
                 variant="white"
                 size="icon"
                 showHoverIcon={false}
                 onClick={nextImage}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-full border-none shadow-sm backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
-                  isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-none border-none bg-white/40 hover:bg-white/80 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+                  isHovered
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-2"
                 }`}
                 aria-label="Next image"
               >
-                <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+                <ChevronRight className="w-4 h-4 text-black stroke-[1.2]" />
               </Button>
             </>
           )}
+
+          {showRemove ? (
+            <Button
+              variant="white"
+              size="icon"
+              showHoverIcon={false}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onRemove?.(id);
+              }}
+              className="absolute right-0 top-0 z-20 size-8 md:size-10 rounded-none bg-white hover:bg-red-50 text-zinc-400 hover:text-red-500 border-l border-b border-zinc-100 transition-all duration-300"
+              aria-label="Remove from wishlist"
+            >
+              <Trash2 className="w-4 h-4 stroke-[1.2]" />
+            </Button>
+          ) : (
+            /* Minimalist Wishlist Button */
+            <button
+              className={`absolute right-3 top-3 z-20 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+                isHovered
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 -translate-y-2"
+              }`}
+              aria-label="Save to wishlist"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log(`Saved ${id} to wishlist`);
+              }}
+            >
+              <Heart className="w-4 h-4 text-black stroke-[1.2] hover:fill-black transition-all" />
+            </button>
+          )}
         </div>
 
-        {/* Floating Cart Button Inside Image Bounds */}
-        <Button
-          variant="white"
-          showHoverIcon={false}
-          className="absolute right-3 bottom-3 md:bottom-4 h-[34px] md:h-[36px] w-max max-w-[34px] md:max-w-[36px] hover:max-w-[128px] overflow-hidden bg-white/60 backdrop-blur-md border border-gray-200 rounded-full flex items-center shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:bg-white/95 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] z-20 px-0 group/btn"
-          aria-label="Add to cart"
+        {/* Integrated Quick Add Bar */}
+        <button
+          className={`absolute bottom-0 left-0 right-0 h-10 md:h-12 bg-black text-white text-[9px] md:text-[10px] font-bold tracking-[0.2em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-30 uppercase ${
+            isHovered
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0"
+          }`}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             console.log(`Added ${id} to cart`);
           }}
         >
-          <div className="w-[32px] md:w-[34px] h-full shrink-0 flex items-center justify-center">
-            <div className="relative size-[14px] -ml-0.5 md:size-[16px]">
-              <Image
-                src="/icon/add-to-cart.png"
-                alt="Add to cart"
-                fill
-                className="object-contain"
-              />
-            </div>
-          </div>
-
-          <span className="whitespace-nowrap text-[9px] md:text-[10px] font-bold tracking-[0.14em] text-black pr-4 opacity-0 -translate-x-3 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
-            {buttonText}
-          </span>
-        </Button>
+          {buttonText} TO CART
+        </button>
       </div>
 
-      {/* Details Area */}
-      <div className="flex flex-col pr-12 text-left relative z-10 bg-white pt-1">
-        <Link href={`/product/${id}`}>
-          <h3 className="text-[10px] md:text-[11px] font-semibold text-[#111] tracking-[0.05em] uppercase leading-[1.4] mb-1 line-clamp-3 group-hover:text-black transition-colors hover:underline underline-offset-4 decoration-1">
+      {/* Details Area (Editorial Layout) */}
+      <div className="flex flex-col text-left relative z-10">
+        <Link href={`/product/${id}`} className="group/title">
+          <h3 className="text-[10px] md:text-[11px] font-medium text-black tracking-[0.12em] uppercase leading-[1.6] mb-1 line-clamp-2 transition-colors duration-300 group-hover/title:text-zinc-500">
             {title}
           </h3>
         </Link>
-        <span className="text-[10px] md:text-[11px] text-[#444] font-medium tracking-wide">
-          {price}
-        </span>
+        <div className="flex items-center justify-between border-t border-zinc-100 pt-2.5 mt-1">
+          <span className="text-[10px] md:text-[11px] text-black font-semibold tracking-wider">
+            {formattedPrice}
+          </span>
+          <span className="text-[8px] text-zinc-400 font-medium tracking-[0.15em] uppercase">
+            Limited
+          </span>
+        </div>
       </div>
     </div>
   );

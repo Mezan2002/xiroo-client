@@ -196,7 +196,7 @@ function PhotoLightbox({ photos, initialIndex, onClose }) {
       </Button>
 
       {/* Counter */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[11px] font-black tracking-[0.3em] uppercase text-white/40">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[11px] font-semibold tracking-[0.3em] uppercase text-white/40">
         {index + 1} <span className="mx-2">/</span> {photos.length}
       </div>
     </div>
@@ -224,7 +224,7 @@ function ReviewCard({ review, onClick, variant = "light" }) {
           <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-2">
             <Stars count={review.rating} size={11} />
-            <h3 className="text-[14px] md:text-[16px] font-black text-white leading-tight">
+            <h3 className="text-[14px] md:text-[16px] font-semibold text-white leading-tight">
               &ldquo;{review.title}&rdquo;
             </h3>
             <p className="text-[10px] text-white/50 tracking-wide uppercase font-bold">
@@ -249,14 +249,14 @@ function ReviewCard({ review, onClick, variant = "light" }) {
               <Stars count={review.rating} size={13} />
               {review.verified && (
                 <span
-                  className={`text-[8px] font-black tracking-widest uppercase border px-2 py-[2px] ${isBlack ? "border-white/20 text-white/40" : "border-gray-200 text-gray-400"}`}
+                  className={`text-[8px] font-semibold tracking-widest uppercase border px-2 py-[2px] ${isBlack ? "border-white/20 text-white/40" : "border-gray-200 text-gray-400"}`}
                 >
                   Verified
                 </span>
               )}
             </div>
             <h3
-              className={`text-[16px] md:text-[18px] font-black leading-snug ${isBlack ? "text-white" : "text-black"}`}
+              className={`text-[16px] md:text-[18px] font-semibold leading-snug ${isBlack ? "text-white" : "text-black"}`}
             >
               &ldquo;{review.title}&rdquo;
             </h3>
@@ -269,13 +269,13 @@ function ReviewCard({ review, onClick, variant = "light" }) {
               className={`flex items-center gap-2 pt-4 border-t ${isBlack ? "border-white/10" : "border-gray-200"}`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black ${isBlack ? "bg-white text-black" : "bg-black text-white"}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold ${isBlack ? "bg-white text-black" : "bg-black text-white"}`}
               >
                 {review.name.charAt(0)}
               </div>
               <div className="flex flex-col">
                 <span
-                  className={`text-[12px] font-black ${isBlack ? "text-white" : "text-black"}`}
+                  className={`text-[12px] font-semibold ${isBlack ? "text-white" : "text-black"}`}
                 >
                   {review.name}
                 </span>
@@ -336,7 +336,7 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
             </Button>
           </div>
 
-          <h3 className="text-[22px] font-black text-black leading-snug mb-4 tracking-tight">
+          <h3 className="text-[22px] font-semibold text-black leading-snug mb-4 tracking-tight">
             &ldquo;{review.title}&rdquo;
           </h3>
           <p className="text-[13px] text-gray-500 leading-[1.9] flex-1">
@@ -344,17 +344,17 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
           </p>
 
           <div className="flex items-center gap-3 mt-6 pt-5 border-t border-gray-100">
-            <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-[12px] font-black shrink-0">
+            <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-[12px] font-semibold shrink-0">
               {review.name.charAt(0)}
             </div>
             <div className="flex-1">
-              <p className="text-[13px] font-black text-black">{review.name}</p>
+              <p className="text-[13px] font-semibold text-black">{review.name}</p>
               <p className="text-[11px] text-gray-400">
                 {review.location} · {review.date}
               </p>
             </div>
             {review.verified && (
-              <span className="text-[9px] font-black tracking-widest border border-gray-200 text-gray-400 px-2 py-1 uppercase">
+              <span className="text-[9px] font-semibold tracking-widest border border-gray-200 text-gray-400 px-2 py-1 uppercase">
                 Verified
               </span>
             )}
@@ -366,7 +366,7 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
               variant="ghost"
               showHoverIcon={false}
               onClick={onPrev}
-              className="flex items-center gap-1 text-[11px] font-black text-gray-400 hover:text-black transition-colors uppercase tracking-wider h-auto px-0 hover:bg-transparent"
+              className="flex items-center gap-1 text-[11px] font-semibold text-gray-400 hover:text-black transition-colors uppercase tracking-wider h-auto px-0 hover:bg-transparent"
             >
               <ChevronLeft size={14} /> Prev
             </Button>
@@ -377,7 +377,7 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
               variant="ghost"
               showHoverIcon={false}
               onClick={onNext}
-              className="flex items-center gap-1 text-[11px] font-black text-gray-400 hover:text-black transition-colors uppercase tracking-wider h-auto px-0 hover:bg-transparent"
+              className="flex items-center gap-1 text-[11px] font-semibold text-gray-400 hover:text-black transition-colors uppercase tracking-wider h-auto px-0 hover:bg-transparent"
             >
               Next <ChevronRight size={14} />
             </Button>
@@ -433,7 +433,7 @@ function ReviewFormModal({ onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-7 pt-6 pb-5 border-b border-gray-100">
           <div>
-            <h3 className="text-[15px] font-black text-black tracking-tight">
+            <h3 className="text-[15px] font-semibold text-black tracking-tight">
               Write a Review
             </h3>
             <p className="text-[11px] text-gray-400 mt-1">
@@ -456,7 +456,7 @@ function ReviewFormModal({ onClose }) {
             <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center">
               <Star size={22} className="text-white" fill="currentColor" />
             </div>
-            <h4 className="text-[18px] font-black text-black">Thank you!</h4>
+            <h4 className="text-[18px] font-semibold text-black">Thank you!</h4>
             <p className="text-[13px] text-gray-500">
               Your review has been submitted for moderation.
             </p>
@@ -477,7 +477,7 @@ function ReviewFormModal({ onClose }) {
           >
             {/* Star picker */}
             <div>
-              <label className="text-[10px] font-black tracking-widest uppercase text-gray-400 block mb-2">
+              <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">
                 Your Rating *
               </label>
               <div className="flex gap-2">
@@ -511,7 +511,7 @@ function ReviewFormModal({ onClose }) {
             {/* Name + email */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-black tracking-widest uppercase text-gray-400 block mb-2">
+                <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">
                   Name *
                 </label>
                 <input
@@ -526,7 +526,7 @@ function ReviewFormModal({ onClose }) {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-black tracking-widest uppercase text-gray-400 block mb-2">
+                <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">
                   Email
                 </label>
                 <input
@@ -543,7 +543,7 @@ function ReviewFormModal({ onClose }) {
 
             {/* Title */}
             <div>
-              <label className="text-[10px] font-black tracking-widest uppercase text-gray-400 block mb-2">
+              <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">
                 Review Title
               </label>
               <input
@@ -559,7 +559,7 @@ function ReviewFormModal({ onClose }) {
 
             {/* Body */}
             <div>
-              <label className="text-[10px] font-black tracking-widest uppercase text-gray-400 block mb-2">
+              <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">
                 Your Review *
               </label>
               <textarea
@@ -576,7 +576,7 @@ function ReviewFormModal({ onClose }) {
 
             {/* Image upload */}
             <div>
-              <label className="text-[10px] font-black tracking-widest uppercase text-gray-400 block mb-2">
+              <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">
                 Add Photos (up to 6)
               </label>
               <div className="flex flex-wrap gap-2">
@@ -612,7 +612,7 @@ function ReviewFormModal({ onClose }) {
                     className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-[4px] flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-black hover:text-black transition-colors"
                   >
                     <ImagePlus size={18} />
-                    <span className="text-[8px] font-black tracking-wider">
+                    <span className="text-[8px] font-semibold tracking-wider">
                       ADD
                     </span>
                   </Button>
@@ -668,7 +668,7 @@ export default function ProductReviews() {
         {/* ── Top row ── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <h2 className="text-[32px] md:text-[44px] font-black tracking-tight text-black leading-none">
+            <h2 className="text-[32px] md:text-[44px] font-semibold tracking-tight text-black leading-none">
               What customers
               <br />
               <em className="not-italic text-gray-300">are saying</em>
@@ -785,7 +785,7 @@ export default function ProductReviews() {
             variant="ghost"
             showHoverIcon={false}
             onClick={() => setShowAll(!showAll)}
-            className="group flex items-center gap-3 text-[12px] font-black tracking-widest uppercase text-black hover:text-gray-500 transition-colors h-auto p-0 hover:bg-transparent"
+            className="group flex items-center gap-3 text-[12px] font-semibold tracking-widest uppercase text-black hover:text-gray-500 transition-colors h-auto p-0 hover:bg-transparent"
           >
             {showAll ? "Show less" : "View all 104 reviews"}
             <ArrowRight

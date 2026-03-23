@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
         <>
           {/* Heading Section */}
           <div className="mb-14 text-center lg:text-left">
-            <h1 className="text-[44px] lg:text-[56px] font-playfair font-medium leading-[1.1] mb-4 tracking-tight">
+            <h1 className="text-[44px] lg:text-[56px] font-montserrat font-semibold leading-[1.1] mb-4 tracking-tight">
               Recover <br />
               <span className="italic font-bold">Access</span>
             </h1>
@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-12">
             <div className="space-y-2 group">
-              <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+              <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
                 Email Identity
               </label>
               <div className="relative">
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
           <div className="w-20 h-20 bg-[#FDFCFB] rounded-none flex items-center justify-center mb-10 border border-zinc-800/20 mx-auto lg:mx-0 shadow-xl shadow-zinc-800/5">
             <Mail className="w-8 h-8 text-black stroke-1" />
           </div>
-          <h2 className="text-[44px] lg:text-[56px] font-playfair font-medium tracking-tight leading-[1.1] mb-6">
+          <h2 className="text-[44px] lg:text-[56px] font-montserrat font-semibold tracking-tight leading-[1.1] mb-6">
             Link <br />
             <span className="italic font-bold">Sent.</span>
           </h2>

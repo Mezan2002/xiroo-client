@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
+import ProductCard from "@/components/ui/ProductCard";
 import { Search, X } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const TRENDING_SEARCHES = [
@@ -9,6 +9,73 @@ const TRENDING_SEARCHES = [
   "Smart LED Desk Lamp",
   "Heated Jacket",
   "Pet Smart Feeder",
+];
+
+const RECENTLY_VIEWED = [
+  {
+    id: "1",
+    title: "Xiroo™ 4-in-1 Travel Dispensing Bottles...",
+    price: "2445",
+    image: "/images/featured-product-main.png",
+  },
+  {
+    id: "2",
+    title: "Xiroo™ Minimalist LED String Cap Lamp",
+    price: "5850",
+    oldPrice: "৳7,343",
+    image: "/images/category-smart-home.png",
+  },
+  {
+    id: "3",
+    title: "Xiroo™ Magnetic Stirring Cup",
+    price: "2999",
+    image: "/images/featured-product-main.png",
+  },
+  {
+    id: "4",
+    title: "Xiroo™ Smart LED Lamp",
+    price: "3500",
+    image: "/images/category-smart-home.png",
+  },
+  {
+    id: "5",
+    title: "Xiroo™ Heated Jacket",
+    price: "8900",
+    image: "/images/category-smart-home.png",
+  },
+];
+
+const TRENDING_PRODUCTS = [
+  {
+    id: "6",
+    title: "Xiroo™ Portable Mini Fan",
+    price: "1200",
+    image: "/images/featured-product-main.png",
+  },
+  {
+    id: "7",
+    title: "Xiroo™ Smart Pet Feeder",
+    price: "4500",
+    image: "/images/category-smart-home.png",
+  },
+  {
+    id: "8",
+    title: "Xiroo™ Humidifier Pro",
+    price: "2800",
+    image: "/images/featured-product-main.png",
+  },
+  {
+    id: "9",
+    title: "Xiroo™ Wireless Mouse",
+    price: "1500",
+    image: "/images/category-smart-home.png",
+  },
+  {
+    id: "10",
+    title: "Xiroo™ Bluetooth Speaker",
+    price: "3200",
+    image: "/images/featured-product-main.png",
+  },
 ];
 
 export function SearchOverlay({ isOpen, onClose }) {
@@ -76,129 +143,33 @@ export function SearchOverlay({ isOpen, onClose }) {
             {/* Recently Viewed */}
             <div className="space-y-8 mb-16">
               <div className="flex items-center justify-between">
-                <h3 className="text-[12px] font-bold uppercase tracking-widest text-gray-400">
+                <h3 className="text-[12px] font-semibold uppercase tracking-widest text-gray-400">
                   Recently Viewed
                 </h3>
                 <Button
                   variant="link"
                   size="sm"
                   showHoverIcon={false}
-                  className="text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+                  className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
                 >
                   Clear All
                 </Button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-                {[
-                  {
-                    title: "Xiroo™ 4-in-1 Travel Dispensing Bottles...",
-                    price: "৳2,445",
-                    image: "/images/featured-product-main.png",
-                  },
-                  {
-                    title: "Xiroo™ Minimalist LED String Cap Lamp",
-                    price: "৳5,850",
-                    oldPrice: "৳7,343",
-                    image: "/images/category-smart-home.png",
-                  },
-                  {
-                    title: "Xiroo™ Magnetic Stirring Cup",
-                    price: "৳2,999",
-                    image: "/images/featured-product-main.png",
-                  },
-                  {
-                    title: "Xiroo™ Smart LED Lamp",
-                    price: "৳3,500",
-                    image: "/images/category-smart-home.png",
-                  },
-                  {
-                    title: "Xiroo™ Heated Jacket",
-                    price: "৳8,900",
-                    image: "/images/category-smart-home.png",
-                  },
-                ].map((product, idx) => (
-                  <div key={idx} className="group cursor-pointer space-y-4">
-                    <div className="aspect-4/5 bg-gray-50 overflow-hidden relative border border-gray-100/50">
-                      <Image
-                        src={product.image}
-                        alt={product.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
-                    <div>
-                      <h5 className="text-[12px] font-bold text-gray-800 uppercase leading-snug mb-1 line-clamp-2 tracking-tight">
-                        {product.title}
-                      </h5>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[12px] text-gray-400 font-medium">
-                          {product.price}
-                        </span>
-                        {product.oldPrice && (
-                          <span className="text-[10px] text-gray-200 line-through">
-                            {product.oldPrice}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8">
+                {RECENTLY_VIEWED.map((product) => (
+                  <ProductCard key={product.id} {...product} />
                 ))}
               </div>
             </div>
 
             {/* Products Section */}
             <div className="space-y-8 pb-4">
-              <h3 className="text-[12px] font-bold uppercase tracking-[0.25em] text-gray-400">
+              <h3 className="text-[12px] font-semibold uppercase tracking-[0.25em] text-gray-400">
                 Trending Products
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-                {[
-                  {
-                    title: "Xiroo™ Portable Mini Fan",
-                    price: "৳1,200",
-                    image: "/images/featured-product-main.png",
-                  },
-                  {
-                    title: "Xiroo™ Smart Pet Feeder",
-                    price: "৳4,500",
-                    image: "/images/category-smart-home.png",
-                  },
-                  {
-                    title: "Xiroo™ Humidifier Pro",
-                    price: "৳2,800",
-                    image: "/images/featured-product-main.png",
-                  },
-                  {
-                    title: "Xiroo™ Wireless Mouse",
-                    price: "৳1,500",
-                    image: "/images/category-smart-home.png",
-                  },
-                  {
-                    title: "Xiroo™ Bluetooth Speaker",
-                    price: "৳3,200",
-                    image: "/images/featured-product-main.png",
-                  },
-                ].map((product, idx) => (
-                  <div key={idx} className="group cursor-pointer space-y-4">
-                    <div className="aspect-4/5 bg-gray-50 overflow-hidden relative border border-gray-100/50">
-                      <Image
-                        src={product.image}
-                        alt={product.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
-                    <div>
-                      <h5 className="text-[12px] font-bold text-gray-800 uppercase leading-snug mb-1 line-clamp-2 tracking-tight">
-                        {product.title}
-                      </h5>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[12px] text-gray-400 font-medium tracking-tight">
-                          {product.price}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8">
+                {TRENDING_PRODUCTS.map((product) => (
+                  <ProductCard key={product.id} {...product} />
                 ))}
               </div>
             </div>

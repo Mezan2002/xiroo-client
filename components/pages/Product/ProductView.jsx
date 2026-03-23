@@ -107,7 +107,7 @@ export default function ProductView({ productId }) {
 
           {/* Product Info */}
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-[12px] font-bold text-black truncate leading-tight">
+            <span className="text-[12px] font-semibold text-black truncate leading-tight">
               {product.title}
             </span>
             <span className="text-[11px] text-gray-500 mt-px truncate">
@@ -117,7 +117,7 @@ export default function ProductView({ productId }) {
 
           {/* Price */}
           <div className="flex flex-col items-end shrink-0 mr-1">
-            <span className="text-[14px] font-black text-black">
+            <span className="text-[14px] font-semibold text-black">
               {product.price}
             </span>
             <span className="text-[10px] text-gray-400 line-through">

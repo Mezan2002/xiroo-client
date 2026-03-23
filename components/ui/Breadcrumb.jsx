@@ -32,7 +32,7 @@ export default function Breadcrumb({ customItems }) {
   }
 
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center xl:gap-3 gap-2 text-[9px] xl:text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 mb-2">
+    <nav aria-label="Breadcrumb" className="flex items-center xl:gap-3 gap-2 text-[9px] xl:text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-2">
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         return (

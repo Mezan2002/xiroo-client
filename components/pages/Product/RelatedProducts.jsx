@@ -10,7 +10,7 @@ const MOCK_RELATED = [
 export default function RelatedProducts() {
   return (
     <div className="w-full mt-12 lg:mt-24 xl:mt-32 max-w-[1400px] mx-auto px-4 md:px-8 xl:px-12 pt-16">
-      <h2 className="text-center text-[15px] md:text-xl font-bold tracking-[0.2em] uppercase mb-10 text-[#111]">You May Also Like</h2>
+      <h2 className="text-center text-[15px] md:text-xl font-semibold tracking-[0.2em] uppercase mb-10 text-[#111]">You May Also Like</h2>
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
          {MOCK_RELATED.map(item => (

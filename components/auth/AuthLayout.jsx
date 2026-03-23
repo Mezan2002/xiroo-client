@@ -48,13 +48,13 @@ export default function AuthLayout({ children, showEditorialBorder = true }) {
             <div className="absolute bottom-16 left-16 right-16 max-w-lg z-10 animate-in slide-in-from-bottom-5 duration-700 delay-300">
               {badgeText && (
                 <div className="w-max px-5 py-2.5 bg-white/10 backdrop-blur-md rounded-none border border-white/20 mb-10">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white">
                     {badgeText}
                   </p>
                 </div>
               )}
 
-              <h2 className="text-[64px] font-playfair text-white leading-none mb-8 tracking-tighter">
+              <h2 className="text-[64px] font-montserrat font-bold text-white leading-none mb-8 tracking-tighter">
                 {heading}
               </h2>
 

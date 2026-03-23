@@ -1,4 +1,4 @@
-import { Montserrat, Playfair_Display } from "next/font/google";
+import { Montserrat, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -6,8 +6,8 @@ const montserrat = Montserrat({
   subsets: ["latin"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const mono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
@@ -23,7 +23,7 @@ import ConditionalLayout from "@/components/shared/ConditionalLayout";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${playfair.variable} antialiased`}>
+    <html lang="en" className={`${montserrat.variable} ${mono.variable} antialiased`}>
       <body className="min-h-screen selection:bg-black selection:text-white">
         <ConditionalLayout>{children}</ConditionalLayout>
       </body>

@@ -23,7 +23,7 @@ export default function PromoBanner() {
       <div className="relative z-10 w-full h-full px-6 lg:px-12 max-w-[1600px] mx-auto flex flex-col justify-end pb-12 md:pb-16">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-12 w-full">
           {/* Main Heading */}
-          <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-mono font-bold leading-[1.3] tracking-wide lg:tracking-widest max-w-[1000px] uppercase drop-shadow-lg">
+          <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-mono font-semibold leading-[1.3] tracking-wide lg:tracking-widest max-w-[1000px] uppercase drop-shadow-lg">
             ELEVATE YOUR DAILY LIVING WITH
             <br />
             CURATED NORDIC AESTHETICS

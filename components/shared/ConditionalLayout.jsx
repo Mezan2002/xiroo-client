@@ -10,8 +10,9 @@ export default function ConditionalLayout({ children }) {
   // Define routes that should NOT have the global header/footer
   const authRoutes = ["/login", "/register", "/forgot-password", "/verify-email", "/reset-password"];
   const isAuthRoute = authRoutes.includes(pathname);
+  const isAdminRoute = pathname.startsWith("/admin");
 
-  if (isAuthRoute) {
+  if (isAuthRoute || isAdminRoute) {
     return <main className="min-h-screen">{children}</main>;
   }
 

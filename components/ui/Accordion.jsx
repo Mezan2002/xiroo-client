@@ -15,7 +15,7 @@ export default function Accordion({ title, children, defaultOpen = false }) {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-[22px] text-left transition-colors hover:text-gray-600 outline-none focus:outline-none rounded-none h-auto px-0"
       >
-        <span className="text-[11px] font-bold tracking-widest uppercase text-black">{title}</span>
+        <span className="text-[11px] font-semibold tracking-widest uppercase text-black">{title}</span>
         <div className="relative w-3 h-3 flex items-center justify-center shrink-0">
           <Minus 
             size={12} 

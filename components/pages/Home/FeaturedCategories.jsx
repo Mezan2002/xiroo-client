@@ -9,25 +9,25 @@ const CATEGORIES = [
     id: "smart-home",
     name: "SMART HOME",
     count: 8,
-    image: "/images/category-smart-home.png",
+    image: "https://images.unsplash.com/photo-1558227691-41ea78d1f631?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "home-decor",
     name: "HOME DECOR",
     count: 4,
-    image: "/images/category-home-decor.png",
+    image: "https://images.unsplash.com/photo-1513519247388-4e283713972d?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "lifestyle",
     name: "LIFESTYLE",
     count: 5,
-    image: "/images/category-lifestyle.png",
+    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "kitchen-gadgets",
     name: "KITCHEN GADGETS",
     count: 10,
-    image: "/images/category-kitchen.png",
+    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=800",
   },
 ];
 

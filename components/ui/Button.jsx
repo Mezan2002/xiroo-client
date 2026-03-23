@@ -14,13 +14,15 @@ export function Button({
   href,
   icon: Icon = ChevronRight,
   showHoverIcon = true,
+  isLoading = false,
   ...props
 }) {
   // Base core styles - only include relative if absolute/fixed is not provided in className
   const isPositioned = /absolute|fixed|sticky/.test(className);
   const baseStyles = cn(
-    "group inline-flex items-center justify-center font-bold tracking-[0.1em] uppercase transition-all duration-300 ease-out focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden rounded-none active:scale-[0.98]",
-    !isPositioned && "relative"
+    "group inline-flex items-center justify-center font-semibold tracking-[0.1em] uppercase transition-all duration-300 ease-out focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden rounded-none active:scale-[0.98]",
+    !isPositioned && "relative",
+    isLoading && "opacity-70 pointer-events-none cursor-not-allowed"
   );
 
   // Pre-configured style variants

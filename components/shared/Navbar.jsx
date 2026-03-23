@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import ProductCard from "@/components/ui/ProductCard";
 import { Search, ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,16 +29,25 @@ const MENUS_DATA = {
     ],
     products: [
       {
-        title: "Cat Steam Brush Steamy Dog Brush 3 In 1 Electric Spray Cat...",
+        id: "cat-brush",
+        title: "Cat Steam Brush Steamy Dog Brush 3 In 1",
         price: "$24.45",
+        image:
+          "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=400",
       },
       {
-        title: "Winter Heated Jacket USB Electric Cotton Coat Zip-up...",
+        id: "heated-jacket",
+        title: "Winter Heated Jacket USB Electric",
         price: "$45.90",
+        image:
+          "https://images.unsplash.com/photo-1544923246-77307dd654ca?auto=format&fit=crop&q=80&w=400",
       },
       {
-        title: "Xiroo™ 4-in-1 Travel Dispensing Bottles Portable Lotion Bottle",
+        id: "travel-bottles",
+        title: "Xiroo™ 4-in-1 Travel Dispensing Bottles",
         price: "$28.55",
+        image:
+          "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=400",
       },
     ],
   },
@@ -50,16 +60,25 @@ const MENUS_DATA = {
     ],
     products: [
       {
-        title: "Smart LED Desk Lamp with Wireless Fast Charger...",
+        id: "smart-lamp",
+        title: "Smart LED Desk Lamp with Wireless Charger",
         price: "$35.00",
+        image:
+          "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400",
       },
       {
-        title: "Portable Mini Blender Juicer Cup Rechargeable...",
+        id: "mini-blender",
+        title: "Portable Mini Blender Juicer Cup",
         price: "$19.99",
+        image:
+          "https://images.unsplash.com/photo-1585336139118-1356ee74cd12?auto=format&fit=crop&q=80&w=400",
       },
       {
-        title: "Automatic Pet Smart Feeder with 1080p HD Camera",
+        id: "pet-feeder",
+        title: "Automatic Pet Smart Feeder with HD Camera",
         price: "$89.50",
+        image:
+          "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400",
       },
     ],
   },
@@ -67,16 +86,25 @@ const MENUS_DATA = {
     categories: ["CLEARANCE", "FLASH DEALS", "UNDER $20", "BUNDLE & SAVE"],
     products: [
       {
-        title: "Men's Winter Heavy Fleece Lined Utility Jacket...",
+        id: "heavy-jacket",
+        title: "Men's Winter Heavy Fleece Utility Jacket",
         price: "$39.99",
+        image:
+          "https://images.unsplash.com/photo-1591047139829-d91aec36caea?auto=format&fit=crop&q=80&w=400",
       },
       {
-        title: "Ergonomic Office Chair with Adjustable Lumbar Support",
+        id: "office-chair",
+        title: "Ergonomic Office Chair with Lumbar Support",
         price: "$120.00",
+        image:
+          "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=400",
       },
       {
-        title: "Wireless Active Noise Cancelling Earbuds Pro Edition",
+        id: "anc-earbuds",
+        title: "Wireless Active Noise Cancelling Earbuds",
         price: "$45.00",
+        image:
+          "https://images.unsplash.com/photo-1534073828943-f801091bb270?auto=format&fit=crop&q=80&w=400",
       },
     ],
   },
@@ -191,20 +219,11 @@ export function Navbar() {
                   ))}
                 </div>
 
-                {/* Right: Featured Products Placeholder Grid */}
-                <div className="flex gap-6">
+                {/* Right: Featured Products Grid using reusable ProductCard */}
+                <div className="flex gap-6 items-start">
                   {currentMenuData.products.map((product, idx) => (
-                    <div key={idx} className="w-[200px] group cursor-pointer">
-                      <div className="aspect-4/5 bg-gray-100 relative overflow-hidden mb-4 rounded-sm">
-                        {/* Place image here if available */}
-                        <div className="absolute inset-0 bg-gray-200 transition-transform duration-500 group-hover:scale-105"></div>
-                      </div>
-                      <h3 className="text-[13px] font-medium leading-relaxed text-gray-900 line-clamp-2 group-hover:underline">
-                        {product.title}
-                      </h3>
-                      <p className="text-[13px] text-gray-500 mt-1">
-                        {product.price}
-                      </p>
+                    <div key={idx} className="w-[180px] shrink-0">
+                      <ProductCard {...product} />
                     </div>
                   ))}
                 </div>
@@ -228,7 +247,7 @@ export function Navbar() {
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center justify-end gap-3 md:gap-6 w-[250px]">
+          <div className="flex items-center justify-end gap-3 w-[250px]">
             <Button
               variant="ghost"
               size="icon"
@@ -256,7 +275,7 @@ export function Navbar() {
                 variant="ghost"
                 size="icon"
                 showHoverIcon={false}
-                className={`flex items-center justify-center size-7 rounded-full font-bold text-[10px] tracking-wider transition-all duration-300 ${
+                className={`flex items-center justify-center size-7 rounded-full font-semibold text-[10px] tracking-wider transition-all duration-300 ${
                   isSolid
                     ? "bg-black text-white hover:bg-gray-800"
                     : "bg-white text-black hover:bg-gray-300"

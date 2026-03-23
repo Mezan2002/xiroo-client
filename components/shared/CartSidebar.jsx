@@ -295,6 +295,8 @@ export function CartSidebar({ isOpen, onClose }) {
                   variant="primary"
                   size="lg"
                   className="w-full shadow-lg"
+                  href="/checkout"
+                  onClick={onClose}
                 >
                   CHECK OUT
                 </Button>

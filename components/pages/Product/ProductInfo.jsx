@@ -80,7 +80,7 @@ export default function ProductInfo({ product, cartRef }) {
       <div className="w-full mb-10 px-[2px]">
         {/* Added Native Heading and Subheading Elements */}
         <div className="flex flex-col text-left w-full mb-6 py-[2px]">
-          <h3 className="text-[14px] md:text-[15px] font-black tracking-widest text-black uppercase">
+          <h3 className="text-[14px] md:text-[15px] font-semibold tracking-widest text-black uppercase">
             Choose Your Bundle
           </h3>
           <p className="text-[12px] md:text-[13px] text-gray-500 mt-[6px]">
@@ -105,7 +105,7 @@ export default function ProductInfo({ product, cartRef }) {
                 {/* Absolute Floating UI Badges */}
                 {bundle.badge && (
                   <div
-                    className={`absolute -top-[12px] right-3 md:right-5 px-[10px] md:px-3 py-[4px] text-[9px] md:text-[10px] font-black tracking-widest uppercase flex items-center gap-[6px] shadow-sm ${
+                    className={`absolute -top-[12px] right-3 md:right-5 px-[10px] md:px-3 py-[4px] text-[9px] md:text-[10px] font-semibold tracking-widest uppercase flex items-center gap-[6px] shadow-sm ${
                       bundle.badge.theme === "dark" || isSelected
                         ? "bg-black text-white"
                         : "bg-white text-black border border-gray-200"
@@ -136,13 +136,13 @@ export default function ProductInfo({ product, cartRef }) {
                   <div className="flex flex-col text-left">
                     <div className="flex flex-wrap items-center gap-2 md:gap-3">
                       <span
-                        className={`text-[13px] md:text-[15px] font-black tracking-[0.05em] uppercase text-black`}
+                        className={`text-[13px] md:text-[15px] font-semibold tracking-[0.05em] uppercase text-black`}
                       >
                         {bundle.title}
                       </span>
                       {bundle.discount && (
                         <span
-                          className={`px-[6px] py-[3px] text-[9px] md:text-[10px] font-black tracking-widest leading-none mt-px md:mt-0 ${
+                          className={`px-[6px] py-[3px] text-[9px] md:text-[10px] font-semibold tracking-widest leading-none mt-px md:mt-0 ${
                             isSelected
                               ? "bg-black text-white"
                               : "bg-gray-100 text-black border border-gray-200"
@@ -165,7 +165,7 @@ export default function ProductInfo({ product, cartRef }) {
                 {/* Pricing Outputs */}
                 <div className="flex flex-col items-end text-right w-[35%] shrink-0">
                   <span
-                    className={`text-[18px] md:text-[22px] font-black tracking-tight text-black`}
+                    className={`text-[18px] md:text-[22px] font-semibold tracking-tight text-black`}
                   >
                     <span className="mr-[2px]">৳</span>
                     {bundle.price.toLocaleString()}
@@ -186,7 +186,7 @@ export default function ProductInfo({ product, cartRef }) {
 
         {/* Dynamic Adjust Quantity Terminal Row */}
         <div className="flex items-center justify-between w-full mt-4 md:mt-8 pt-6 pb-2 border-t border-gray-200">
-          <div className="text-[11px] md:text-[12px] font-black tracking-widest text-black uppercase">
+          <div className="text-[11px] md:text-[12px] font-semibold tracking-widest text-black uppercase">
             Adjust Quantity
           </div>
           <div className="flex items-center border border-gray-300 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
@@ -221,7 +221,7 @@ export default function ProductInfo({ product, cartRef }) {
         <div className="flex flex-col md:flex-row items-center justify-between w-full bg-black text-white px-4 md:px-5 py-[14px] gap-2 md:gap-0">
           <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-start">
             <Clock size={16} strokeWidth={2.5} className="text-[#c8ab5c]" />
-            <span className="text-[11px] md:text-[12px] font-black tracking-widest uppercase">
+            <span className="text-[11px] md:text-[12px] font-semibold tracking-widest uppercase">
               Order within 21:13:06
             </span>
           </div>
@@ -241,7 +241,7 @@ export default function ProductInfo({ product, cartRef }) {
               strokeWidth={1.5}
               className="text-black mb-[14px]"
             />
-            <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase text-black mb-1">
+            <span className="text-[9px] md:text-[10px] font-semibold tracking-widest uppercase text-black mb-1">
               Purchased
             </span>
             <span className="text-[10px] font-bold text-gray-500 tracking-wide mt-1">
@@ -257,7 +257,7 @@ export default function ProductInfo({ product, cartRef }) {
               strokeWidth={1.5}
               className="text-black mb-[14px]"
             />
-            <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase text-black mb-1">
+            <span className="text-[9px] md:text-[10px] font-semibold tracking-widest uppercase text-black mb-1">
               Processing
             </span>
             <span className="text-[10px] font-bold text-black tracking-wide mt-1">
@@ -273,7 +273,7 @@ export default function ProductInfo({ product, cartRef }) {
                 className="text-black mb-[14px]"
               />
             </div>
-            <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase text-black mb-1">
+            <span className="text-[9px] md:text-[10px] font-semibold tracking-widest uppercase text-black mb-1">
               Delivered
             </span>
             <span className="text-[10px] font-bold text-gray-600 tracking-wide mt-1">
@@ -308,7 +308,7 @@ export default function ProductInfo({ product, cartRef }) {
             variant="ghost"
             showHoverIcon={false}
             onClick={() => setActiveTab("description")}
-            className={`pb-3 rounded-none text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative h-auto px-0 hover:bg-transparent ${activeTab === "description" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
+            className={`pb-3 rounded-none text-[11px] md:text-[12px] font-semibold tracking-widest uppercase transition-colors relative h-auto px-0 hover:bg-transparent ${activeTab === "description" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
           >
             Description
             {activeTab === "description" && (
@@ -319,7 +319,7 @@ export default function ProductInfo({ product, cartRef }) {
             variant="ghost"
             showHoverIcon={false}
             onClick={() => setActiveTab("specifications")}
-            className={`pb-3 rounded-none text-[11px] md:text-[12px] font-black tracking-widest uppercase transition-colors relative h-auto px-0 hover:bg-transparent ${activeTab === "specifications" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
+            className={`pb-3 rounded-none text-[11px] md:text-[12px] font-semibold tracking-widest uppercase transition-colors relative h-auto px-0 hover:bg-transparent ${activeTab === "specifications" ? "text-black" : "text-gray-400 hover:text-gray-700"}`}
           >
             Specifications
             {activeTab === "specifications" && (

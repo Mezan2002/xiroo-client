@@ -103,7 +103,7 @@ function VerifyEmailContent() {
         )}
       </div>
 
-      <h1 className="text-[36px] lg:text-[56px] font-playfair font-medium tracking-tight leading-[1.1] mb-4 lg:mb-6">
+      <h1 className="text-[36px] lg:text-[56px] font-montserrat font-semibold tracking-tight leading-[1.1] mb-4 lg:mb-6">
         {isOtp ? (
           <>
             Verify <br />
@@ -135,7 +135,7 @@ function VerifyEmailContent() {
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-10 h-14 lg:w-14 lg:h-20 text-center text-2xl lg:text-3xl font-playfair font-bold bg-transparent border-b-2 border-zinc-200 focus:border-black outline-none transition-all duration-300 placeholder:text-zinc-100"
+                className="w-10 h-14 lg:w-14 lg:h-20 text-center text-2xl lg:text-3xl font-montserrat font-bold bg-transparent border-b-2 border-zinc-200 focus:border-black outline-none transition-all duration-300 placeholder:text-zinc-100"
                 placeholder="0"
                 required
               />

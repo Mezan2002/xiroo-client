@@ -14,7 +14,7 @@ export default function Footer() {
           
           {/* Newsletter Column */}
           <div className="flex flex-col col-span-2 md:col-span-1 lg:col-span-1 lg:pr-6">
-            <h3 className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] uppercase mb-6 md:mb-8 text-white">
+            <h3 className="text-[10px] md:text-[11px] font-semibold tracking-[0.2em] uppercase mb-6 md:mb-8 text-white">
               Newsletter
             </h3>
             <p className="text-[11px] text-gray-400 mb-8 leading-[1.8] pr-4">
@@ -42,7 +42,7 @@ export default function Footer() {
 
           {/* Shop Column */}
           <div className="flex flex-col gap-5 lg:pl-6">
-            <h4 className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">Shop</h4>
+            <h4 className="text-[10px] md:text-[11px] font-semibold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">Shop</h4>
             <Link href="/collections/all" className="text-[11px] text-gray-400 hover:text-white transition-colors">All Products</Link>
             <Link href="/collections/smart-home" className="text-[11px] text-gray-400 hover:text-white transition-colors">Smart Home</Link>
             <Link href="/collections/lifestyle" className="text-[11px] text-gray-400 hover:text-white transition-colors">Lifestyle</Link>
@@ -51,7 +51,7 @@ export default function Footer() {
 
           {/* Support Column */}
           <div className="flex flex-col gap-5 lg:pl-4">
-            <h4 className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">Support</h4>
+            <h4 className="text-[10px] md:text-[11px] font-semibold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">Support</h4>
             <Link href="/faq" className="text-[11px] text-gray-400 hover:text-white transition-colors">FAQ</Link>
             <Link href="/shipping" className="text-[11px] text-gray-400 hover:text-white transition-colors">Shipping</Link>
             <Link href="/returns" className="text-[11px] text-gray-400 hover:text-white transition-colors">Returns</Link>
@@ -60,7 +60,7 @@ export default function Footer() {
 
           {/* About Column */}
           <div className="flex flex-col gap-5 lg:pl-2">
-            <h4 className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">About</h4>
+            <h4 className="text-[10px] md:text-[11px] font-semibold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">About</h4>
             <Link href="/our-story" className="text-[11px] text-gray-400 hover:text-white transition-colors">Our Story</Link>
             <Link href="/journal" className="text-[11px] text-gray-400 hover:text-white transition-colors">Journal</Link>
             <Link href="/sustainability" className="text-[11px] text-gray-400 hover:text-white transition-colors">Sustainability</Link>
@@ -68,7 +68,7 @@ export default function Footer() {
 
           {/* Social Column */}
           <div className="flex flex-col gap-5">
-            <h4 className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">Social</h4>
+            <h4 className="text-[10px] md:text-[11px] font-semibold tracking-[0.2em] uppercase text-white mb-4 md:mb-8">Social</h4>
             <div className="flex items-center gap-5 pt-1">
               <a href="#" className="text-gray-400 hover:text-white hover:-translate-y-1 transform transition-all duration-300" aria-label="Instagram">
                 <Instagram size={18} strokeWidth={1.5} />
@@ -106,7 +106,7 @@ export default function Footer() {
 
       {/* Bottom Section: Huge Brand Text (Absolute Bottom, Edge-to-Edge Bleed) */}
       <div className="w-full flex justify-center overflow-hidden pt-6 -mb-[6vw] pointer-events-none mt-4 lg:mt-8">
-        <h1 className="w-full text-center text-[27vw] font-black tracking-tighter text-white/5 leading-[0.75] select-none pointer-events-auto hover:text-white/10 transition-colors duration-700 m-0 p-0">
+        <h1 className="w-full text-center text-[27vw] font-semibold tracking-tighter text-white/5 leading-[0.75] select-none pointer-events-auto hover:text-white/10 transition-colors duration-700 m-0 p-0">
           XIROO
         </h1>
       </div>

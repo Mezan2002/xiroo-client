@@ -37,7 +37,7 @@ export default function LoginPage() {
     <>
       {/* Heading Section */}
       <div className="mb-14 text-center lg:text-left">
-        <h1 className="text-[44px] lg:text-[56px] font-playfair font-medium leading-[1.1] mb-2 tracking-tight">
+        <h1 className="text-[44px] lg:text-[56px] font-montserrat font-semibold leading-[1.1] mb-2 tracking-tight">
           Welcome <br />
           <span className="italic font-bold">Back</span>
         </h1>
@@ -50,7 +50,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Email Field */}
         <div className="space-y-2 group">
-          <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors duration-300">
+          <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors duration-300">
             Email
           </label>
           <div className="relative">
@@ -71,7 +71,7 @@ export default function LoginPage() {
         {/* Password Field */}
         <div className="space-y-2 group">
           <div className="flex justify-between items-center">
-            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors duration-300">
+            <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors duration-300">
               Password
             </label>
             <Link

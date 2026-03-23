@@ -1,32 +1,29 @@
-import Image from "next/image";
-import Link from "next/link";
+import ProductCard from "@/components/ui/ProductCard";
 
 const PRODUCTS = [
   {
     id: "cat-steam-brush",
-    title:
-      "CAT STEAM BRUSH STEAMY DOG BRUSH 3 IN 1 ELECTRIC SPRAY CAT HAIR BRUSHES FOR MASSAGE PET...",
+    title: "CAT STEAM BRUSH STEAMY DOG BRUSH 3 IN 1 ELECTRIC SPRAY CAT HAIR BRUSHES",
     price: "$24.45",
-    image: "/images/featured-product-main.png",
+    image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "winter-heated-jacket",
-    title:
-      "WINTER HEATED JACKET USB ELECTRIC COTTON COAT ZIP-UP HEATER THERMAL CLOTHING HEATING...",
+    title: "WINTER HEATED JACKET USB ELECTRIC COTTON COAT",
     price: "$45.90",
-    image: "/images/product-heated-jacket.png",
+    image: "https://images.unsplash.com/photo-1544923246-77307dd654ca?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "xiroo-travel-bottles",
     title: "XIROO™ 4-IN-1 TRAVEL DISPENSING BOTTLES PORTABLE LOTION BOTTLE",
     price: "$28.55",
-    image: "/images/product-travel-bottles.png",
+    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "xiroo-vegetable-cutter",
     title: "XIROO™ 5-IN-1 KITCHEN VEGETABLE CUTTER",
     price: "$45.99",
-    image: "/images/product-vegetable-cutter.png",
+    image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=800",
   },
 ];
 
@@ -43,31 +40,7 @@ export default function NewArrival() {
       {/* Products Display Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-8">
         {PRODUCTS.map((product) => (
-          <Link
-            href={`/product/${product.id}`}
-            key={product.id}
-            className="group flex flex-col cursor-pointer"
-          >
-            {/* Product Image Wrapper */}
-            <div className="relative w-full aspect-square bg-[#f8f8f8] mb-4 overflow-hidden">
-              <Image
-                src={product.image}
-                alt={product.title}
-                fill
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
-              />
-            </div>
-
-            {/* Product Details */}
-            <div className="flex flex-col">
-              <h3 className="text-[10px] md:text-[11px] font-semibold text-[#555] uppercase leading-[1.6] mb-[2px] line-clamp-4 group-hover:text-black transition-colors">
-                {product.title}
-              </h3>
-              <span className="text-[10px] md:text-[11px] text-gray-500 tracking-wide font-medium">
-                {product.price}
-              </span>
-            </div>
-          </Link>
+          <ProductCard key={product.id} {...product} />
         ))}
       </div>
     </section>

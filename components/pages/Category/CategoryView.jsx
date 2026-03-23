@@ -10,61 +10,61 @@ const ALL_PRODUCTS = [
     id: "1",
     title: "CAT STEAM BRUSH STEAMY DOG BRUSH",
     price: "$24.45",
-    image: "/images/product-cat-brush.png",
-    hoverImage: "/images/image-2.jpeg",
+    image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=600",
+    hoverImage: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=600",
     inStock: true,
   },
   {
     id: "2",
     title: "WINTER HEATED JACKET USB ELECTRIC",
     price: "$45.90",
-    image: "/images/product-heated-jacket.png",
-    hoverImage: "/images/image-4.jpeg",
+    image: "https://images.unsplash.com/photo-1544923246-77307dd654ca?auto=format&fit=crop&q=80&w=600",
+    hoverImage: "https://images.unsplash.com/photo-1591047139829-d91aec36caea?auto=format&fit=crop&q=80&w=600",
     inStock: true,
   },
   {
     id: "3",
     title: "XIROO™ 4-IN-1 TRAVEL DISPENSING BOTTLES",
     price: "$28.55",
-    image: "/images/product-travel-bottles.png",
-    hoverImage: "/images/product-cat-brush.png",
+    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=600",
+    hoverImage: "https://images.unsplash.com/photo-1610461888750-10bfc601b874?auto=format&fit=crop&q=80&w=600",
     inStock: false,
   },
   {
     id: "4",
     title: "XIROO™ 5-IN-1 KITCHEN VEGETABLE CUTTER",
     price: "$45.99",
-    image: "/images/product-vegetable-cutter.png",
-    hoverImage: "/images/featured-product-main.png",
+    image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=600",
+    hoverImage: "https://images.unsplash.com/photo-1616644200388-1bfd5985860b?auto=format&fit=crop&q=80&w=600",
     inStock: true,
   },
   {
     id: "5",
     title: "MINIMALIST NORDIC READING LAMP",
     price: "$120.00",
-    image: "/images/featured-product-main.png",
-    hoverImage: "/images/promo-banner.png",
+    image: "https://images.unsplash.com/photo-1534073828943-f801091bb270?auto=format&fit=crop&q=80&w=600",
+    hoverImage: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=600",
     inStock: true,
   },
   {
     id: "6",
     title: "CURATED NORDIC AESTHETICS CHAIR",
     price: "$350.00",
-    image: "/images/promo-banner.png",
+    image: "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=600",
     inStock: true,
   },
   {
     id: "7",
     title: "GRAVITY BALANCE LIGHT (LIGHT)",
     price: "$180.00",
-    image: "/images/comparison-light.png",
+    image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=600",
     inStock: false,
   },
   {
     id: "8",
     title: "GRAVITY BALANCE LIGHT (DARK)",
     price: "$180.00",
-    image: "/images/comparison-dark.png",
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=600",
     inStock: true,
   },
 ];
@@ -125,7 +125,7 @@ export default function CategoryView({ category }) {
             {title}
           </h1>
         </div>
-        <div className="flex text-[10px] md:text-[11px] font-bold tracking-[0.15em] text-black uppercase pb-1">
+        <div className="flex text-[10px] md:text-[11px] font-semibold tracking-[0.15em] text-black uppercase pb-1">
           <span>{filteredProducts.length} ITEMS FOUND</span>
         </div>
       </div>
@@ -145,14 +145,14 @@ export default function CategoryView({ category }) {
                 placeholder="SEARCH CATALOG"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent pl-7 pr-2 text-[10px] uppercase font-bold tracking-widest outline-none placeholder-gray-400 text-black"
+                className="w-full bg-transparent pl-7 pr-2 text-[10px] uppercase font-semibold tracking-widest outline-none placeholder-gray-400 text-black"
               />
             </div>
           </div>
 
           {/* Availability Filter */}
           <div className="flex flex-col">
-            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-black mb-5 border-b border-gray-100 pb-3">
+            <h3 className="text-[10px] font-semibold tracking-[0.2em] uppercase text-black mb-5 border-b border-gray-100 pb-3">
               Availability
             </h3>
             <div className="flex flex-col gap-4">
@@ -171,7 +171,7 @@ export default function CategoryView({ category }) {
                   />
                 </div>
                 <span
-                  className={`text-[11px] transition-colors ${inStockOnly ? "text-black font-bold tracking-widest" : "text-gray-500 font-medium tracking-wider group-hover:text-black"}`}
+                  className={`text-[11px] transition-colors ${inStockOnly ? "text-black font-semibold tracking-widest" : "text-gray-500 font-medium tracking-wider group-hover:text-black"}`}
                 >
                   In Stock ({inStockCount})
                 </span>
@@ -192,7 +192,7 @@ export default function CategoryView({ category }) {
                   />
                 </div>
                 <span
-                  className={`text-[11px] transition-colors ${outOfStockOnly ? "text-black font-bold tracking-widest" : "text-gray-500 font-medium tracking-wider group-hover:text-black"}`}
+                  className={`text-[11px] transition-colors ${outOfStockOnly ? "text-black font-semibold tracking-widest" : "text-gray-500 font-medium tracking-wider group-hover:text-black"}`}
                 >
                   Out of Stock ({outOfStockCount})
                 </span>
@@ -202,7 +202,7 @@ export default function CategoryView({ category }) {
 
           {/* Price Filter */}
           <div className="flex flex-col">
-            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-black mb-5 border-b border-gray-100 pb-3">
+            <h3 className="text-[10px] font-semibold tracking-[0.2em] uppercase text-black mb-5 border-b border-gray-100 pb-3">
               Price Range
             </h3>
             <div className="flex items-center gap-3 w-full">
