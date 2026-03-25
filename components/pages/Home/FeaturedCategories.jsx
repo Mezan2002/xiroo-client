@@ -15,7 +15,7 @@ const CATEGORIES = [
     id: "home-decor",
     name: "HOME DECOR",
     count: 4,
-    image: "https://images.unsplash.com/photo-1513519247388-4e283713972d?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "lifestyle",
@@ -72,8 +72,9 @@ export default function FeaturedCategories() {
                 className={`object-cover object-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
                   activeCategory.id === cat.id
                     ? "opacity-100 scale-100"
-                    : "opacity-0 scale-105"
+                    : "opacity-0 scale-[1.02]"
                 }`}
+                sizes="(max-width: 1024px) 100vw, 40vw"
               />
             ))}
           </div>

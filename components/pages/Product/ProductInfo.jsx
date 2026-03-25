@@ -10,6 +10,8 @@ import {
   Truck,
 } from "lucide-react";
 import Image from "next/image";
+import { useUser } from "@/context/UserContext";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
 const bundles = [
@@ -52,6 +54,9 @@ const bundles = [
 ];
 
 export default function ProductInfo({ product, cartRef }) {
+  const { user } = useUser();
+  const router = useRouter();
+  const pathname = usePathname();
   const [selectedBundle, setSelectedBundle] = useState(3);
   const [quantity, setQuantity] = useState(3);
   const [activeTab, setActiveTab] = useState("description");
@@ -289,6 +294,14 @@ export default function ProductInfo({ product, cartRef }) {
           variant="primary"
           size="lg"
           className="w-full shadow-lg shadow-black/10"
+          onClick={() => {
+            if (!user) {
+              const redirectPath = encodeURIComponent(pathname);
+              router.push(`/login?redirect=${redirectPath}`);
+              return;
+            }
+            console.log("Added to cart");
+          }}
         >
           ADD TO CART
         </Button>
@@ -296,6 +309,14 @@ export default function ProductInfo({ product, cartRef }) {
           variant="outline"
           size="lg"
           className="w-full shadow-sm"
+          onClick={() => {
+            if (!user) {
+              const redirectPath = encodeURIComponent(pathname);
+              router.push(`/login?redirect=${redirectPath}`);
+              return;
+            }
+            console.log("Buy it now");
+          }}
         >
           BUY IT NOW
         </Button>
@@ -374,6 +395,7 @@ export default function ProductInfo({ product, cartRef }) {
                     alt="Detailed View"
                     fill
                     className="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-700"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                   />
                 </div>
                 {/* Split Detail Structure */}
@@ -384,6 +406,7 @@ export default function ProductInfo({ product, cartRef }) {
                       fill
                       alt="Detailed Structure Focus"
                       className="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-700"
+                      sizes="(max-width: 1024px) 50vw, 25vw"
                     />
                   </div>
                   <div className="relative w-full aspect-4/5 md:aspect-square bg-[#f8f8f8] overflow-hidden rounded-[4px]">
@@ -392,6 +415,7 @@ export default function ProductInfo({ product, cartRef }) {
                       alt="Detailed Material Focus"
                       fill
                       className="w-full h-full object-cover object-center hover:scale-[1.03] transition-transform duration-700"
+                      sizes="(max-width: 1024px) 50vw, 25vw"
                     />
                   </div>
                 </div>

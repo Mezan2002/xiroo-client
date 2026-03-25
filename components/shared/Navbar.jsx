@@ -1,13 +1,17 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Button } from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
-import { Search, ShoppingBag, User } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CartSidebar } from "./CartSidebar";
-import { SearchOverlay } from "./SearchOverlay";
-import { UserAccountDrawer } from "./UserAccountDrawer";
+import dynamic from "next/dynamic";
+const CartSidebar = dynamic(() => import("./CartSidebar").then(mod => mod.CartSidebar), { ssr: false });
+const SearchOverlay = dynamic(() => import("./SearchOverlay").then(mod => mod.SearchOverlay), { ssr: false });
+const UserAccountDrawer = dynamic(() => import("./UserAccountDrawer").then(mod => mod.UserAccountDrawer), { ssr: false });
+import { UserAvatar } from "./UserAvatar";
 
 // Structure of our dynamical nav items
 const NAV_ITEMS = [
@@ -33,21 +37,21 @@ const MENUS_DATA = {
         title: "Cat Steam Brush Steamy Dog Brush 3 In 1",
         price: "$24.45",
         image:
-          "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=400",
       },
       {
         id: "heated-jacket",
         title: "Winter Heated Jacket USB Electric",
         price: "$45.90",
         image:
-          "https://images.unsplash.com/photo-1544923246-77307dd654ca?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1551028719-00160b23e035?auto=format&fit=crop&q=80&w=400",
       },
       {
         id: "travel-bottles",
         title: "Xiroo™ 4-in-1 Travel Dispensing Bottles",
         price: "$28.55",
         image:
-          "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=400",
       },
     ],
   },
@@ -64,14 +68,14 @@ const MENUS_DATA = {
         title: "Smart LED Desk Lamp with Wireless Charger",
         price: "$35.00",
         image:
-          "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=400",
       },
       {
         id: "mini-blender",
         title: "Portable Mini Blender Juicer Cup",
         price: "$19.99",
         image:
-          "https://images.unsplash.com/photo-1585336139118-1356ee74cd12?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1570222094114-d054a817e56b?auto=format&fit=crop&q=80&w=400",
       },
       {
         id: "pet-feeder",
@@ -90,7 +94,7 @@ const MENUS_DATA = {
         title: "Men's Winter Heavy Fleece Utility Jacket",
         price: "$39.99",
         image:
-          "https://images.unsplash.com/photo-1591047139829-d91aec36caea?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1551028719-00160b23e035?auto=format&fit=crop&q=80&w=400",
       },
       {
         id: "office-chair",
@@ -104,24 +108,30 @@ const MENUS_DATA = {
         title: "Wireless Active Noise Cancelling Earbuds",
         price: "$45.00",
         image:
-          "https://images.unsplash.com/photo-1534073828943-f801091bb270?auto=format&fit=crop&q=80&w=400",
+          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400",
       },
     ],
   },
 };
 
+import { useCart } from "@/context/CartContext";
+
 export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  // Replaced boolean hoveredMenu with a string state tracking exactly WHICH menu is active
   const [activeMenu, setActiveMenu] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Fake auth state for conditional rendering
-  const isLoggedIn = false;
-  const currentUser = { firstName: "John", lastName: "Doe" };
+  const { user: currentUser } = useUser();
+  const { itemCount } = useCart();
+  const isLoggedIn = !!currentUser;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -239,6 +249,7 @@ export function Navbar() {
                 alt="Xiroo Shop Logo"
                 width={130}
                 height={130}
+                style={{ height: "auto" }}
                 className={`transition-all duration-300 ${
                   isSolid ? "delay-0" : "brightness-0 invert delay-500"
                 }`}
@@ -248,6 +259,20 @@ export function Navbar() {
 
           {/* Right side actions */}
           <div className="flex items-center justify-end gap-3 w-[250px]">
+            {mounted && currentUser?.role === "admin" && (
+              <Link href="/admin">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  showHoverIcon={false}
+                  className="hover:bg-transparent! transition-all duration-300 text-inherit!"
+                  aria-label="Admin Dashboard"
+                >
+                  <LayoutGrid className="w-[18px] h-[18px] stroke-[1.5]" />
+                </Button>
+              </Link>
+            )}
+
             <Button
               variant="ghost"
               size="icon"
@@ -263,27 +288,32 @@ export function Navbar() {
               variant="ghost"
               size="icon"
               showHoverIcon={false}
-              className="hover:bg-transparent! transition-all duration-300 text-inherit!"
+              className="hover:bg-transparent! transition-all duration-300 text-inherit! relative"
               aria-label="Shopping Bag"
               onClick={() => setIsCartOpen(true)}
             >
               <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
+              {mounted && itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-white">
+                  {itemCount}
+                </span>
+              )}
             </Button>
 
-            {isLoggedIn && currentUser ? (
+            {mounted && isLoggedIn && currentUser ? (
               <Button
                 variant="ghost"
                 size="icon"
                 showHoverIcon={false}
-                className={`flex items-center justify-center size-7 rounded-full font-semibold text-[10px] tracking-wider transition-all duration-300 ${
-                  isSolid
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "bg-white text-black hover:bg-gray-300"
-                }`}
+                className="hover:bg-transparent! transition-all duration-300 text-inherit!"
                 aria-label="User Account"
                 onClick={() => setIsUserOpen(true)}
               >
-                {`${currentUser.firstName.charAt(0)}${currentUser.lastName.charAt(0)}`.toUpperCase()}
+                <UserAvatar
+                  user={currentUser}
+                  className="w-[24px] h-[24px] rounded-full border-[1.5px] border-current bg-transparent"
+                  textClassName="text-[9px] tracking-widest ml-px"
+                />
               </Button>
             ) : (
               <Button

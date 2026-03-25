@@ -3,15 +3,24 @@
 import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
 import { useAuthLayout } from "@/context/AuthContext";
+import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const { updateLayout } = useAuthLayout();
+  const searchParams = useSearchParams();
+  const { loginMutation } = useUser();
+  const { toast } = useToast();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   useEffect(() => {
     updateLayout({
@@ -28,14 +37,36 @@ export default function LoginPage() {
     });
   }, [updateLayout]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login submitted:", { email, password });
+
+    loginMutation.mutate(formData, {
+      onSuccess: () => {
+        const redirect = searchParams.get("redirect");
+        router.push(redirect ? decodeURIComponent(redirect) : "/");
+      },
+      onError: (err) => {
+        if (err.code === "VERIFICATION_REQUIRED") {
+          toast.info("Security Verification Pending. Please Check Your Email.");
+          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&mode=otp`);
+        } else {
+          toast.error(err.message || "--- Identification Failure ---");
+        }
+      },
+    });
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
   };
 
   return (
     <>
-      {/* Heading Section */}
       <div className="mb-14 text-center lg:text-left">
         <h1 className="text-[44px] lg:text-[56px] font-montserrat font-semibold leading-[1.1] mb-2 tracking-tight">
           Welcome <br />
@@ -46,32 +77,30 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Email Field */}
         <div className="space-y-2 group">
-          <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors duration-300">
+          <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${formData.email ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
             Email
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.email ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
               <Mail className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-8 pr-4 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${formData.email ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
               placeholder="your@email.com"
               required
             />
           </div>
         </div>
 
-        {/* Password Field */}
         <div className="space-y-2 group">
           <div className="flex justify-between items-center">
-            <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors duration-300">
+            <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${formData.password ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
               Password
             </label>
             <Link
@@ -82,14 +111,15 @@ export default function LoginPage() {
             </Link>
           </div>
           <div className="relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.password ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
               <Lock className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
               type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-8 pr-12 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${formData.password ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
               placeholder="••••••••"
               required
             />
@@ -115,13 +145,13 @@ export default function LoginPage() {
             type="submit"
             variant="primary"
             size="lg"
+            disabled={loginMutation.isPending}
             className="w-full hover:bg-zinc-800 transition-all duration-500"
           >
-            SIGN IN
+            {loginMutation.isPending ? "IDENTIFYING..." : "SIGN IN"}
           </Button>
         </div>
 
-        {/* Social Login Divider */}
         <div className="relative py-4">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-100"></div>
@@ -133,10 +163,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Social Button */}
-        <SocialAuthButton />
+        <SocialAuthButton onClick={handleGoogleLogin} />
 
-        {/* Footer Links */}
         <div className="pt-10 text-center">
           <p className="text-[12px] font-medium text-gray-400">
             Don&apos;t have an account?{" "}

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
-import ConfirmModal from "@/components/admin/shared/ConfirmModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Plus, ShoppingBag, Trash2 } from "lucide-react";
 
 import { useRouter } from "next/navigation";

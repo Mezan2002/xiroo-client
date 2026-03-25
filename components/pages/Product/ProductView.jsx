@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/Button";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
+import { useUser } from "@/context/UserContext";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
@@ -33,6 +35,9 @@ const MOCK_PRODUCT = {
 };
 
 export default function ProductView({ productId }) {
+  const { user } = useUser();
+  const router = useRouter();
+  const pathname = usePathname();
   const product = MOCK_PRODUCT;
 
   // Sticky bar: shows once cart buttons scroll past the top, stays visible until page end
@@ -126,7 +131,16 @@ export default function ProductView({ productId }) {
           </div>
 
           {/* CTA */}
-          <Button>
+          <Button
+            onClick={() => {
+              if (!user) {
+                const redirectPath = encodeURIComponent(pathname);
+                router.push(`/login?redirect=${redirectPath}`);
+                return;
+              }
+              console.log("Added to cart (sticky)");
+            }}
+          >
             <div className="flex items-center gap-2">
               <ShoppingCart size={14} />
               ADD TO CART

@@ -16,7 +16,8 @@ export function Select({
   onChange,
   placeholder = "Select Option",
   className = "",
-  variant = "default"
+  variant = "default",
+  size = "default"
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -35,7 +36,12 @@ export function Select({
   const variants = {
     default: "bg-white border border-gray-100 hover:border-black text-black",
     black: "bg-black text-white border-black hover:bg-zinc-800",
-    ghost: "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50 border-transparent",
+    ghost: "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50 border-gray-100",
+  };
+
+  const sizes = {
+    default: "h-14 px-6 text-[10px]",
+    sm: "h-10 px-4 text-[9px]",
   };
 
   return (
@@ -45,10 +51,12 @@ export function Select({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center justify-between w-full h-14 px-6
-          text-[10px] font-bold uppercase tracking-[0.2em]
+          flex items-center justify-between w-full
+          font-bold uppercase tracking-[0.2em]
           transition-all duration-300 rounded-none outline-none
+          border
           ${variants[variant]}
+          ${sizes[size]}
           ${className}
         `}
       >
@@ -68,7 +76,7 @@ export function Select({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 right-0 z-50 -mt-px bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden">
+        <div className="absolute left-0 right-0 z-50 -mt-px bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden shadow-xl">
           <div className="max-h-60 overflow-y-auto py-0">
             {options.map((option) => (
               <button
@@ -79,8 +87,9 @@ export function Select({
                   setIsOpen(false);
                 }}
                 className={`
-                  flex items-center justify-between w-full px-6 py-4
-                  text-[10px] font-bold uppercase tracking-[0.2em] text-left
+                  flex items-center justify-between w-full px-6
+                  ${size === 'sm' ? 'py-2.5 text-[9px]' : 'py-4 text-[10px]'}
+                  font-bold uppercase tracking-[0.2em] text-left
                   transition-all duration-200 border-b border-gray-50 last:border-none
                   ${value === option.value ? "bg-black text-white" : "text-zinc-400 hover:bg-gray-50 hover:text-black"}
                 `}

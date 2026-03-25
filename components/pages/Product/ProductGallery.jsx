@@ -15,6 +15,7 @@ export default function ProductGallery({ images = [], title }) {
             alt={`${title} - view ${index + 1}`}
             fill
             className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,1,0.5,1)]"
+            sizes="(max-width: 1024px) 100vw, 60vw"
           />
         </div>
       ))}

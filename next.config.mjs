@@ -15,11 +15,15 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: ["images.unsplash.com"],
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
       },
     ],
   },

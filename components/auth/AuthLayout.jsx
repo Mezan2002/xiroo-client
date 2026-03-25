@@ -39,6 +39,7 @@ export default function AuthLayout({ children, showEditorialBorder = true }) {
               fill
               className="object-cover transition-transform duration-3000 group-hover:scale-110"
               priority
+              sizes="(max-width: 1024px) 0vw, 55vw"
             />
             {/* Double Overlay for Depth */}
             <div className="absolute inset-0 bg-black/40 pointer-events-none group-hover:bg-black/30 transition-colors duration-1000" />

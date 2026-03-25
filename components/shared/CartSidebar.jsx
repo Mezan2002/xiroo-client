@@ -10,24 +10,14 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCart } from "@/context/CartContext";
 import { Button } from "../ui/Button";
-
-const MOCK_CART_ITEMS = [
-  {
-    id: 1,
-    title: "Xiroo™ 4-in-1 Travel Dispensing Bottles Portable Lotion Bottle",
-    price: 2150, // Updated price for Taka example
-    quantity: 1,
-    image: "/images/featured-product-main.png",
-    variant: "Gray, Sticker English Version",
-  },
-];
+import { useEffect, useState } from "react";
 
 const FREE_SHIPPING_THRESHOLD = 2000;
 
 export function CartSidebar({ isOpen, onClose }) {
-  const [items, setItems] = useState(MOCK_CART_ITEMS);
+  const { items, subtotal, updateQuantity, removeItem } = useCart();
   const [activeDrawer, setActiveDrawer] = useState(null); // 'note' or 'coupon'
   const [note, setNote] = useState("");
   const [coupon, setCoupon] = useState("");
@@ -42,25 +32,6 @@ export function CartSidebar({ isOpen, onClose }) {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
-
-  const updateQuantity = (id, delta) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item,
-      ),
-    );
-  };
-
-  const removeItem = (id) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
 
   const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
   const progress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
@@ -193,7 +164,7 @@ export function CartSidebar({ isOpen, onClose }) {
                               variant="ghost"
                               size="icon"
                               showHoverIcon={false}
-                              onClick={() => updateQuantity(item.id, -1)}
+                              onClick={() => updateQuantity({ id: item.id, variant: item.variant, delta: -1 })}
                               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                               aria-label="Decrease quantity"
                             >
@@ -206,7 +177,7 @@ export function CartSidebar({ isOpen, onClose }) {
                               variant="ghost"
                               size="icon"
                               showHoverIcon={false}
-                              onClick={() => updateQuantity(item.id, 1)}
+                              onClick={() => updateQuantity({ id: item.id, variant: item.variant, delta: 1 })}
                               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                               aria-label="Increase quantity"
                             >
@@ -218,7 +189,7 @@ export function CartSidebar({ isOpen, onClose }) {
                             variant="ghost"
                             size="icon"
                             showHoverIcon={false}
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => removeItem({ id: item.id, variant: item.variant })}
                             className="p-2 text-gray-400 hover:text-black transition-colors"
                             aria-label="Remove item"
                           >

@@ -3,12 +3,19 @@
 import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
 import { useAuthLayout } from "@/context/AuthContext";
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
+import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function RegisterPage() {
   const { updateLayout } = useAuthLayout();
+  const searchParams = useSearchParams();
+  const { registerMutation } = useUser();
+  const { toast } = useToast();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -32,14 +39,30 @@ export default function RegisterPage() {
     });
   }, [updateLayout]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Registration submitted:", formData);
+
+    registerMutation.mutate(formData, {
+      onSuccess: () => {
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&mode=otp`);
+      },
+      onError: (err) => {
+        toast.error(err.message || "--- Onboarding Failure ---");
+      },
+    });
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
   };
 
   return (
     <>
-      {/* Heading Section */}
       <div className="mb-14 text-center lg:text-left">
         <h1 className="text-[44px] lg:text-[56px] font-montserrat font-semibold leading-[1.1] mb-2 tracking-tight">
           Join the <br />
@@ -50,69 +73,77 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Name Row */}
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-2 group">
-            <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+            <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.firstName ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
               First Name
             </label>
             <div className="relative">
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
-                <User className="w-3.5 h-3.5 stroke-[1.5]" />
+              <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.firstName ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
+                <UserIcon className="w-3.5 h-3.5 stroke-[1.5]" />
               </div>
               <input
                 type="text"
-                className="w-full pl-8 pr-4 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[14px] transition-all placeholder:text-gray-300"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[14px] transition-all placeholder:text-gray-300 ${formData.firstName ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
                 placeholder="John"
                 required
               />
             </div>
           </div>
           <div className="space-y-2 group">
-            <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+            <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.lastName ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
               Last Name
             </label>
             <input
               type="text"
-              className="w-full px-0 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[14px] transition-all placeholder:text-gray-300"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className={`w-full px-0 py-4 bg-transparent border-b outline-none text-[14px] transition-all placeholder:text-gray-300 ${formData.lastName ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
               placeholder="Doe"
               required
             />
           </div>
         </div>
 
-        {/* Email Field */}
         <div className="space-y-2 group">
-          <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+          <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.email ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
             Email Identity
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.email ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
               <Mail className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
               type="email"
-              className="w-full pl-8 pr-4 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${formData.email ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
               placeholder="fashion@xiroo.com"
               required
             />
           </div>
         </div>
 
-        {/* Password Field */}
         <div className="space-y-2 group">
-          <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+          <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.password ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
             Security Secret
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.password ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
               <Lock className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
               type={showPassword ? "text" : "password"}
-              className="w-full pl-8 pr-12 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${formData.password ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
               placeholder="Create Password"
               required
             />
@@ -133,7 +164,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Consent */}
         <div className="flex items-start gap-4 py-2">
           <div className="relative flex items-center h-5">
             <input
@@ -158,19 +188,18 @@ export default function RegisterPage() {
           </label>
         </div>
 
-        {/* Action Button */}
         <div className="pt-4">
           <Button
             type="submit"
             variant="primary"
             size="lg"
+            disabled={registerMutation.isPending}
             className="w-full hover:bg-zinc-800 transition-all duration-500 tracking-[0.2em]"
           >
-            CREATE IDENTITY
+            {registerMutation.isPending ? "INITIALIZING..." : "CREATE IDENTITY"}
           </Button>
         </div>
 
-        {/* Social Login Divider */}
         <div className="relative py-4">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-100"></div>
@@ -180,10 +209,8 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Social Button */}
-        <SocialAuthButton text="GOOGLE IDENTITY" />
+        <SocialAuthButton text="GOOGLE IDENTITY" onClick={handleGoogleLogin} />
 
-        {/* Footer Links */}
         <div className="pt-8 text-center border-t border-gray-50 mt-8">
           <p className="text-[12px] font-medium text-gray-400">
             Already an elite member?{" "}

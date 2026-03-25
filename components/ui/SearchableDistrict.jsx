@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, Search } from "lucide-react";
 
 export const BANGLADESH_DISTRICTS = [
@@ -10,7 +11,10 @@ export const BANGLADESH_DISTRICTS = [
 export default function SearchableDistrict({ value, onChange, placeholder = "Select District", className = "" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [openAbove, setOpenAbove] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef(null);
+  const portalRef = useRef(null);
 
   const filteredDistricts = BANGLADESH_DISTRICTS.filter(d => 
     d.toLowerCase().includes(search.toLowerCase())
@@ -18,7 +22,10 @@ export default function SearchableDistrict({ value, onChange, placeholder = "Sel
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      const isInsideDropdown = dropdownRef.current && dropdownRef.current.contains(event.target);
+      const isInsidePortal = portalRef.current && portalRef.current.contains(event.target);
+      
+      if (!isInsideDropdown && !isInsidePortal) {
         setIsOpen(false);
       }
     };
@@ -26,10 +33,33 @@ export default function SearchableDistrict({ value, onChange, placeholder = "Sel
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const toggleDropdown = () => {
+    if (!isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const spaceBelow = windowHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      
+      setCoords({
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+        bottom: rect.bottom + window.scrollY,
+        width: rect.width
+      });
+
+      if (spaceBelow < 320 && spaceAbove > spaceBelow) {
+        setOpenAbove(true);
+      } else {
+        setOpenAbove(false);
+      }
+    }
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className={`w-full h-14 px-6 bg-transparent border-b ${isOpen ? "border-black" : "border-gray-200"} flex items-center justify-between cursor-pointer transition-all text-[14px] font-medium uppercase tracking-tight ${className}`}
       >
         <span className={value ? "text-black" : "text-gray-300"}>
@@ -38,9 +68,20 @@ export default function SearchableDistrict({ value, onChange, placeholder = "Sel
         <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </div>
 
-      {isOpen && (
-        <div className="absolute z-50 top-full left-0 w-full mt-1 bg-white border border-gray-100 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-3 border-b border-gray-50 flex items-center gap-3">
+      {isOpen && createPortal(
+        <div 
+          ref={portalRef}
+          className={`fixed z-9999 bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 duration-200 flex flex-col`}
+          style={{
+            left: coords.left,
+            width: coords.width,
+            ...(openAbove 
+               ? { bottom: window.innerHeight - (coords.top - window.scrollY) + 4 } 
+               : { top: (coords.bottom - window.scrollY) + 4 }
+            )
+          }}
+        >
+          <div className="p-3 border-b border-gray-50 flex items-center gap-3 bg-white">
             <Search className="w-4 h-4 text-gray-300" />
             <input
               type="text"
@@ -51,7 +92,7 @@ export default function SearchableDistrict({ value, onChange, placeholder = "Sel
               autoFocus
             />
           </div>
-          <div className="max-h-64 overflow-y-auto custom-scrollbar">
+          <div className="max-h-64 overflow-y-auto custom-scrollbar bg-white">
             {filteredDistricts.length > 0 ? (
               filteredDistricts.map(d => (
                 <div
@@ -72,7 +113,8 @@ export default function SearchableDistrict({ value, onChange, placeholder = "Sel
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

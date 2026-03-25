@@ -11,6 +11,7 @@ export default function PromoBanner() {
           alt="Curated Nordic Aesthetics Banner"
           fill
           className="object-cover object-center"
+          sizes="100vw"
         />
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/50" />

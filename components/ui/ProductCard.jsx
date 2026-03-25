@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useUser } from "@/context/UserContext";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
+
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 export default function ProductCard({
   id,
@@ -15,13 +20,21 @@ export default function ProductCard({
   showRemove = false,
   onRemove = null,
 }) {
+  const { user } = useUser();
+  const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
+  const router = useRouter();
+  const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = hoverImage ? [image, hoverImage] : [image];
-  const hasVariants = parseInt((id || "0").replace(/\D/g, "") || "0") % 2 !== 0;
+  const idStr = String(id || "0");
+  const hasVariants = parseInt(idStr.replace(/\D/g, "") || "0") % 2 !== 0;
   const buttonText = hasVariants ? "CHOOSE" : "ADD";
   const hasMultipleImages = images.length > 1;
+
+  const isSaved = isInWishlist(id);
 
   // Format price to use BDT symbol if it currently uses $
   const formattedPrice =
@@ -79,6 +92,7 @@ export default function ProductCard({
                       ? "opacity-100 scale-100"
                       : "opacity-0 scale-[1.02]"
                   }`}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
             ))}
@@ -128,7 +142,7 @@ export default function ProductCard({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onRemove?.(id);
+                toggleItem({ id, title, price, image });
               }}
               className="absolute right-0 top-0 z-20 size-8 md:size-10 rounded-none bg-white hover:bg-red-50 text-zinc-400 hover:text-red-500 border-l border-b border-zinc-100 transition-all duration-300"
               aria-label="Remove from wishlist"
@@ -143,14 +157,23 @@ export default function ProductCard({
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 -translate-y-2"
               }`}
-              aria-label="Save to wishlist"
+              aria-label={isSaved ? "Remove from wishlist" : "Save to wishlist"}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log(`Saved ${id} to wishlist`);
+                if (!user) {
+                  const redirectPath = encodeURIComponent(pathname);
+                  router.push(`/login?redirect=${redirectPath}`);
+                  return;
+                }
+                toggleItem({ id, title, price, image });
               }}
             >
-              <Heart className="w-4 h-4 text-black stroke-[1.2] hover:fill-black transition-all" />
+              <Heart 
+                className={`w-4 h-4 text-black stroke-[1.2] transition-all ${
+                  isSaved ? "fill-black" : "hover:fill-black"
+                }`} 
+              />
             </button>
           )}
         </div>
@@ -165,7 +188,15 @@ export default function ProductCard({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log(`Added ${id} to cart`);
+            if (!user) {
+              const redirectPath = encodeURIComponent(pathname);
+              router.push(`/login?redirect=${redirectPath}`);
+              return;
+            }
+            addItem({ 
+              product: { id, title, price, image }, 
+              variant: hasVariants ? "Default" : "Standard" 
+            });
           }}
         >
           {buttonText} TO CART

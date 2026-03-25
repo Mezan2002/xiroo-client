@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/Button";
 import { useAuthLayout } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { apiRequest } from "@/lib/api";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +12,7 @@ import { useEffect, useState } from "react";
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const { updateLayout } = useAuthLayout();
+  const { forgotPasswordMutation } = useUser();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -30,8 +33,11 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Password Reset Request:", email);
-    router.push(`/verify-email?email=${encodeURIComponent(email)}&mode=otp`);
+    forgotPasswordMutation.mutate({ email }, {
+      onSuccess: () => {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}&mode=reset`);
+      },
+    });
   };
 
   return (
@@ -52,18 +58,18 @@ export default function ForgotPasswordPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-12">
             <div className="space-y-2 group">
-              <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+              <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${email ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
                 Email Identity
               </label>
               <div className="relative">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+                <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${email ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
                   <Mail className="w-4 h-4 stroke-[1.5]" />
                 </div>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-8 pr-4 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300"
+                  className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${email ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
                   placeholder="fashion@xiroo.com"
                   required
                 />
@@ -74,9 +80,10 @@ export default function ForgotPasswordPage() {
               type="submit"
               variant="primary"
               size="lg"
+              disabled={forgotPasswordMutation.isPending}
               className="w-full hover:bg-zinc-800 transition-all duration-500 tracking-[0.2em]"
             >
-              SEND RESET LINK
+              {forgotPasswordMutation.isPending ? "DISPATCHING..." : "SEND RESET LINK"}
             </Button>
           </form>
 

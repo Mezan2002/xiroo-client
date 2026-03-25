@@ -13,6 +13,7 @@ const Hero = () => {
           priority
           className="object-cover object-center"
           quality={90}
+          sizes="100vw"
         />
       </div>
 

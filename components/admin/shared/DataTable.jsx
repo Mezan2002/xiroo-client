@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
  * @param {Array} columns - [{ key, label, type: 'text' | 'image' | 'status' | 'actions' | 'custom', render: (row) => ... }]
  * @param {Array} data - Array of row objects
  */
-export default function DataTable({ columns, data, onEdit, onDelete, onView }) {
+export default function DataTable({ columns, data, loading, onEdit, onDelete, onView }) {
   const renderCell = (col, row) => {
     if (col.render) return col.render(row);
 
@@ -95,7 +95,17 @@ export default function DataTable({ columns, data, onEdit, onDelete, onView }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-[#EDECE9]">
-          {data.length > 0 ? (
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <tr key={i} className="animate-pulse">
+                {columns.map((col, j) => (
+                  <td key={j} className="px-3 py-4">
+                    <div className="h-4 bg-gray-50 rounded w-full" />
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : data.length > 0 ? (
             data.map((row, idx) => (
               <tr key={row.id || idx} className="group hover:bg-[#F7F7F5] transition-colors">
                 {columns.map((col) => (

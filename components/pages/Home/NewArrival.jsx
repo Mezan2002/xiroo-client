@@ -5,19 +5,19 @@ const PRODUCTS = [
     id: "cat-steam-brush",
     title: "CAT STEAM BRUSH STEAMY DOG BRUSH 3 IN 1 ELECTRIC SPRAY CAT HAIR BRUSHES",
     price: "$24.45",
-    image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "winter-heated-jacket",
     title: "WINTER HEATED JACKET USB ELECTRIC COTTON COAT",
     price: "$45.90",
-    image: "https://images.unsplash.com/photo-1544923246-77307dd654ca?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1551028719-00160b23e035?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "xiroo-travel-bottles",
     title: "XIROO™ 4-IN-1 TRAVEL DISPENSING BOTTLES PORTABLE LOTION BOTTLE",
     price: "$28.55",
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "xiroo-vegetable-cutter",

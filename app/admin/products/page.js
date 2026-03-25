@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
-import ConfirmModal from "@/components/admin/shared/ConfirmModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Plus, Package } from "lucide-react";
 
 const MOCK_PRODUCTS = [

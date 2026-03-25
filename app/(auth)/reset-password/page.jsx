@@ -2,16 +2,28 @@
 
 import { Button } from "@/components/ui/Button";
 import { useAuthLayout } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { apiRequest } from "@/lib/api";
 import { Eye, EyeOff, Lock, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const { updateLayout } = useAuthLayout();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { resetPasswordMutation } = useUser();
+  
+  const email = searchParams.get("email");
+  const otp = searchParams.get("code");
+
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     updateLayout({
@@ -31,10 +43,15 @@ export default function ResetPasswordPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Security Mismatch: Passwords do not match.");
       return;
     }
-    setSubmitted(true);
+    
+    resetPasswordMutation.mutate({ email, otp, newPassword: password }, {
+      onSuccess: () => {
+        setSubmitted(true);
+      },
+    });
   };
 
   return (
@@ -56,18 +73,18 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Password Field */}
             <div className="space-y-2 group">
-              <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+              <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${password ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
                 New Password
               </label>
               <div className="relative">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+                <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${password ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
                   <Lock className="w-4 h-4 stroke-[1.5]" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-8 pr-12 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300"
+                  className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${password ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
                   placeholder="••••••••"
                   required
                 />
@@ -90,18 +107,18 @@ export default function ResetPasswordPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-2 group">
-              <label className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-400 group-focus-within:text-zinc-800 transition-colors">
+              <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${confirmPassword ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
                 Confirm Password
               </label>
               <div className="relative">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-zinc-800 transition-colors">
+                <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${confirmPassword ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
                   <Lock className="w-4 h-4 stroke-[1.5]" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-8 pr-12 py-4 bg-transparent border-b border-gray-200 focus:border-zinc-800 outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300"
+                  className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${confirmPassword ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
                   placeholder="••••••••"
                   required
                 />
@@ -113,9 +130,10 @@ export default function ResetPasswordPage() {
                 type="submit"
                 variant="primary"
                 size="lg"
+                disabled={resetPasswordMutation.isPending}
                 className="w-full hover:bg-zinc-800 transition-all duration-500 tracking-[0.2em]"
               >
-                UPDATE PASSWORD
+                {resetPasswordMutation.isPending ? "CONFIGURING..." : "UPDATE CREDENTIALS"}
               </Button>
             </div>
           </form>
@@ -142,5 +160,17 @@ export default function ResetPasswordPage() {
         </div>
       )}
     </>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <div className="w-8 h-8 rounded-full border-2 border-zinc-200 border-t-zinc-800 animate-spin" />
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
