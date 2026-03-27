@@ -17,7 +17,7 @@ import {
   Image as ImageIcon,
   Type,
 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 // Move MenuButton outside to avoid "Cannot create components during render"
 const MenuButton = ({ onClick, isActive, children, title }) => (
@@ -68,6 +68,12 @@ export default function TiptapEditor({
       },
     },
   });
+
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   const addImage = useCallback(() => {
     const url = window.prompt("Enter image URL");

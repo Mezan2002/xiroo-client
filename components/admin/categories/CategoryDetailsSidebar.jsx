@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { X, Save, Image as ImageIcon, Trash2, Check, AlertCircle } from "lucide-react";
+import { X, Save, Image as ImageIcon, Trash2, Check, AlertCircle, Hash } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ImageUploader } from "@/components/shared/ImageUploader";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
 
 export default function CategoryDetailsSidebar({ 
   category, 
@@ -17,9 +19,28 @@ export default function CategoryDetailsSidebar({
     image: category?.image || null,
     isActive: category?.isActive !== false,
     isFeatured: category?.isFeatured || false,
+    allowedAttributes: category?.allowedAttributes || [],
+  });
+
+  const { data: attributes = [] } = useQuery({
+    queryKey: ["attributes"],
+    queryFn: async () => {
+      const response = await apiRequest("/attributes");
+      return response.data || [];
+    },
   });
 
   if (!category) return null;
+
+  const toggleAttribute = (attrId) => {
+    setFormData(prev => {
+      const current = prev.allowedAttributes || [];
+      const updated = current.includes(attrId)
+        ? current.filter(id => id !== attrId)
+        : [...current, attrId];
+      return { ...prev, allowedAttributes: updated };
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -165,6 +186,44 @@ export default function CategoryDetailsSidebar({
                   className="w-full bg-white border border-[#EDECE9] px-4 py-3 text-[13px] font-medium leading-relaxed text-black outline-none focus:border-black/20 transition-all resize-none placeholder:text-[#37352F20]"
                   placeholder="Specify the scope and attributes of this category..."
                 />
+              </div>
+
+              {/* Attributes Mapping */}
+              <div className="pt-6 border-t border-[#EDECE9] space-y-4">
+                <label className="text-[10px] font-bold text-[#91918E] uppercase tracking-widest block">
+                  Filter Registry (Attributes)
+                </label>
+                <div className="grid grid-cols-1 gap-3">
+                  {attributes.map((attr) => {
+                    const isSelected = formData.allowedAttributes?.includes(attr._id);
+                    return (
+                      <div 
+                        key={attr._id}
+                        onClick={() => toggleAttribute(attr._id)}
+                        className={`
+                          flex items-center justify-between p-4 cursor-pointer transition-all border
+                          ${isSelected ? 'bg-black border-black shadow-lg shadow-black/5' : 'bg-white border-[#EDECE9] hover:border-[#37352F20]'}
+                        `}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Hash size={12} className={isSelected ? 'text-white/40' : 'text-zinc-300'} />
+                          <span className={`text-[11px] font-bold uppercase tracking-widest ${isSelected ? 'text-white' : 'text-zinc-600'}`}>
+                            {attr.name}
+                          </span>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${isSelected ? 'bg-white border-white' : 'border-[#EDECE9]'}`}>
+                          {isSelected && <Check size={10} className="text-black" strokeWidth={3} />}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {attributes.length === 0 && (
+                    <p className="text-[10px] text-zinc-400 font-medium italic">No global attributes registered.</p>
+                  )}
+                </div>
+                <p className="text-[10px] text-[#91918E] font-medium leading-relaxed">
+                  Select specific attributes to enable contextual filtering in the storefront sidebar for this category.
+                </p>
               </div>
             </div>
 

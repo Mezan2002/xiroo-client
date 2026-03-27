@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import {
   AlertCircle,
@@ -9,85 +10,41 @@ import {
   ShoppingBag,
   Trash2,
   Zap,
+  Loader2,
+  Clock
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-const MOCK_NOTIFICATIONS = [
-  {
-    id: "1",
-    type: "Order",
-    title: "New Order #XR-2814",
-    message: "৳2,450 • Processing • John Doe",
-    time: "2 mins ago",
-    unread: true,
-  },
-  {
-    id: "2",
-    type: "Inventory",
-    title: "Low Stock Alert",
-    message: "Xiroo™ LED Cap Lamp is below 5 units.",
-    time: "1 hour ago",
-    unread: true,
-  },
-  {
-    id: "3",
-    type: "Security",
-    title: "New Login Detected",
-    message: "Admin session from Windows (Dhaka, BD).",
-    time: "3 hours ago",
-    unread: true,
-  },
-  {
-    id: "4",
-    type: "Order",
-    title: "Payment Verified",
-    message: "Order #XR-2811 was paid via bKash.",
-    time: "5 hours ago",
-    unread: false,
-  },
-  {
-    id: "5",
-    type: "System",
-    title: "Backup Secure",
-    message: "Automated daily system backup completed.",
-    time: "1 day ago",
-    unread: false,
-  },
-];
+import { useNotifications } from "@/context/NotificationContext";
+import Link from "next/link";
+
+const formatTimeAgo = (date) => {
+  const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+  if (seconds < 60) return "just now";
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + "y ago";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + "mo ago";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + "d ago";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + "h ago";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + "m ago";
+  return "just now";
+};
 
 export default function AdminNotifications() {
-  const router = useRouter();
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
   const [filter, setFilter] = useState("All");
+  const { notifications, markAsRead, markAllAsRead } = useNotifications();
 
-  const filteredNotifications = notifications.filter((n) => {
-    if (filter === "Unread") return n.unread;
-    if (filter === "Critical")
-      return n.type === "Inventory" || n.type === "Security";
+  const filteredNotifications = notifications.filter((notif) => {
+    if (filter === "All") return true;
+    if (filter === "Orders") return notif.type === "order";
+    if (filter === "System") return notif.type === "system";
+    if (filter === "Security") return notif.type === "security";
+    if (filter === "Messages") return notif.type === "message";
     return true;
   });
-
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-  };
-
-  const deleteNotification = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
-  const getIcon = (type) => {
-    switch (type) {
-      case "Order":
-        return ShoppingBag;
-      case "Inventory":
-        return AlertCircle;
-      case "Security":
-        return Shield;
-      default:
-        return Zap;
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -100,15 +57,14 @@ export default function AdminNotifications() {
         icon={Bell}
       />
 
-      <div className="space-y-6">
-        {/* Sorting & Global Actions */}
+      <div className="space-y-6 px-1">
         <div className="flex items-center justify-between border-b border-[#EDECE9] pb-4">
-          <div className="flex items-center gap-2">
-            {["All", "Unread", "Critical"].map((f) => (
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {["All", "Orders", "Messages", "System", "Security"].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] transition-all ${
+                className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all shrink-0 ${
                   filter === f
                     ? "bg-black text-white"
                     : "text-[#37352FA6] hover:bg-[#F7F7F5]"
@@ -118,88 +74,68 @@ export default function AdminNotifications() {
               </button>
             ))}
           </div>
-          <button
-            onClick={markAllRead}
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#37352F40] hover:text-black transition-colors"
+          <button 
+            onClick={markAllAsRead}
+            className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#37352F40] hover:text-black transition-colors shrink-0"
           >
-            Mark all as read
+            Mark all read
           </button>
         </div>
 
-        {/* Notification Stream */}
-        <div className="space-y-px bg-[#EDECE9] border border-[#EDECE9] rounded-sm overflow-hidden">
-          {filteredNotifications.length > 0 ? (
-            filteredNotifications.map((n) => {
-              const Icon = getIcon(n.type);
+        <div className="space-y-px bg-[#EDECE9] border border-[#EDECE9] rounded-none overflow-hidden shadow-2xl shadow-black/5">
+          {filteredNotifications.length === 0 ? (
+            <div className="bg-white py-32 text-center">
+              <div className="opacity-20 flex flex-col items-center gap-4">
+                <Bell size={48} strokeWidth={1} />
+                <p className="text-[11px] font-bold uppercase tracking-[0.4em]">No active pulse found</p>
+              </div>
+            </div>
+          ) : (
+            filteredNotifications.map((notif) => {
+              let Icon = Bell;
+              if (notif.type === "order") Icon = ShoppingBag;
+              if (notif.type === "system") Icon = AlertCircle;
+              if (notif.type === "security") Icon = Shield;
+              if (notif.type === "message") Icon = Zap;
+
               return (
                 <div
-                  key={n.id}
-                  onClick={() => router.push(`/admin/notifications/${n.id}`)}
-                  className={`flex items-center gap-6 p-6 transition-all group relative cursor-pointer ${
-                    n.unread ? "bg-white" : "bg-white opacity-60 grayscale"
+                  key={notif._id}
+                  onClick={() => !notif.isRead && markAsRead(notif._id)}
+                  className={`flex items-start gap-6 p-6 transition-all group relative cursor-pointer ${
+                    !notif.isRead
+                      ? "bg-white"
+                      : "bg-[#FBFBFA] hover:bg-white"
                   }`}
                 >
-                  <div className="w-10 h-10 bg-[#F7F7F5] flex items-center justify-center rounded-sm shrink-0">
-                    <Icon
-                      size={18}
-                      className={n.unread ? "text-black" : "text-[#37352F40]"}
-                      strokeWidth={1.5}
-                    />
+                  <div className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-none shadow-lg transition-transform group-hover:scale-105 ${
+                    !notif.isRead ? "bg-black text-white" : "bg-[#EDECE9] text-[#37352F40]"
+                  }`}>
+                    <Icon size={18} strokeWidth={1.5} />
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`text-[9px] font-bold uppercase tracking-[0.2em] ${
-                          n.type === "Inventory" || n.type === "Security"
-                            ? "text-red-500"
-                            : "text-[#37352F40]"
-                        }`}
-                      >
-                        {n.type}
-                      </span>
-                      <span className="text-[9px] text-[#37352F20]">•</span>
-                      <span className="text-[9px] font-bold text-[#37352F40] tracking-tight">
-                        {n.time}
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#37352F40]">
+                        {notif.type} • {formatTimeAgo(notif.createdAt)}
                       </span>
                     </div>
-                    <h3 className="text-[14px] font-bold text-[#37352F] tracking-tight mb-0.5">
-                      {n.title}
-                    </h3>
-                    <p className="text-[12px] text-[#37352FA6] line-clamp-1">
-                      {n.message}
+                    <Link href={notif.link || "/admin/notifications"}>
+                      <h3 className={`text-[14px] tracking-tight mb-1.5 ${!notif.isRead ? "font-bold text-black" : "font-medium text-[#37352F]"}`}>
+                        {notif.title}
+                      </h3>
+                    </Link>
+                    <p className="text-[13px] text-[#37352FA6] font-medium leading-relaxed max-w-2xl">
+                      {notif.message}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                    <button
-                      onClick={() => deleteNotification(n.id)}
-                      className="p-2 text-[#37352F40] hover:text-red-500 transition-colors"
-                      title="Dismiss"
-                    >
-                      <Trash2 size={16} strokeWidth={1.5} />
-                    </button>
-                    <button className="p-2 text-[#37352F40] hover:text-black transition-colors">
-                      <ArrowRight size={16} strokeWidth={1.5} />
-                    </button>
-                  </div>
+                  {!notif.isRead && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-black animate-pulse" />
+                  )}
                 </div>
               );
             })
-          ) : (
-            <div className="bg-white py-24 text-center space-y-4">
-              <div className="w-16 h-16 bg-[#F7F7F5] rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle2 size={24} className="text-[#37352F20]" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-[14px] font-bold text-[#37352F]">
-                  Systems optimal
-                </p>
-                <p className="text-[12px] text-[#37352FA6]">
-                  All system operations are running without alerts.
-                </p>
-              </div>
-            </div>
           )}
         </div>
       </div>

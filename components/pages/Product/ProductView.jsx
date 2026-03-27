@@ -5,40 +5,26 @@ import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
+import LoadingOverlay from "@/components/shared/LoadingOverlay";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
 import ProductReviews from "./ProductReviews";
 import RelatedProducts from "./RelatedProducts";
 
-const MOCK_PRODUCT = {
-  id: "1",
-  title: "Xiroo™ Minimalist LED String Cap Lamp",
-  price: "$58.50",
-  referencePrice: "$73.43",
-  images: [
-    "/images/image-2.jpeg",
-    "/images/comparison-dark.png",
-    "/images/comparison-light.png",
-    "/images/featured-product-main.png",
-    "/images/product-coffee-1.png",
-    "/images/product-travel-bottles.png",
-  ],
-  category: "Lighting",
-  description:
-    "Experience lighting architecture explicitly engineered for calm precision. Floating directly over its premium matte core base powered strictly by custom magnetic tracking loops.",
-  rating: 4.8,
-  reviewsCount: 104,
-  colors: ["Dark Grey", "Green", "White", "Yellow"],
-  electricalOutlet: "USB",
-  materials: "Premium Matte Aluminum & Glass Envelope.",
-  shipping: "Shipping calculated at checkout.",
-};
-
 export default function ProductView({ productId }) {
   const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();
-  const product = MOCK_PRODUCT;
+
+  const { data: productResponse, isLoading, error } = useQuery({
+    queryKey: ["product", productId],
+    queryFn: () => apiRequest(`/products/${productId}`),
+    enabled: !!productId,
+  });
+
+  const product = productResponse?.success ? productResponse.data : null;
 
   // Sticky bar: shows once cart buttons scroll past the top, stays visible until page end
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -48,7 +34,6 @@ export default function ProductView({ productId }) {
     const cartObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
-          // Only show when cart has scrolled UP off the top of the screen
           setShowStickyBar(entry.boundingClientRect.top < 0);
         } else {
           setShowStickyBar(false);
@@ -61,8 +46,18 @@ export default function ProductView({ productId }) {
     return () => cartObserver.disconnect();
   }, []);
 
+  if (isLoading) return <LoadingOverlay />;
+  if (error || !product) {
+    return (
+      <div className="w-full h-[60vh] flex flex-col items-center justify-center gap-4">
+        <h2 className="text-xl font-semibold tracking-tight">Product not found</h2>
+        <Button onClick={() => router.push("/")}>Return to Home</Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full">
+    <div className="w-full pt-16 md:pt-24 lg:pt-32">
       <div className="max-w-[1400px] w-full mx-auto px-0 md:px-8 xl:px-12">
         {/* Split Architecture Container */}
         <div className="flex flex-col lg:flex-row gap-0 lg:gap-14 relative">
@@ -81,13 +76,16 @@ export default function ProductView({ productId }) {
         </div>
       </div>
 
-      <RelatedProducts />
+      <RelatedProducts 
+        categoryId={product.category?._id || product.category} 
+        currentProductId={product._id} 
+      />
       <ProductReviews />
 
       {/* Sticky Add to Cart Bar — controlled at ProductView level */}
       <div
         className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center px-4 pb-4 pt-2 pointer-events-none transition-all duration-300 ${
-          showStickyBar
+          showStickyBar && (!["out-of-stock", "upcoming"].includes(product.stockStage))
             ? "translate-y-0 opacity-100"
             : "translate-y-6 opacity-0"
         }`}
@@ -116,18 +114,20 @@ export default function ProductView({ productId }) {
               {product.title}
             </span>
             <span className="text-[11px] text-gray-500 mt-px truncate">
-              {product.colors?.[0]} / {product.electricalOutlet}
+              {product.variants?.[0]?.name}: {product.variants?.[0]?.values?.[0] || "Standard"}
             </span>
           </div>
 
           {/* Price */}
           <div className="flex flex-col items-end shrink-0 mr-1">
             <span className="text-[14px] font-semibold text-black">
-              {product.price}
+              ৳{(product.salePrice || product.price).toLocaleString()}
             </span>
-            <span className="text-[10px] text-gray-400 line-through">
-              {product.referencePrice}
-            </span>
+            {product.salePrice && (
+              <span className="text-[10px] text-gray-400 line-through">
+                ৳{product.price.toLocaleString()}
+              </span>
+            )}
           </div>
 
           {/* CTA */}
@@ -138,7 +138,7 @@ export default function ProductView({ productId }) {
                 router.push(`/login?redirect=${redirectPath}`);
                 return;
               }
-              console.log("Added to cart (sticky)");
+              console.log("Added to cart (sticky)", { productId: product._id });
             }}
           >
             <div className="flex items-center gap-2">

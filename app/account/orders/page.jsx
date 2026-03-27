@@ -1,20 +1,20 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { apiRequest } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { Package } from "lucide-react";
 import Link from "next/link";
 
 export default function OrdersPage() {
-  const { 
-    data: orders = [], 
+  const {
+    data: orders = [],
     isLoading,
-    error 
+    error,
   } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
-      const response = await apiRequest("/orders");
+      const response = await apiRequest("/orders/my-orders");
       if (!response.success) throw new Error("Order Registry Sync Failure");
       return response.data;
     },
@@ -56,7 +56,7 @@ export default function OrdersPage() {
                       Order ID
                     </span>
                     <span className="text-[14px] font-montserrat font-bold text-black italic tracking-tight">
-                      #{order.orderNumber || order.id}
+                      #{order.orderId || order.id}
                     </span>
                   </div>
                   <div className="flex items-center gap-6">
@@ -64,7 +64,9 @@ export default function OrdersPage() {
                       Placed On
                     </span>
                     <span className="text-[13px] font-montserrat font-bold text-black uppercase tracking-tight">
-                      {new Date(order.createdAt || order.date).toLocaleDateString("en-GB", {
+                      {new Date(
+                        order.createdAt || order.date,
+                      ).toLocaleDateString("en-GB", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
@@ -88,7 +90,7 @@ export default function OrdersPage() {
                     </span>
                     <span className="text-3xl font-montserrat font-bold text-black tracking-tighter">
                       <span className="font-sans mr-0.5">৳</span>
-                      {order.totalAmount || order.total}
+                      {order.totalPrice || order.total}
                     </span>
                   </div>
                 </div>
@@ -98,10 +100,12 @@ export default function OrdersPage() {
 
               <div className="flex justify-between items-center">
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] italic">
-                  {order.items?.length || order.items} Items in this order
+                  {order.items?.length || 0} Items in this order
                 </p>
-                <Link href={`/account/orders/${(order._id || order.id).replace("##", "")}`}>
-                  <Button className="bg-black text-white hover:bg-zinc-800 px-10 h-12 tracking-[0.1em] font-bold uppercase text-[11px] rounded-none group">
+                <Link
+                  href={`/account/orders/${(order._id || order.id).replace("##", "")}`}
+                >
+                  <Button className="bg-black text-white hover:bg-zinc-800 px-10 h-12 tracking-widest font-bold uppercase text-[11px] rounded-none group">
                     VIEW DETAILS
                   </Button>
                 </Link>

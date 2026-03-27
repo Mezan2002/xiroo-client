@@ -27,6 +27,8 @@ import QueryProvider from "@/components/providers/QueryProvider";
 
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { SocketProvider } from "@/context/SocketContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -36,11 +38,15 @@ export default function RootLayout({ children }) {
           <ReduxProvider>
             <QueryProvider>
               <UserProvider>
-                <CartProvider>
-                  <WishlistProvider>
-                    <ConditionalLayout>{children}</ConditionalLayout>
-                  </WishlistProvider>
-                </CartProvider>
+                <SocketProvider>
+                  <NotificationProvider>
+                    <CartProvider>
+                      <WishlistProvider>
+                        <ConditionalLayout>{children}</ConditionalLayout>
+                      </WishlistProvider>
+                    </CartProvider>
+                  </NotificationProvider>
+                </SocketProvider>
               </UserProvider>
             </QueryProvider>
           </ReduxProvider>

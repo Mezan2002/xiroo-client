@@ -56,7 +56,11 @@ export function CartProvider({ children }) {
 
   // Calculate high-performance engagement metrics
   const { subtotal, itemCount } = useMemo(() => {
-    const total = items.reduce((sum, item) => sum + (parseFloat(item.price?.toString().replace(/[^0-9.]/g, "") || 0) * item.quantity), 0);
+    const total = items.reduce((sum, item) => {
+      const activePrice = (item.salePrice && item.salePrice > 0) ? item.salePrice : item.price;
+      const numericPrice = parseFloat(activePrice?.toString().replace(/[^0-9.]/g, "") || 0);
+      return sum + (numericPrice * item.quantity);
+    }, 0);
     const count = items.reduce((sum, item) => sum + item.quantity, 0);
     return { subtotal: total, itemCount: count };
   }, [items]);

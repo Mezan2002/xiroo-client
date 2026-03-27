@@ -15,10 +15,14 @@ export default function ProductCard({
   id,
   title,
   price,
+  salePrice,
   image,
+  images: imagesProp,
   hoverImage,
   showRemove = false,
   onRemove = null,
+  priority = false,
+  stockStage = "in-stock",
 }) {
   const { user } = useUser();
   const { addItem } = useCart();
@@ -28,7 +32,7 @@ export default function ProductCard({
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const images = hoverImage ? [image, hoverImage] : [image];
+  const images = imagesProp && imagesProp.length > 0 ? imagesProp : (hoverImage ? [image, hoverImage] : [image]);
   const idStr = String(id || "0");
   const hasVariants = parseInt(idStr.replace(/\D/g, "") || "0") % 2 !== 0;
   const buttonText = hasVariants ? "CHOOSE" : "ADD";
@@ -67,7 +71,7 @@ export default function ProductCard({
         {!showRemove && (
           <div className="absolute top-0 left-0 z-30 px-2 py-1 bg-white border-r border-b border-zinc-100">
             <p className="text-[8px] font-bold tracking-[0.2em] text-black uppercase">
-              NEW
+              {stockStage !== "in-stock" ? stockStage.replace("-", " ") : "NEW"}
             </p>
           </div>
         )}
@@ -93,45 +97,38 @@ export default function ProductCard({
                       : "opacity-0 scale-[1.02]"
                   }`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={priority && idx === 0}
                 />
               </div>
             ))}
             {/* Subtle overlay on hover */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.02] transition-colors duration-500" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
           </Link>
 
-          {/* Navigation Arrows (Premium Minimalist) */}
+          {/* Minimalist Progress Dots (Interactive) */}
           {hasMultipleImages && (
-            <>
-              <Button
-                variant="white"
-                size="icon"
-                showHoverIcon={false}
-                onClick={prevImage}
-                className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-none border-none bg-white/40 hover:bg-white/80 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
-                  isHovered
-                    ? "opacity-100 translate-x-0"
-                    : "opacity-0 -translate-x-2"
-                }`}
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-4 h-4 text-black stroke-[1.2]" />
-              </Button>
-              <Button
-                variant="white"
-                size="icon"
-                showHoverIcon={false}
-                onClick={nextImage}
-                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 size-8 md:size-10 rounded-none border-none bg-white/40 hover:bg-white/80 transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
-                  isHovered
-                    ? "opacity-100 translate-x-0"
-                    : "opacity-0 translate-x-2"
-                }`}
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-4 h-4 text-black stroke-[1.2]" />
-              </Button>
-            </>
+            <div 
+              className={`absolute left-1/2 -translate-x-1/2 z-20 flex gap-1.5 px-3 py-1.5 rounded-full bg-black/10 backdrop-blur-[2px] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+                isHovered ? "bottom-14" : "bottom-3"
+              }`}
+            >
+              {images.map((_, dotIdx) => (
+                <button
+                  key={dotIdx}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCurrentImageIndex(dotIdx);
+                  }}
+                  className={`h-1 transition-all duration-300 rounded-full ${
+                    dotIdx === currentImageIndex 
+                      ? "w-4 bg-white" 
+                      : "w-1 bg-white/40 hover:bg-white/60"
+                  }`}
+                  aria-label={`Go to image ${dotIdx + 1}`}
+                />
+              ))}
+            </div>
           )}
 
           {showRemove ? (
@@ -142,7 +139,7 @@ export default function ProductCard({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                toggleItem({ id, title, price, image });
+                toggleItem({ id, title, price, salePrice, image });
               }}
               className="absolute right-0 top-0 z-20 size-8 md:size-10 rounded-none bg-white hover:bg-red-50 text-zinc-400 hover:text-red-500 border-l border-b border-zinc-100 transition-all duration-300"
               aria-label="Remove from wishlist"
@@ -166,12 +163,14 @@ export default function ProductCard({
                   router.push(`/login?redirect=${redirectPath}`);
                   return;
                 }
-                toggleItem({ id, title, price, image });
+                toggleItem({ id, title, price, salePrice, image });
               }}
             >
               <Heart 
-                className={`w-4 h-4 text-black stroke-[1.2] transition-all ${
-                  isSaved ? "fill-black" : "hover:fill-black"
+                className={`w-4 h-4 transition-all duration-300 stroke-[1.5] ${
+                  isSaved 
+                    ? "text-[#ff385c] fill-[#ff385c]" 
+                    : "text-white drop-shadow-md hover:text-[#ff385c] fill-none"
                 }`} 
               />
             </button>
@@ -179,13 +178,14 @@ export default function ProductCard({
         </div>
 
         {/* Integrated Quick Add Bar */}
-        <button
-          className={`absolute bottom-0 left-0 right-0 h-10 md:h-12 bg-black text-white text-[9px] md:text-[10px] font-bold tracking-[0.2em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-30 uppercase ${
-            isHovered
-              ? "translate-y-0 opacity-100"
-              : "translate-y-full opacity-0"
-          }`}
-          onClick={(e) => {
+        {(!["out-of-stock", "upcoming"].includes(stockStage)) && (
+          <button
+            className={`absolute bottom-0 left-0 right-0 h-10 md:h-12 bg-black text-white text-[9px] md:text-[10px] font-bold tracking-[0.2em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-30 uppercase ${
+              isHovered
+                ? "translate-y-0 opacity-100"
+                : "translate-y-full opacity-0"
+            }`}
+            onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             if (!user) {
@@ -194,13 +194,14 @@ export default function ProductCard({
               return;
             }
             addItem({ 
-              product: { id, title, price, image }, 
+              product: { id, title, price, salePrice, image }, 
               variant: hasVariants ? "Default" : "Standard" 
             });
           }}
         >
-          {buttonText} TO CART
-        </button>
+            {buttonText} {stockStage === "pre-order" ? "PRE-ORDER" : "TO CART"}
+          </button>
+        )}
       </div>
 
       {/* Details Area (Editorial Layout) */}
@@ -211,11 +212,26 @@ export default function ProductCard({
           </h3>
         </Link>
         <div className="flex items-center justify-between border-t border-zinc-100 pt-2.5 mt-1">
-          <span className="text-[10px] md:text-[11px] text-black font-semibold tracking-wider">
-            {formattedPrice}
-          </span>
+          <div className="flex flex-col">
+            {["out-of-stock", "upcoming"].includes(stockStage) ? (
+              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">
+                {stockStage.replace("-", " ")}
+              </span>
+            ) : (
+              <>
+                <span className="text-[10px] md:text-[11px] text-black font-semibold tracking-wider">
+                  {(salePrice && salePrice > 0) ? `৳${salePrice.toLocaleString()}` : formattedPrice}
+                </span>
+                {(salePrice && salePrice > 0) && (
+                  <span className="text-[8px] md:text-[9px] text-zinc-400 line-through tracking-wider">
+                    {formattedPrice}
+                  </span>
+                )}
+              </>
+            )}
+          </div>
           <span className="text-[8px] text-zinc-400 font-medium tracking-[0.15em] uppercase">
-            Limited
+            {stockStage === "pre-order" ? "Enrolling" : "Limited"}
           </span>
         </div>
       </div>

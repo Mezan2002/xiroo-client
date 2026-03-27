@@ -89,7 +89,7 @@ export function CartSidebar({ isOpen, onClose }) {
                       <>
                         Add{" "}
                         <span className="font-semibold text-black">
-                          ৳{remaining.toFixed(0)}
+                          ৳{Number(remaining || 0).toFixed(0)}
                         </span>{" "}
                         more for{" "}
                         <span className="font-semibold text-black">
@@ -135,6 +135,7 @@ export function CartSidebar({ isOpen, onClose }) {
                           src={item.image}
                           alt={item.title}
                           fill
+                          sizes="96px"
                           className="object-cover"
                         />
                       </div>
@@ -146,16 +147,23 @@ export function CartSidebar({ isOpen, onClose }) {
                             {item.title}
                           </h3>
                           <span className="text-[14px] font-medium text-black whitespace-nowrap">
-                            ৳{item.price.toFixed(0)}
+                            ৳{parseFloat(((item.salePrice && item.salePrice > 0) ? item.salePrice : item.price)?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
                           </span>
                         </div>
 
                         <p className="text-[13px] text-gray-400 mb-1">
                           {item.variant}
                         </p>
-                        <p className="text-[13px] text-gray-400 mb-5">
-                          ৳{item.price.toFixed(0)}
-                        </p>
+                        <div className="flex items-center gap-2 mb-5">
+                          <p className="text-[13px] text-black font-semibold">
+                            ৳{parseFloat(((item.salePrice && item.salePrice > 0) ? item.salePrice : item.price)?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
+                          </p>
+                          {(item.salePrice && item.salePrice > 0) && (
+                            <p className="text-[11px] text-gray-400 line-through">
+                              ৳{parseFloat(item.price?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
+                            </p>
+                          )}
+                        </div>
 
                         <div className="flex items-center gap-4">
                           {/* Quantity Selector Box */}
@@ -258,7 +266,7 @@ export function CartSidebar({ isOpen, onClose }) {
                     Estimated total
                   </span>
                   <span className="text-[22px] font-semibold text-black">
-                    ৳{subtotal.toFixed(0)}
+                    ৳{Number(subtotal || 0).toFixed(0)}
                   </span>
                 </div>
 

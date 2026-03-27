@@ -2,7 +2,7 @@
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { useToast } from "@/context/ToastContext";
 import { apiRequest } from "@/lib/api";
-import { Info, Plus, Save, Shield, Trash2 } from "lucide-react";
+import { Info, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AdminLoyalty() {

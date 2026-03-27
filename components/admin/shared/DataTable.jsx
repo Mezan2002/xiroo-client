@@ -28,22 +28,49 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
             )}
           </div>
         );
+      case 'date':
+        const dateValue = row[col.key];
+        if (!dateValue) return <span className="text-[13px] text-zinc-400 font-bold uppercase tracking-widest italic">N/A</span>;
+        return (
+          <span className="text-[13px] text-[#37352F] font-medium">
+            {new Date(dateValue).toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
+          </span>
+        );
       case 'status':
         const status = row[col.key];
         return (
-          <span className={`text-[12px] font-medium px-2 py-[2px] rounded-sm bg-opacity-10 ${
-            status === 'Active' || status === 'Completed' || status === 'Paid'
-              ? 'bg-green-100 text-[#0E6245] bg-opacity-100'
-              : status === 'Draft' || status === 'Processing'
-              ? 'bg-blue-100 text-[#0B4A72] bg-opacity-100'
-              : 'bg-red-100 text-[#9B2C2C] bg-opacity-100'
+          <span className={`text-[10px] font-bold px-2 py-[2px] rounded-none border uppercase tracking-widest ${
+            status?.toLowerCase() === 'active' || status?.toLowerCase() === 'completed' || status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'delivered'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+              : status?.toLowerCase() === 'draft' || status?.toLowerCase() === 'processing' || status?.toLowerCase() === 'pending'
+              ? 'bg-amber-50 text-amber-700 border-amber-100'
+              : 'bg-rose-50 text-rose-700 border-rose-100'
           }`}>
-            {status}
+            {status?.toUpperCase()}
+          </span>
+        );
+      case 'currency':
+        return (
+          <span className="text-[13px] text-[#37352F] font-bold">
+            ৳{row[col.key]?.toLocaleString()}
           </span>
         );
       case 'actions':
         return (
           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onView && (
+              <button 
+                onClick={() => onView(row)}
+                className="p-2 text-[#37352F80] hover:text-[#37352F] transition-colors" 
+                title="View Detail"
+              >
+                <ExternalLink size={14} />
+              </button>
+            )}
             {onEdit && (
               <button 
                 onClick={() => onEdit(row)}
@@ -60,15 +87,6 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
                 title="Delete"
               >
                 <Trash2 size={14} />
-              </button>
-            )}
-            {onView && (
-              <button 
-                onClick={() => onView(row)}
-                className="p-2 text-[#37352F80] hover:text-[#37352F] transition-colors" 
-                title="View Detail"
-              >
-                <ExternalLink size={14} />
               </button>
             )}
           </div>

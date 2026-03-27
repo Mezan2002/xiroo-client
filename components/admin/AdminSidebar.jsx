@@ -17,6 +17,7 @@ import {
   Tag,
   Users,
   Bell,
+  Hash,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,14 +31,45 @@ const NAV_ITEMS = [
   { label: "Loyalty Matrix", href: "/admin/loyalty", icon: Shield },
   { label: "Discounts", href: "/admin/discounts", icon: Tag },
   { label: "Newsletters", href: "/admin/newsletters", icon: Mail },
+  { label: "Navigation", href: "/admin/navigation", icon: Layers },
+  { label: "Attributes", href: "/admin/attributes", icon: Hash },
   { label: "Analytics", href: "/admin/analytics", icon: LineChart },
   { label: "Branding", href: "/admin/branding", icon: Palette },
   { label: "Store Layout", href: "/admin/layout", icon: Layers },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
+import { useNotifications } from "@/context/NotificationContext";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
+import { useSocket } from "@/context/SocketContext";
+import { useUser } from "@/context/UserContext";
+import { useEffect } from "react";
+import { useConversations } from "@/hooks/useInbox";
+
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { unreadCount: notificationUnread } = useNotifications();
+  const { user } = useUser();
+  const { socket } = useSocket();
+
+  // Dynamic Inbox Sync
+  const { data: conversations, refetch: refetchInbox } = useConversations({ status: 'active' });
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("inbox_update", () => refetchInbox());
+      socket.on("new_message", () => refetchInbox());
+      return () => {
+        socket.off("inbox_update");
+        socket.off("new_message");
+      };
+    }
+  }, [socket, refetchInbox]);
+
+  const inboxUnread = conversations?.reduce((acc, conv) => {
+    return acc + (conv.unreadCount?.[user?._id] || 0);
+  }, 0) || 0;
 
   const handleOpenSearch = () => {
     window.dispatchEvent(new CustomEvent('open-admin-search'));
@@ -47,8 +79,8 @@ export default function AdminSidebar() {
     <aside className="w-64 h-screen bg-[#F7F7F5] border-r border-[#EDECE9] flex flex-col sticky top-0 shrink-0 select-none font-montserrat antialiased overflow-hidden">
       {/* Workspace Selector */}
       <div className="p-4">
-        <div className="flex items-center gap-3 px-2 py-2 hover:bg-[#EBEBE9] rounded-lg cursor-pointer transition-all active:scale-[0.98] group">
-          <div className="w-7 h-7 bg-black text-white flex items-center justify-center font-bold text-[12px] rounded-lg shadow-xl shadow-black/10 ring-1 ring-black/5">
+        <div className="flex items-center gap-3 px-2 py-2 hover:bg-[#EBEBE9] rounded-none cursor-pointer transition-all active:scale-[0.98] group">
+          <div className="w-7 h-7 bg-black text-white flex items-center justify-center font-bold text-[12px] rounded-none shadow-xl shadow-black/10 ring-1 ring-black/5">
             X
           </div>
           <div className="flex flex-col flex-1 min-w-0">
@@ -72,8 +104,8 @@ export default function AdminSidebar() {
       <div className="px-3 space-y-px">
         {[
           { icon: Search, label: "Search", onClick: handleOpenSearch },
-          { icon: Inbox, label: "Inbox", href: "/admin/inbox", badge: 2 },
-          { icon: Bell, label: "Notifications", href: "/admin/notifications", badge: 3 },
+          { icon: Inbox, label: "Inbox", href: "/admin/inbox", badge: inboxUnread },
+          { icon: Bell, label: "Notifications", href: "/admin/notifications", badge: notificationUnread },
         ].map((item, idx) => {
           const Icon = item.icon;
           const isActive = item.href && pathname === item.href;
@@ -83,7 +115,7 @@ export default function AdminSidebar() {
               <button
                 key={idx}
                 onClick={item.onClick}
-                className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-md text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] outline-none"
+                className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-none text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] outline-none"
               >
                 <Icon size={16} className="text-[#37352F80] group-hover:text-[#37352F]" />
                 <span className="flex-1 text-left">{item.label}</span>
@@ -95,7 +127,7 @@ export default function AdminSidebar() {
             <Link
               key={idx}
               href={item.href || "#"}
-              className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-md ${
+              className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-none ${
                 isActive
                   ? "bg-[#EBEBE9] text-[#37352F]"
                   : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
@@ -134,7 +166,7 @@ export default function AdminSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-md ${
+                  className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-none ${
                     isActive
                       ? "bg-[#EBEBE9] text-[#37352F]"
                       : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
@@ -156,9 +188,9 @@ export default function AdminSidebar() {
       <div className="px-3 py-4 border-t border-[#EDECE9]">
         <Link
           href="/"
-          className="flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] rounded-md transition-all"
+          className="flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] rounded-none transition-all"
         >
-          <div className="w-5 h-5 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center text-[10px] text-gray-500 font-bold border border-gray-100">
+          <div className="w-5 h-5 bg-gray-200 rounded-none overflow-hidden flex items-center justify-center text-[10px] text-gray-500 font-bold border border-gray-100">
             A
           </div>
           <span>Back to Store</span>

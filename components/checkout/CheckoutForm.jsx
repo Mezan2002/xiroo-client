@@ -1,11 +1,20 @@
-import { ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { ChevronRight, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/Button";
 import SearchableDistrict from "../ui/SearchableDistrict";
+import { useUser } from "@/context/UserContext";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/context/ToastContext";
+import { apiRequest } from "@/lib/api";
 
-export default function CheckoutForm({ step, setStep, setProductDistrict }) {
+export default function CheckoutForm({ step, setStep, setProductDistrict, deliveryMethod, setDeliveryMethod, items, subtotal, shipping, total }) {
   const router = useRouter();
+  const { user } = useUser();
+  const { clearCart } = useCart();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
@@ -18,6 +27,29 @@ export default function CheckoutForm({ step, setStep, setProductDistrict }) {
     paymentMethod: "cod",
   });
 
+  // Pre-fill user data
+  useEffect(() => {
+    if (user) {
+      const defaultAddress = user.addresses?.find(addr => addr.isDefault) || user.addresses?.[0];
+      
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || prev.email,
+        firstName: user.firstName || user.name?.split(' ')[0] || prev.firstName,
+        lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || prev.lastName,
+        phone: user.phoneNumber || user.phone || prev.phone,
+        address: defaultAddress ? `${defaultAddress.addressLine1}${defaultAddress.addressLine2 ? ', ' + defaultAddress.addressLine2 : ''}` : prev.address,
+        district: defaultAddress?.state || prev.district,
+        upazila: defaultAddress?.city || prev.upazila,
+        postalCode: defaultAddress?.postalCode || prev.postalCode,
+      }));
+
+      if (defaultAddress?.state && setProductDistrict) {
+        setProductDistrict(defaultAddress.state);
+      }
+    }
+  }, [user, setProductDistrict]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -28,13 +60,55 @@ export default function CheckoutForm({ step, setStep, setProductDistrict }) {
     if (setProductDistrict) setProductDistrict(val);
   };
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Simulate order placement
-      router.push("/checkout/success");
+      await handlePlaceOrder();
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      const orderItems = items.map(item => ({
+        product: item.id || item._id,
+        quantity: item.quantity,
+        price: parseFloat((item.salePrice || item.price)?.toString().replace(/[^0-9.]/g, "") || 0)
+      }));
+
+      const shippingAddress = `${formData.address}, ${formData.upazila}, ${formData.district} - ${formData.postalCode}`;
+      
+      const orderPayload = {
+        user: user?._id || user?.id,
+        items: orderItems,
+        totalPrice: total,
+        shippingFee: shipping,
+        deliveryMethod: deliveryMethod,
+        paymentMethod: formData.paymentMethod,
+        shippingAddress: shippingAddress,
+      };
+
+      const response = await apiRequest("/orders", {
+        method: "POST",
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (response.success) {
+        toast.success("Order placed successfully!");
+        clearCart();
+        const orderId = response.data._id || response.data.id;
+        router.push(`/checkout/success?id=${orderId}`);
+      } else {
+        toast.error(response.message || "Failed to place order");
+      }
+    } catch (error) {
+      console.error("Order submission error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -183,7 +257,8 @@ export default function CheckoutForm({ step, setStep, setProductDistrict }) {
                     <input
                       type="radio"
                       name="shipping"
-                      defaultChecked
+                      checked={deliveryMethod === "normal"}
+                      onChange={() => setDeliveryMethod("normal")}
                       className="w-4 h-4 accent-black"
                     />
                     <div className="flex flex-col">
@@ -202,6 +277,8 @@ export default function CheckoutForm({ step, setStep, setProductDistrict }) {
                     <input
                       type="radio"
                       name="shipping"
+                      checked={deliveryMethod === "fast"}
+                      onChange={() => setDeliveryMethod("fast")}
                       className="w-4 h-4 accent-black"
                     />
                     <div className="flex flex-col">
@@ -266,8 +343,15 @@ export default function CheckoutForm({ step, setStep, setProductDistrict }) {
         )}
 
         <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-gray-100">
-          <Button type="submit" size="lg" className="flex-1">
-            {step === 3 ? "Complete Purchase" : "Continue to Delivery"}
+          <Button type="submit" size="lg" className="flex-1" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Processing...
+              </div>
+            ) : (
+              step === 3 ? "Complete Purchase" : "Continue to Delivery"
+            )}
           </Button>
           {step > 1 && (
             <Button

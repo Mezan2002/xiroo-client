@@ -1,71 +1,109 @@
 "use client";
-import ConfirmationModal from "@/components/admin/ConfirmationModal";
-import { Button } from "@/components/ui/Button";
+import { useSocket } from "@/context/SocketContext";
+import { useUser } from "@/context/UserContext";
+import {
+  useAssignConversation,
+  useConversation,
+  useFlagConversation,
+  useMarkAsRead,
+  useSendMessage,
+  useSetPriority,
+  useSetStatus,
+} from "@/hooks/useInbox";
+import { apiRequest } from "@/lib/api";
 import {
   ArrowLeft,
   CheckCircle2,
-  Clock,
+  ChevronDown,
   Flag,
   Loader2,
-  MoreHorizontal,
   Paperclip,
-  Search,
   Send,
   Shield,
-  Smile,
-  Trash2,
-  User,
+  UserCheck,
 } from "lucide-react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-const INITIAL_MESSAGES = [
-  {
-    id: "h1",
-    sender: "John Doe",
-    message:
-      "Is the Xiroo™ LED Cap Lamp back in stock? I'd like to order 5 for my team.",
-    time: "10:42 AM",
-    type: "received",
-  },
-  {
-    id: "h2",
-    sender: "Admin",
-    message: "Initial inquiry registered. Checking inventory across all nodes.",
-    time: "10:45 AM",
-    type: "sent",
-  },
-  {
-    id: "h3",
-    sender: "John Doe",
-    message:
-      "Thank you. Let me know if you can ship them to Dhaka by tomorrow.",
-    time: "10:48 AM",
-    type: "received",
-  },
-];
+const PRIORITY_OPTIONS = ["low", "medium", "high", "urgent"];
 
-export default function MessagingTerminalFunctional() {
+const PRIORITY_STYLES = {
+  low: {
+    pill: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    dot: "bg-emerald-500",
+  },
+  medium: {
+    pill: "bg-zinc-50 text-zinc-600 border-zinc-100",
+    dot: "bg-zinc-400",
+  },
+  high: {
+    pill: "bg-orange-50 text-orange-700 border-orange-100",
+    dot: "bg-orange-500",
+  },
+  urgent: { pill: "bg-red-50 text-red-700 border-red-100", dot: "bg-red-500" },
+};
+
+export default function MessagingTerminal() {
   const router = useRouter();
   const { id } = useParams();
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
-  const [reply, setReply] = useState("");
-  const [status, setStatus] = useState("Online Now");
-  const [caseStatus, setCaseStatus] = useState("active"); // active, resolved
-  const [isFlagged, setIsFlagged] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showMenu, setShowMenu] = useState(false);
-  const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
-  const [showEmojis, setShowEmojis] = useState(false);
-  const scrollRef = useRef(null);
-  const menuRef = useRef(null);
-  const emojiRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const textareaRef = useRef(null);
 
-  // Auto-resize textarea
+  const { data: conversation, isLoading, refetch } = useConversation(id);
+  const sendMessageMutation = useSendMessage();
+  const assignMutation = useAssignConversation(id);
+  const flagMutation = useFlagConversation(id);
+  const statusMutation = useSetStatus(id);
+  const priorityMutation = useSetPriority(id);
+  const { mutate: markAsRead } = useMarkAsRead();
+
+  const { socket } = useSocket();
+  const { user: currentUser } = useUser();
+
+  const [reply, setReply] = useState("");
+  const [showPriorityMenu, setShowPriorityMenu] = useState(false);
+  const [showAssignMenu, setShowAssignMenu] = useState(false);
+  const [admins, setAdmins] = useState([]);
+
+  const scrollRef = useRef(null);
+  const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    apiRequest(`/users?role=admin`)
+      .then((d) => {
+        // Double check filtering on client side for security/robustness
+        const filteredAdmins = (d.data || []).filter(u => u.role === 'admin');
+        setAdmins(filteredAdmins);
+      })
+      .catch(() => {});
+  }, []);
+
+  const lastMarkedId = useRef(null);
+  useEffect(() => {
+    if (id && lastMarkedId.current !== id) {
+      markAsRead(id);
+      lastMarkedId.current = id;
+    }
+  }, [id, markAsRead]);
+
+  useEffect(() => {
+    if (!socket || !id) return;
+    socket.emit("join_room", id);
+    const onMsg = (d) => {
+      if (String(d.conversationId) === String(id)) refetch();
+    };
+    const onUpd = (d) => {
+      if (!d?.conversationId || String(d.conversationId) === String(id))
+        refetch();
+    };
+    socket.on("new_message", onMsg);
+    socket.on("inbox_update", onUpd);
+    return () => {
+      socket.off("new_message", onMsg);
+      socket.off("inbox_update", onUpd);
+    };
+  }, [socket, id, refetch]);
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -73,476 +111,471 @@ export default function MessagingTerminalFunctional() {
     }
   }, [reply]);
 
-  // Close menus on click outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
-        setShowEmojis(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current)
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isTyping]);
+  }, [conversation?.messages?.length]);
 
   const handleSend = (e) => {
     e?.preventDefault();
     if (!reply.trim()) return;
-
-    const newMessage = {
-      id: Date.now().toString(),
-      sender: "Admin",
-      message: reply,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      type: "sent",
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
-    setReply("");
-    if (textareaRef.current) textareaRef.current.style.height = "auto";
-
-    // Simulate Client Response
-    setTimeout(() => {
-      setIsTyping(true);
-      setTimeout(() => {
-        setIsTyping(false);
-        const response = {
-          id: (Date.now() + 1).toString(),
-          sender: "John Doe",
-          message:
-            "Understood. Please confirm the shipping timeline as soon as possible. ৳2,400 is the rate, correct?",
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          type: "received",
-        };
-        setMessages((prev) => [...prev, response]);
-      }, 2000);
-    }, 1000);
-  };
-
-  const finalizeCase = () => {
-    setCaseStatus("resolved");
-    const closingMsg = {
-      id: "finalize-" + Date.now(),
-      sender: "System",
-      message: "✓ Case officially finalized and archived by Admin.",
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      type: "system",
-    };
-    setMessages((prev) => [...prev, closingMsg]);
-  };
-
-  const purgeRecords = () => {
-    setIsPurgeModalOpen(true);
-  };
-
-  const confirmPurge = () => {
-    setMessages([]);
+    sendMessageMutation.mutate({ content: reply, conversationId: id });
     setReply("");
   };
 
-  const handleFileAttach = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const msg = {
-        id: "file-" + Date.now(),
-        sender: "System",
-        message: `📎 File attachment detected: ${file.name} (${(file.size / 1024).toFixed(1)} KB). Processing upload...`,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        type: "system",
-      };
-      setMessages((prev) => [...prev, msg]);
-    }
-  };
+  <div className="flex flex-col items-center justify-center h-screen gap-4 bg-white">
+    <Loader2 className="w-10 h-10 animate-spin text-zinc-300" />
+    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600">
+      Synchronizing...
+    </p>
+  </div>;
 
-  const addEmoji = (emoji) => {
-    setReply((prev) => prev + emoji);
-    setShowEmojis(false);
-    textareaRef.current?.focus();
-  };
+  const customer =
+    conversation?.customer ||
+    conversation?.participants?.find((p) => p.role === "customer") ||
+    conversation?.participants?.[0] ||
+    {};
+
+  const isResolved = conversation?.status === "resolved";
+  const priority = conversation?.priority || "medium";
+  const ps = PRIORITY_STYLES[priority] || PRIORITY_STYLES.medium;
 
   return (
-    <div className="fixed inset-0 top-0 left-64 bg-white flex overflow-hidden font-montserrat antialiased z-50">
-      {/* Confirmation Modals */}
-      <ConfirmationModal
-        isOpen={isPurgeModalOpen}
-        onClose={() => setIsPurgeModalOpen(false)}
-        onConfirm={confirmPurge}
-        title="Purge Operational Records"
-        message="CRITICAL: You are about to permanently purge all conversation history for this session. This action is irreversible and will remove all intelligence metadata. Proceed?"
-        confirmText="Purge History"
-        type="danger"
-      />
-
-      {/* Main Conversation Hub */}
-      <div className="flex-1 flex flex-col bg-[#F7F7F5] relative border-r border-[#EDECE9]">
-        {/* Boutique Header: High Visibility */}
-        <div className="h-16 bg-white flex items-center justify-between px-8 shrink-0 z-10 shadow-sm border-b border-[#EDECE9]">
+    <div className="fixed inset-0 top-0 left-64 flex overflow-hidden bg-white font-montserrat antialiased z-50">
+      {/* ══ Main Column ═══════════════════════════════════════════════════ */}
+      <div className="flex-1 flex flex-col min-w-0 border-r border-zinc-100">
+        {/* Header */}
+        <header className="h-[72px] shrink-0 px-8 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-zinc-100">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="text-[#37352F80] hover:text-black transition-all p-1.5 hover:bg-[#F7F7F5] rounded-none"
+              className="p-2 -ml-2 rounded-none text-zinc-400 hover:bg-zinc-50 transition-colors"
             >
-              <ArrowLeft size={18} strokeWidth={2.5} />
+              <ArrowLeft size={20} />
             </button>
-            <div className="w-10 h-10 bg-black text-white rounded-none flex items-center justify-center font-bold text-[14px] shadow-lg shadow-black/10">
-              J
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[14px] font-bold text-[#37352F] leading-tight tracking-tight">
-                John Doe
-              </span>
-              <div className="flex items-center gap-2 mt-0.5">
-                <div
-                  className={`w-2 h-2 rounded-full ${status === "Online Now" ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]" : "bg-gray-300"}`}
-                />
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-widest ${status === "Online Now" ? "text-green-700" : "text-gray-500"}`}
-                >
-                  {status}
-                </span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-none bg-zinc-900 text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase">
+                {customer.firstName?.[0] || "?"}
               </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-7 text-[#37352F60] relative">
-            {isSearching ? (
-              <div className="flex items-center bg-[#F7F7F5] border border-[#EDECE9] px-3 py-1 animate-in fade-in zoom-in-95 duration-200">
-                <Search size={14} className="text-[#37352F40] mr-2" />
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Find in chat..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onBlur={() => !searchQuery && setIsSearching(false)}
-                  className="bg-transparent text-[12px] font-medium outline-none w-40 text-black placeholder:text-[#37352F40]"
-                />
-              </div>
-            ) : (
-              <Search
-                size={19}
-                onClick={() => setIsSearching(true)}
-                className="hover:text-black cursor-pointer transition-colors"
-              />
-            )}
-
-            <div className="relative" ref={menuRef}>
-              <MoreHorizontal
-                size={19}
-                onClick={() => setShowMenu(!showMenu)}
-                className={`hover:text-black cursor-pointer transition-colors ${showMenu ? "text-black" : ""}`}
-              />
-
-              {showMenu && (
-                <div className="absolute right-0 mt-4 w-56 bg-white border border-[#EDECE9] shadow-2xl py-2 z-60 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <button className="w-full text-left px-4 py-2 text-[12px] font-bold uppercase tracking-widest text-[#37352F80] hover:bg-[#F7F7F5] hover:text-black transition-all">
-                    Export Conversation
-                  </button>
-                  <button className="w-full text-left px-4 py-2 text-[12px] font-bold uppercase tracking-widest text-[#37352F80] hover:bg-[#F7F7F5] hover:text-black transition-all">
-                    Mute Alerts
-                  </button>
-                  <button
-                    onClick={() => {
-                      purgeRecords();
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-[12px] font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 transition-all border-t border-[#EDECE9] mt-1 pt-3"
-                  >
-                    Clear History
-                  </button>
+              <div>
+                <h1 className="text-[15px] font-semibold text-zinc-900 leading-tight">
+                  {customer.firstName} {customer.lastName}
+                </h1>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-none bg-emerald-500" />
+                  <span className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider">
+                    Online
+                  </span>
                 </div>
-              )}
+              </div>
             </div>
-
-            {caseStatus === "resolved" && (
-              <span className="text-[10px] bg-green-100 text-green-700 px-3 py-1 font-bold uppercase tracking-[0.2em] animate-in fade-in zoom-in-95">
-                Resolved
-              </span>
-            )}
           </div>
-        </div>
 
-        {/* Cinematic Chat Window: Solid Separation */}
+          <div className="flex items-center gap-4">
+            <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-widest px-3 py-1 border border-zinc-200 rounded-none">
+              Case #{conversation?._id?.slice(-6).toUpperCase()}
+            </span>
+            <div className="w-px h-6 bg-zinc-200 mx-2" />
+            <button
+              onClick={() =>
+                statusMutation.mutate({
+                  status: isResolved ? "active" : "resolved",
+                })
+              }
+              disabled={statusMutation.isPending}
+              className={`h-9 px-5 rounded-none text-[11px] font-semibold tracking-wide transition-all ${
+                isResolved
+                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                  : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-zinc-200"
+              }`}
+            >
+              {statusMutation.isPending ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : isResolved ? (
+                "Reopen Case"
+              ) : (
+                "Resolve Case"
+              )}
+            </button>
+          </div>
+        </header>
+
+        {/* Messaging Area */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-10 space-y-8 bg-[#F7F7F5] custom-scrollbar relative scroll-smooth"
+          className="flex-1 overflow-y-auto px-10 py-10 space-y-8 bg-white custom-scrollbar"
         >
-          <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00754774d27ee05193060ef7da012.jpg')] bg-repeat bg-contain" />
+          <div className="flex justify-center mb-4">
+            <span className="text-[11px] font-medium text-zinc-600 bg-zinc-50 px-3 py-1 rounded-none border border-zinc-200">
+              Inquiry started on{" "}
+              {new Date(conversation?.createdAt).toLocaleDateString([], {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+          </div>
 
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full space-y-4 opacity-20">
-              <Clock size={48} />
-              <p className="text-[11px] font-bold uppercase tracking-[0.4em]">
-                Historical Void
-              </p>
-            </div>
-          )}
+          {conversation?.messages?.map((msg, idx) => {
+            const isAdminMsg = msg.senderRole === "admin";
+            const isMe =
+              isAdminMsg &&
+              String(msg.sender?._id || msg.sender) ===
+                String(currentUser?._id);
 
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${msg.type === "sent" ? "justify-end" : msg.type === "system" ? "justify-center" : "justify-start"} relative z-10`}
-            >
-              {msg.type === "system" ? (
-                <div className="bg-white/50 border border-[#EDECE9] px-6 py-2 text-[10px] font-bold text-[#37352F40] uppercase tracking-[0.2em] rounded-none">
-                  {msg.message}
-                </div>
-              ) : (
+            return (
+              <div
+                key={msg._id || idx}
+                className={`flex ${isAdminMsg ? "justify-end" : "justify-start"} animate-in fade-in duration-500`}
+              >
                 <div
-                  className={`max-w-[70%] relative group shadow-sm border border-[#EDECE9]/50 animate-in fade-in slide-in-from-bottom-2 duration-300 ${
-                    msg.type === "sent"
-                      ? "bg-black text-white p-5 rounded-none shadow-black/5"
-                      : "bg-white text-[#37352F] p-5 rounded-none"
-                  }`}
+                  className={`max-w-[75%] flex flex-col ${isAdminMsg ? "items-end" : "items-start"} gap-1.5`}
                 >
-                  <p
-                    className={`text-[13px] leading-relaxed font-medium whitespace-pre-wrap ${
-                      msg.type === "sent" ? "text-white" : "text-[#37352F]"
+                  {/* Bubble */}
+                  <div
+                    className={`px-5 py-3.5 rounded-none text-[14px] leading-relaxed tracking-tight ${
+                      isAdminMsg
+                        ? "bg-zinc-900 text-white rounded-none shadow-lg shadow-zinc-200"
+                        : "bg-zinc-200 text-zinc-800 border border-zinc-100/50 rounded-none"
                     }`}
                   >
-                    {msg.message}
-                  </p>
-                  <div className="flex items-center gap-2 mt-3 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <span
-                      className={`text-[9px] font-bold uppercase tracking-widest leading-none ${msg.type === "sent" ? "text-white/60" : "text-[#37352F80]"}`}
-                    >
-                      {msg.time}
-                    </span>
-                    {msg.type === "sent" && (
-                      <div className="flex items-center -space-x-1 translate-y-[0.5px]">
-                        <CheckCircle2 size={11} className="text-blue-400" />
-                        <CheckCircle2 size={11} className="text-blue-400" />
-                      </div>
+                    {msg.content && (
+                      <p className="whitespace-pre-wrap font-medium">
+                        {msg.content}
+                      </p>
                     )}
+
+                    {msg.attachments?.map((at, i) => (
+                      <div key={i} className="mt-3">
+                        {at.type?.startsWith("image") ? (
+                          <Image
+                            src={at.url}
+                            alt="Attachment"
+                            width={500}
+                            height={500}
+                            className="max-w-full rounded-none border border-zinc-200/50"
+                          />
+                        ) : (
+                          <a
+                            href={at.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-3 p-3 rounded-none bg-zinc-800/50 border border-zinc-700/30 text-white hover:bg-zinc-700/50 transition-all"
+                          >
+                            <Paperclip size={14} />
+                            <div className="text-left">
+                              <p className="text-[11px] font-semibold truncate max-w-[150px]">
+                                {at.name}
+                              </p>
+                              <p className="text-[9px] opacity-40 uppercase tracking-widest">
+                                {(at.size / 1024).toFixed(1)} KB
+                              </p>
+                            </div>
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Metadata */}
+                  <div className="flex items-center gap-2 px-1 opacity-70">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-900">
+                      {isAdminMsg
+                        ? isMe
+                          ? "You"
+                          : msg.sender?.firstName || "Admin"
+                        : customer.firstName}
+                    </span>
+                    <span className="text-[14px] leading-none text-zinc-400 pb-0.5">
+                      ·
+                    </span>
+                    <span className="text-[10px] font-semibold tracking-wide text-zinc-600">
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
                   </div>
                 </div>
-              )}
-            </div>
-          ))}
-
-          {isTyping && (
-            <div className="flex justify-start relative z-10 animate-pulse">
-              <div className="bg-white text-[#37352F40] p-4 rounded-none border border-[#EDECE9]/50 flex items-center gap-2">
-                <Loader2 size={14} className="animate-spin" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">
-                  Customer is typing...
-                </span>
               </div>
-            </div>
-          )}
+            );
+          })}
         </div>
 
-        {/* Boutique Solid Input Bar */}
-        <form
-          onSubmit={handleSend}
-          className="p-6 bg-white flex items-end gap-6 border-t border-[#EDECE9] shrink-0"
-        >
-          <div className="flex items-center gap-5 text-[#37352F80] mb-3">
-            <div className="relative" ref={emojiRef}>
-              <Smile
-                size={22}
-                onClick={() => setShowEmojis(!showEmojis)}
-                className={`hover:text-black cursor-pointer transition-transform hover:scale-110 active:scale-95 ${showEmojis ? "text-black" : ""}`}
-              />
-              {showEmojis && (
-                <div className="absolute bottom-full left-0 mb-4 bg-white border border-[#EDECE9] shadow-2xl p-4 z-60 flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                  {["✨", "📦", "✅", "🔥", "🚀", "⭐"].map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => addEmoji(emoji)}
-                      className="text-lg hover:scale-125 transition-transform"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              )}
+        {/* Footer / Input */}
+        <footer className="p-6 bg-white border-t border-zinc-100 shrink-0">
+          {isResolved ? (
+            <div className="flex items-center justify-center h-14 bg-emerald-50 text-emerald-700 text-[12px] font-semibold rounded-none gap-2 border border-emerald-100">
+              <CheckCircle2 size={16} /> This conversation was resolved. Reopen
+              to continue.
             </div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileAttach}
-            />
-            <Paperclip
-              size={22}
-              onClick={() => fileInputRef.current?.click()}
-              className="hover:text-black cursor-pointer transition-transform hover:scale-110 active:scale-95"
-            />
-          </div>
-          <div className="flex-1 relative">
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder={
-                caseStatus === "resolved"
-                  ? "Case resolved. Dispatch locked."
-                  : "Dispatch official response..."
-              }
-              disabled={caseStatus === "resolved"}
-              className="w-full bg-[#F7F7F5] border border-[#EDECE9] focus:border-black focus:bg-white rounded-none px-6 py-4 text-[13px] font-medium outline-none transition-all placeholder:text-[#37352F40] disabled:opacity-50 resize-none max-h-[200px] custom-scrollbar"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={!reply.trim() || caseStatus === "resolved"}
-            className={`h-12 px-10 flex items-center justify-center transition-all rounded-none font-bold text-[11px] uppercase tracking-[0.2em] shadow-xl mb-0.5 ${
-              reply && caseStatus !== "resolved"
-                ? "bg-black text-white hover:bg-[#111111] hover:-translate-y-0.5 active:translate-y-0"
-                : "bg-[#37352F20] text-white cursor-not-allowed opacity-40"
-            }`}
-          >
-            <Send size={16} className="mr-3" /> Dispatch
-          </button>
-        </form>
+          ) : (
+            <form
+              onSubmit={handleSend}
+              className="flex items-end gap-3 max-w-5xl mx-auto"
+            >
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-3 rounded-none text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-all mb-0.5"
+              >
+                <Paperclip size={22} />
+              </button>
+              <input ref={fileInputRef} type="file" hidden multiple />
+
+              <div className="flex-1 bg-zinc-50 border border-zinc-100 rounded-none focus-within:bg-white focus-within:border-zinc-300 focus-within:shadow-xl focus-within:shadow-zinc-100/50 transition-all px-4 py-1">
+                <textarea
+                  ref={textareaRef}
+                  rows={1}
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  placeholder="Type your response…"
+                  disabled={sendMessageMutation.isPending}
+                  className="w-full bg-transparent px-2 py-4 text-[14px] text-zinc-800 placeholder:text-zinc-400 outline-none resize-none max-h-[160px] leading-relaxed font-medium"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!reply.trim() || sendMessageMutation.isPending}
+                className="h-14 w-14 flex items-center justify-center rounded-none transition-all shadow-xl shadow-zinc-200/50 mb-0.5 shrink-0
+                  enabled:bg-zinc-900 enabled:text-white enabled:hover:bg-zinc-700 enabled:hover:scale-105 active:scale-95
+                  disabled:bg-zinc-100 disabled:text-zinc-300"
+              >
+                {sendMessageMutation.isPending ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <Send size={20} className="ml-0.5" />
+                )}
+              </button>
+            </form>
+          )}
+        </footer>
       </div>
 
-      {/* Right Sidebar: Architecturally Distinct Intelligence */}
-      <div className="w-[330px] border-l border-[#EDECE9] flex flex-col bg-white overflow-y-auto custom-scrollbar">
-        {/* Identity Hub: Solid Header */}
-        <div className="p-8 text-center space-y-6 border-b border-[#EDECE9] bg-[#F7F7F5]/40">
-          <div className="w-24 h-24 bg-white border-2 border-[#EDECE9] rounded-none flex items-center justify-center mx-auto mb-4 font-bold text-[36px] text-black shadow-2xl shadow-black/5">
-            J
+      {/* ══ Sidebar ═══════════════════════════════════════════════════════ */}
+      <aside className="w-[320px] shrink-0 flex flex-col bg-white overflow-y-auto custom-scrollbar">
+        {/* User Card */}
+        <div className="p-8 text-center bg-zinc-50/50 border-b border-zinc-100">
+          <div className="w-20 h-20 rounded-none bg-white border border-zinc-100 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-zinc-200/50 font-bold text-2xl text-zinc-900 uppercase">
+            {customer.firstName?.[0] || "?"}
           </div>
-          <div className="space-y-1.5">
-            <h3 className="text-[20px] font-bold text-black tracking-tight">
-              John Doe
-            </h3>
-            <p className="text-[12px] text-[#37352F] font-bold tracking-tight opacity-70">
-              john.doe@example.com
-            </p>
+          <h2 className="text-[17px] font-bold text-zinc-900 tracking-tight">
+            {customer.firstName} {customer.lastName}
+          </h2>
+          <p className="text-[12px] text-zinc-600 mt-1.5 font-semibold truncate px-4">
+            {customer.email}
+          </p>
+          <div className="mt-6 flex flex-col gap-2.5 px-4 w-full">
+            <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+              <span className="uppercase tracking-widest text-[9px]">Joined</span>
+              <span className="text-zinc-900">{customer?.createdAt ? new Date(customer.createdAt).toLocaleDateString([], { month: 'short', year: 'numeric' }) : 'Mar 2024'}</span>
+            </div>
+            <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+              <span className="uppercase tracking-widest text-[9px]">Total Orders</span>
+              <span className="text-zinc-900 font-bold">12</span>
+            </div>
+             <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+              <span className="uppercase tracking-widest text-[9px]">Account</span>
+              <span className="text-emerald-600 font-bold">Verified</span>
+            </div>
           </div>
-          <div className="pt-3 flex flex-col gap-2.5 px-6">
-            <span className="w-full py-2 bg-black text-white text-[10px] font-bold uppercase tracking-[0.3em] rounded-none shadow-xl shadow-black/10">
-              Platinum Member
-            </span>
-            <button
-              onClick={() => router.push("/admin/orders")}
-              className="w-full py-2 bg-white border border-[#EDECE9] text-[10px] font-bold uppercase tracking-[0.3em] text-black rounded-none hover:bg-black hover:text-white transition-all"
-            >
-              14 Transactions
+
+          <div className="mt-8 flex flex-col gap-3 w-full px-4">
+            <button className="h-11 w-full text-[11px] font-bold text-white bg-black rounded-none hover:bg-zinc-800 transition-all uppercase tracking-widest">
+              View Profile
             </button>
           </div>
         </div>
 
-        {/* Operation Zone: High Contrast Buttons */}
-        <div className="p-10 space-y-10">
+        {/* Management Controls */}
+        <div className="p-8 space-y-10">
           <div className="space-y-6">
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.5em] text-[#37352F] opacity-40">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
               Case Management
-            </h4>
-            <div className="space-y-2.5">
-              <Button
-                variant="outline"
-                disabled={caseStatus === "resolved"}
-                onClick={finalizeCase}
-                className={`w-full justify-start h-12 border-2 border-[#EDECE9] rounded-none text-[11px] font-bold tracking-tight transition-all px-5 ${
-                  caseStatus === "resolved"
-                    ? "bg-green-50 text-green-700 border-green-200"
-                    : "bg-white text-black hover:bg-black hover:text-white hover:border-black"
-                }`}
-              >
-                <CheckCircle2
-                  size={16}
-                  className={`${caseStatus === "resolved" ? "text-green-700" : "text-green-600"} mr-4`}
-                />{" "}
-                {caseStatus === "resolved" ? "Case Resolved" : "Finalize Case"}
-              </Button>
-              <Button
-                variant={isFlagged ? "primary" : "outline"}
-                onClick={() => setIsFlagged(!isFlagged)}
-                className={`w-full justify-start h-12 border-2 rounded-none text-[11px] font-bold tracking-tight px-5 transition-all ${
-                  isFlagged
-                    ? "bg-blue-600 border-blue-600 shadow-lg shadow-blue-600/20"
-                    : "border-[#EDECE9] text-black hover:bg-zinc-50"
+            </p>
+
+            <div className="space-y-3">
+              {/* Priority Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowPriorityMenu(!showPriorityMenu);
+                    setShowAssignMenu(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-5 h-12 rounded-none border transition-all text-[12px] font-semibold tracking-wide ${ps.pill}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`w-2 h-2 rounded-none ${ps.dot} shadow-sm`}
+                    />
+                    <span className="capitalize">{priority} Priority</span>
+                  </div>
+                  <ChevronDown
+                    size={14}
+                    className={`opacity-40 transition-transform ${showPriorityMenu ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {showPriorityMenu && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_40px_rgba(0,0,0,0.06)] rounded-none z-30 py-2 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                    {PRIORITY_OPTIONS.map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => {
+                          priorityMutation.mutate({ priority: p });
+                          setShowPriorityMenu(false);
+                        }}
+                        className="w-full text-left px-5 py-2.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors flex items-center gap-3"
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-none ${PRIORITY_STYLES[p]?.dot}`}
+                        />
+                        <span className="capitalize">{p}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Assignment Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowAssignMenu(!showAssignMenu);
+                    setShowPriorityMenu(false);
+                  }}
+                  className="w-full flex items-center justify-between px-5 h-12 rounded-none border border-zinc-100 bg-white hover:border-zinc-300 transition-all text-[12px] font-semibold text-zinc-700"
+                >
+                  <div className="flex items-center gap-3 text-zinc-400">
+                    <UserCheck size={16} />
+                    <span className="truncate text-zinc-700">
+                      {conversation?.assignedTo
+                        ? `${conversation.assignedTo.firstName}`
+                        : "Unassigned"}
+                    </span>
+                  </div>
+                  <ChevronDown
+                    size={14}
+                    className={`opacity-40 transition-transform ${showAssignMenu ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {showAssignMenu && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_40px_rgba(0,0,0,0.06)] rounded-none z-30 py-2 max-h-56 overflow-y-auto animate-in fade-in slide-in-from-top-2">
+                    {admins.map((admin) => (
+                      <button
+                        key={admin._id}
+                        onClick={() => {
+                          assignMutation.mutate({ assignedTo: admin._id });
+                          setShowAssignMenu(false);
+                        }}
+                        className="w-full text-left px-5 py-2.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors flex items-center gap-3"
+                      >
+                        <div className="w-6 h-6 rounded-none bg-zinc-100 text-zinc-700 flex items-center justify-center text-[10px] font-bold">
+                          {admin.firstName?.[0]}
+                        </div>
+                        {admin.firstName} {admin.lastName}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Flag Toggle */}
+              <button
+                onClick={() => flagMutation.mutate()}
+                className={`w-full flex items-center gap-3 px-5 h-12 rounded-none border transition-all text-[12px] font-semibold ${
+                  conversation?.isFlagged
+                    ? "bg-blue-50 border-blue-100 text-blue-700 shadow-sm"
+                    : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-300"
                 }`}
               >
                 <Flag
-                  size={16}
-                  className={`${isFlagged ? "text-white" : "text-blue-600"} mr-4`}
+                  size={15}
+                  className={
+                    conversation?.isFlagged ? "text-blue-600" : "text-zinc-300"
+                  }
                 />
-                <span className={isFlagged ? "text-white" : "text-black"}>
-                  {isFlagged ? "Flagged for Review" : "Flag for Review"}
+                <span>
+                  {conversation?.isFlagged ? "Under Review" : "Mark for Review"}
                 </span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={purgeRecords}
-                className="w-full justify-start h-12 bg-white border-2 border-[#EDECE9] hover:bg-red-600 hover:text-white hover:border-red-600 rounded-none text-[11px] font-bold text-black tracking-tight transition-all px-5 group"
-              >
-                <Trash2
-                  size={16}
-                  className="text-red-600 mr-4 group-hover:text-white"
-                />{" "}
-                Purge Records
-              </Button>
+              </button>
             </div>
           </div>
 
-          <div className="space-y-6 pt-10 border-t border-[#EDECE9]">
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.5em] text-[#37352F] opacity-40">
-              Security Metadata
-            </h4>
-            <div className="space-y-5">
-              <div className="flex gap-4 items-center group cursor-default">
-                <div className="w-10 h-10 bg-black text-white border border-black rounded-none flex items-center justify-center shrink-0 shadow-lg shadow-black/10">
-                  <Shield size={18} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-bold text-black leading-none mb-1">
-                    Platform Origin
-                  </p>
-                  <p className="text-[11px] text-[#37352F] font-bold opacity-60">
-                    Boutique Core • 1h
-                  </p>
-                </div>
+          <div className="space-y-6 pt-8 border-t border-zinc-50">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
+              Case Registry
+            </p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+                <span className="uppercase tracking-widest text-[9px]">Status</span>
+                <span className={`flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] ${isResolved ? "text-emerald-600" : "text-amber-600"}`}>
+                  <span className={`w-1.5 h-1.5 rounded-none ${isResolved ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
+                  {isResolved ? "Resolved" : "Open"}
+                </span>
               </div>
-              <div className="flex gap-4 items-center group cursor-default">
-                <div className="w-10 h-10 bg-[#F7F7F5] border border-[#EDECE9] rounded-none flex items-center justify-center shrink-0">
-                  <User size={18} className="text-[#37352F80]" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-bold text-black leading-none mb-1">
-                    Support REQ ID
-                  </p>
-                  <p className="text-[11px] text-[#37352F] font-bold opacity-60 truncate underline decoration-[#EDECE9] underline-offset-2">
-                    XRO-8F8C-2D3E
-                  </p>
-                </div>
+              <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+                <span className="uppercase tracking-widest text-[9px]">Created</span>
+                <span className="text-zinc-900">{conversation?.createdAt ? new Date(conversation.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+                <span className="uppercase tracking-widest text-[9px]">Channel</span>
+                <span className="text-zinc-900 font-bold uppercase tracking-tighter text-[10px]">Direct Support</span>
               </div>
             </div>
           </div>
+
+          {/* Activity Timeline */}
+          {conversation?.activityLog?.length > 0 && (
+            <div className="space-y-6 pt-4 border-t border-zinc-50">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
+                Activity History
+              </p>
+              <div className="space-y-4 pr-2">
+                {[...conversation.activityLog].reverse().map((entry, i) => (
+                  <div key={i} className="flex gap-4 items-start group">
+                    <div className="w-8 h-8 rounded-none bg-zinc-50 border border-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-500 group-hover:bg-zinc-900 group-hover:text-white transition-all shrink-0">
+                      {entry.actor?.firstName?.[0] || "A"}
+                    </div>
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      <div className="flex justify-between items-center bg-transparent">
+                        <span className="text-[11px] font-bold text-zinc-800">
+                          {entry.actor?.firstName || "System"}
+                        </span>
+                        <span className="text-[9px] font-semibold text-zinc-500">
+                          {new Date(entry.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-zinc-500 font-bold capitalize mt-0.5">
+                        {entry.action.replace(/_/g, " ")}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Security Footer */}
+          <div className="pt-8 border-t border-zinc-50 flex flex-col items-center opacity-70">
+            <div className="w-12 h-12 rounded-none bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-400 mb-4">
+              <Shield size={20} />
+            </div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-zinc-600">
+              Secure Protocol v2.0
+            </p>
+          </div>
         </div>
-      </div>
+      </aside>
     </div>
   );
 }

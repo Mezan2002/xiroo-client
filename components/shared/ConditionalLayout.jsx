@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "./Navbar";
 import Footer from "./Footer";
+import ChatBubble from "./ChatBubble";
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
@@ -21,6 +22,7 @@ export default function ConditionalLayout({ children }) {
       <Navbar />
       <main className="grow">{children}</main>
       <Footer />
+      <ChatBubble />
     </div>
   );
 }

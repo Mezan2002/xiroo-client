@@ -7,6 +7,7 @@ import { useToast } from "@/context/ToastContext";
 import { Mail, RefreshCw, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
+import { useUser } from "@/context/UserContext";
 
 function VerifyEmailContent() {
   const { updateLayout } = useAuthLayout();

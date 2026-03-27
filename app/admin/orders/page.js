@@ -1,39 +1,60 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Plus, ShoppingBag, Trash2 } from "lucide-react";
-
+import { Plus, ShoppingBag, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-const MOCK_ORDERS = [
-  { id: "#XR-2814", customer: "John Doe", date: "Mar 22, 2024", total: "৳2,450", payment: "COD", status: "Processing" },
-  { id: "#XR-2813", customer: "Sarah Smith", date: "Mar 21, 2024", total: "৳12,100", payment: "Paid", status: "Completed" },
-  { id: "#XR-2812", customer: "Rahim Ahmed", date: "Mar 20, 2024", total: "৳4,950", payment: "Paid", status: "Active" },
-  { id: "#XR-2811", customer: "Zarin Tasnim", date: "Mar 19, 2024", total: "৳1,200", payment: "Paid", status: "Shipped" },
-  { id: "#XR-2810", customer: "Farhan Ali", date: "Mar 18, 2024", total: "৳8,500", payment: "Unpaid", status: "Cancelled" },
-];
+import { apiRequest } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
 
 const COLUMNS = [
-  { key: "id", label: "Order ID", type: "text", mono: true },
-  { key: "customer", label: "Customer", type: "text" },
-  { key: "date", label: "Date", type: "text" },
-  { key: "total", label: "Total", type: "text" },
-  { key: "payment", label: "Payment", type: "status" },
+  { key: "orderId", label: "Order ID", type: "text", mono: true },
+  { key: "customerName", label: "Customer", type: "text" },
+  { key: "createdAt", label: "Date", type: "date" },
+  { key: "totalPrice", label: "Total", type: "currency" },
   { key: "status", label: "Status", type: "status" },
   { key: "actions", label: "Actions", type: "actions", align: "right" },
 ];
 
 export default function AdminOrders() {
   const router = useRouter();
-  const [orders, setOrders] = useState(MOCK_ORDERS);
+  const { toast } = useToast();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [confirming, setConfirming] = useState(false);
+
+  const fetchOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest("/orders");
+      if (response.success) {
+        // Map backend data to table format
+        const formattedOrders = response.data.map(order => ({
+          ...order,
+          id: order._id,
+          customerName: order.user?.firstName ? `${order.user.firstName} ${order.user.lastName || ''}` : order.user?.name || "N/A",
+        }));
+        setOrders(formattedOrders);
+      } else {
+        toast.error("Failed to fetch order registry.");
+      }
+    } catch (error) {
+      console.error("Order fetch error:", error);
+      toast.error("System error while retrieving orders.");
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const handleView = (row) => {
-    const cleanId = row.id.replace("#", "");
-    router.push(`/admin/orders/${cleanId}`);
+    router.push(`/admin/orders/${row._id}`);
   };
 
   const handleDelete = (row) => {
@@ -41,10 +62,27 @@ export default function AdminOrders() {
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    setOrders(prev => prev.filter(o => o.id !== selectedOrder.id));
-    setIsDeleteModalOpen(false);
-    setSelectedOrder(null);
+  const confirmDelete = async () => {
+    if (!selectedOrder) return;
+    try {
+      setConfirming(true);
+      const response = await apiRequest(`/orders/${selectedOrder._id}`, {
+        method: "DELETE",
+      });
+
+      if (response.success) {
+        toast.success(`Protocol: Order ${selectedOrder.orderId} permanently excised.`);
+        fetchOrders(); // Refresh registry
+      } else {
+        toast.error("Deletion protocol failed.");
+      }
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Deletion error:", error);
+      toast.error(error.message || "System error during deletion.");
+    } finally {
+      setConfirming(false);
+    }
   };
 
   return (
@@ -57,25 +95,33 @@ export default function AdminOrders() {
         title="Orders" 
         icon={ShoppingBag}
         primaryAction={{
-          label: "New Order",
-          icon: Plus,
-          onClick: () => router.push("/admin/orders/new")
+          label: "Refresh",
+          icon: Loader2,
+          onClick: fetchOrders
         }}
       />
       
-      <DataTable 
-        columns={COLUMNS}
-        data={orders}
-        onView={handleView}
-        onDelete={handleDelete}
-      />
+      {loading ? (
+        <div className="h-[400px] border border-dashed border-gray-100 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-200" />
+        </div>
+      ) : (
+        <DataTable 
+          columns={COLUMNS}
+          data={orders}
+          onView={handleView}
+          onDelete={handleDelete}
+        />
+      )}
 
       <ConfirmModal 
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={() => !confirming && setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}
-        title="Delete Order Entry"
-        message={`Are you absolutely sure you want to delete ${selectedOrder?.id}? This action will permanently remove the order record from the registry.`}
+        title="Permanently Delete Order Registry"
+        message={`Notice: Order record ${selectedOrder?.orderId} will be permanently removed from the database. This action is irreversible and will impact financial history.`}
+        confirmLabel={confirming ? "Processing..." : "Confirm Deletion"}
+        variant="danger"
       />
     </div>
   );

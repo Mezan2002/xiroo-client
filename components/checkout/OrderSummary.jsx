@@ -31,7 +31,9 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
               <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">
                 {item.variant}
               </p>
-              <span className="text-sm font-bold text-black">৳{item.price.toLocaleString()}</span>
+              <span className="text-sm font-bold text-black">
+                ৳{(item.salePrice || item.price).toLocaleString()}
+              </span>
             </div>
           </div>
         ))}

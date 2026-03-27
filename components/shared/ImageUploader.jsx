@@ -17,10 +17,13 @@ export function ImageUploader({
   onUploadError, 
   onUploadStart, 
   className = "", 
+  multiple = false,
   children 
 }) {
   const fileInputRef = useRef(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingCount, setUploadingCount] = useState(0);
+
+  const isUploading = uploadingCount > 0;
 
   // Securely trigger the hidden file input
   const handleClick = () => {
@@ -30,8 +33,8 @@ export function ImageUploader({
   };
 
   const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     // Reset input immediately so the exact same file can be uploaded twice if needed
     if (fileInputRef.current) {
@@ -39,7 +42,7 @@ export function ImageUploader({
     }
 
     try {
-      setIsUploading(true);
+      setUploadingCount(files.length);
       if (onUploadStart) onUploadStart();
 
       const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -49,34 +52,43 @@ export function ImageUploader({
         throw new Error("Cloudinary Infrastructure Not Configured. Missing Environment Variables.");
       }
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", uploadPreset);
+      // Process uploads in sequence or parallel? 
+      // Parallel is faster but might hit rate limits if many. Let's do parallel for now.
+      const uploadPromises = files.map(async (file) => {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", uploadPreset);
 
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: "POST",
-        body: formData,
+          const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error?.message || "Failed to finalize upload to Cloudinary.");
+          }
+
+          const secureUrl = data.secure_url;
+          
+          if (onUploadSuccess) {
+            onUploadSuccess(secureUrl);
+          }
+          return secureUrl;
+        } finally {
+          setUploadingCount(prev => prev - 1);
+        }
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || "Failed to finalize upload to Cloudinary.");
-      }
-
-      const secureUrl = data.secure_url;
-      
-      if (onUploadSuccess) {
-        onUploadSuccess(secureUrl);
-      }
+      await Promise.all(uploadPromises);
       
     } catch (error) {
       console.error("[ImageUploader] Upload sequence failed:", error);
       if (onUploadError) {
         onUploadError(error.message);
       }
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -88,6 +100,7 @@ export function ImageUploader({
       <input 
         type="file" 
         accept="image/png, image/jpeg, image/webp" 
+        multiple={multiple}
         className="hidden" 
         ref={fileInputRef} 
         onChange={handleFileChange} 
@@ -99,7 +112,14 @@ export function ImageUploader({
       {/* Internal High-performance Uploading Overlay */}
       {isUploading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
-          <div className="w-5 h-5 rounded-full border-2 border-black border-t-transparent animate-spin" />
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-5 h-5 rounded-full border-2 border-black border-t-transparent animate-spin" />
+            {multiple && uploadingCount > 0 && (
+              <span className="text-[8px] font-bold text-black uppercase tracking-widest bg-white px-2 py-1 border border-zinc-100 shadow-sm">
+                Remaining: {uploadingCount}
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -2,119 +2,31 @@
 import { Button } from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
 import { useUser } from "@/context/UserContext";
+import { useQuery } from "@tanstack/react-query";
 import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-const CartSidebar = dynamic(() => import("./CartSidebar").then(mod => mod.CartSidebar), { ssr: false });
-const SearchOverlay = dynamic(() => import("./SearchOverlay").then(mod => mod.SearchOverlay), { ssr: false });
-const UserAccountDrawer = dynamic(() => import("./UserAccountDrawer").then(mod => mod.UserAccountDrawer), { ssr: false });
 import { UserAvatar } from "./UserAvatar";
+const CartSidebar = dynamic(
+  () => import("./CartSidebar").then((mod) => mod.CartSidebar),
+  { ssr: false },
+);
+const SearchOverlay = dynamic(
+  () => import("./SearchOverlay").then((mod) => mod.SearchOverlay),
+  { ssr: false },
+);
+const UserAccountDrawer = dynamic(
+  () => import("./UserAccountDrawer").then((mod) => mod.UserAccountDrawer),
+  { ssr: false },
+);
 
-// Structure of our dynamical nav items
-const NAV_ITEMS = [
-  { id: "collections", label: "COLLECTIONS" },
-  { id: "new-in", label: "NEW IN" },
-  { id: "hot-sale", label: "HOT SALE" },
-];
-
-// Content arrays for each megamenu dropdown tab
-const MENUS_DATA = {
-  collections: {
-    categories: [
-      "SMART HOME",
-      "HOME DECOR",
-      "LIFESTYLE",
-      "KITCHEN GADGETS",
-      "PET ACCESSORIES",
-      "TOYS",
-    ],
-    products: [
-      {
-        id: "cat-brush",
-        title: "Cat Steam Brush Steamy Dog Brush 3 In 1",
-        price: "$24.45",
-        image:
-          "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        id: "heated-jacket",
-        title: "Winter Heated Jacket USB Electric",
-        price: "$45.90",
-        image:
-          "https://images.unsplash.com/photo-1551028719-00160b23e035?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        id: "travel-bottles",
-        title: "Xiroo™ 4-in-1 Travel Dispensing Bottles",
-        price: "$28.55",
-        image:
-          "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=400",
-      },
-    ],
-  },
-  "new-in": {
-    categories: [
-      "NEW ARRIVALS",
-      "TRENDING NOW",
-      "BEST SELLERS",
-      "FEATURED GEAR",
-    ],
-    products: [
-      {
-        id: "smart-lamp",
-        title: "Smart LED Desk Lamp with Wireless Charger",
-        price: "$35.00",
-        image:
-          "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        id: "mini-blender",
-        title: "Portable Mini Blender Juicer Cup",
-        price: "$19.99",
-        image:
-          "https://images.unsplash.com/photo-1570222094114-d054a817e56b?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        id: "pet-feeder",
-        title: "Automatic Pet Smart Feeder with HD Camera",
-        price: "$89.50",
-        image:
-          "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400",
-      },
-    ],
-  },
-  "hot-sale": {
-    categories: ["CLEARANCE", "FLASH DEALS", "UNDER $20", "BUNDLE & SAVE"],
-    products: [
-      {
-        id: "heavy-jacket",
-        title: "Men's Winter Heavy Fleece Utility Jacket",
-        price: "$39.99",
-        image:
-          "https://images.unsplash.com/photo-1551028719-00160b23e035?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        id: "office-chair",
-        title: "Ergonomic Office Chair with Lumbar Support",
-        price: "$120.00",
-        image:
-          "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        id: "anc-earbuds",
-        title: "Wireless Active Noise Cancelling Earbuds",
-        price: "$45.00",
-        image:
-          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400",
-      },
-    ],
-  },
-};
+// Dynamic Navigation Architecture Hooked to Admin Modules
 
 import { useCart } from "@/context/CartContext";
+import { apiRequest } from "@/lib/api";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -124,18 +36,62 @@ export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [navItems, setNavItems] = useState([]);
+  const [menusData, setMenusData] = useState({});
 
   const { user: currentUser } = useUser();
   const { itemCount } = useCart();
   const isLoggedIn = !!currentUser;
 
+  const { data: menuResponse } = useQuery({
+    queryKey: ["menus"],
+    queryFn: () => apiRequest("/menus"),
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
+  });
+
+  const { data: productsData } = useQuery({
+    queryKey: ["mega-menu-products"],
+    queryFn: () => apiRequest("/products?limit=50"),
+    staleTime: 10 * 60 * 1000,
+  });
+
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (menuResponse?.success) {
+      const allProducts = productsData?.data || [];
+      const items = menuResponse.data.map((menu) => {
+        const categories = menu.categories || [];
+        const catIds = categories.map((c) => c._id || c.id || c);
+
+        // Find relevant products for this menu's categories
+        const relevantProducts = allProducts
+          .filter((p) =>
+            catIds.includes(p.category?._id || p.category?.id || p.category),
+          )
+          .slice(0, 2); // Show top 2 for boutique aesthetic
+
+        return {
+          id: menu.slug,
+          label: menu.name.toUpperCase(),
+          categories: categories,
+          products: relevantProducts,
+        };
+      });
+      setNavItems(items);
+
+      const data = {};
+      items.forEach((item) => {
+        data[item.id] = {
+          categories: item.categories,
+          products: item.products,
+        };
+      });
+      setMenusData(data);
+    }
+  }, [menuResponse, productsData]);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Toggle navbar style after scrolling down 50 pixels
       setScrolled(window.scrollY > 50);
     };
 
@@ -143,15 +99,13 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Require solid navbar everywhere except the exact homepage root
   const isHomePage = pathname === "/";
   const isSolid = !isHomePage || scrolled || activeMenu !== null;
 
-  // Retrieve data for the currently hovered menu. Default to "collections" to avoid
-  // undefined mappings during the fade-out closing animation.
-  const currentMenuData = activeMenu
-    ? MENUS_DATA[activeMenu]
-    : MENUS_DATA["collections"];
+  const currentMenuData =
+    activeMenu && menusData[activeMenu]
+      ? menusData[activeMenu]
+      : { categories: [], products: [] };
 
   return (
     <>
@@ -174,20 +128,19 @@ export function Navbar() {
             className="flex items-center gap-8 md:flex w-[250px] h-full"
             onMouseLeave={() => setActiveMenu(null)}
           >
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center h-full cursor-pointer"
                 onMouseEnter={() => setActiveMenu(item.id)}
               >
-                <Link
-                  href={`/${item.id}`}
-                  className={`text-[11px] font-semibold transition-opacity ${
+                <p
+                  className={`text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max ${
                     activeMenu === item.id ? "opacity-70" : "hover:opacity-70"
                   }`}
                 >
                   {item.label}
-                </Link>
+                </p>
               </div>
             ))}
 
@@ -220,11 +173,12 @@ export function Navbar() {
                 <div className="flex flex-col gap-6 min-w-[250px]">
                   {currentMenuData.categories.map((category) => (
                     <Link
-                      key={category}
-                      href={`/collections/${category.toLowerCase().replace(/ /g, "-")}`}
-                      className="text-[15px] font-medium tracking-wide text-gray-800 hover:text-black hover:translate-x-1 transition-transform"
+                      key={category._id}
+                      href={`/collections/${category.slug}`}
+                      className="text-[15px] font-medium tracking-wide text-gray-800 hover:text-black hover:translate-x-1 transition-transform inline-block"
+                      onClick={() => setActiveMenu(null)}
                     >
-                      {category}
+                      {category.name.toUpperCase()}
                     </Link>
                   ))}
                 </div>
@@ -233,7 +187,14 @@ export function Navbar() {
                 <div className="flex gap-6 items-start">
                   {currentMenuData.products.map((product, idx) => (
                     <div key={idx} className="w-[180px] shrink-0">
-                      <ProductCard {...product} />
+                      <ProductCard
+                        id={product._id}
+                        title={product.title}
+                        price={product.price}
+                        image={product.images?.[0]}
+                        images={product.images}
+                        hoverImage={product.images?.[1]}
+                      />
                     </div>
                   ))}
                 </div>
@@ -249,7 +210,7 @@ export function Navbar() {
                 alt="Xiroo Shop Logo"
                 width={130}
                 height={130}
-                style={{ height: "auto" }}
+                style={{ height: "auto", width: "130px" }}
                 className={`transition-all duration-300 ${
                   isSolid ? "delay-0" : "brightness-0 invert delay-500"
                 }`}

@@ -1,119 +1,52 @@
 "use client";
+
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import ProductCard from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
-
-const ALL_PRODUCTS = [
-  {
-    id: "1",
-    title: "CAT STEAM BRUSH STEAMY DOG BRUSH",
-    price: "$24.45",
-    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=600",
-    hoverImage: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=600",
-    inStock: true,
-  },
-  {
-    id: "2",
-    title: "WINTER HEATED JACKET USB ELECTRIC",
-    price: "$45.90",
-    image: "https://images.unsplash.com/photo-1551028719-00160b23e035?auto=format&fit=crop&q=80&w=600",
-    hoverImage: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=600",
-    inStock: true,
-  },
-  {
-    id: "3",
-    title: "XIROO™ 4-IN-1 TRAVEL DISPENSING BOTTLES",
-    price: "$28.55",
-    image: "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=600",
-    hoverImage: "https://images.unsplash.com/photo-1610461888750-10bfc601b874?auto=format&fit=crop&q=80&w=600",
-    inStock: false,
-  },
-  {
-    id: "4",
-    title: "XIROO™ 5-IN-1 KITCHEN VEGETABLE CUTTER",
-    price: "$45.99",
-    image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=600",
-    hoverImage: "https://images.unsplash.com/photo-1616644200388-1bfd5985860b?auto=format&fit=crop&q=80&w=600",
-    inStock: true,
-  },
-  {
-    id: "5",
-    title: "MINIMALIST NORDIC READING LAMP",
-    price: "$120.00",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600",
-    hoverImage: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=600",
-    inStock: true,
-  },
-  {
-    id: "6",
-    title: "CURATED NORDIC AESTHETICS CHAIR",
-    price: "$350.00",
-    image: "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=600",
-    inStock: true,
-  },
-  {
-    id: "7",
-    title: "GRAVITY BALANCE LIGHT (LIGHT)",
-    price: "$180.00",
-    image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=600",
-    inStock: false,
-  },
-  {
-    id: "8",
-    title: "GRAVITY BALANCE LIGHT (DARK)",
-    price: "$180.00",
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=600",
-    inStock: true,
-  },
-];
-
-// Subtly duplicate the catalog to fill out the grid nicely for demonstration
-const MOCK_CATALOG = [
-  ...ALL_PRODUCTS,
-  ...[...ALL_PRODUCTS].reverse().map((p) => ({ ...p, id: `dup-${p.id}` })),
-];
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
+import { useMemo, useState, useEffect } from "react";
 
 export default function CategoryView({ category }) {
-  const title =
-    category.toLowerCase() === "all"
-      ? "ALL PRODUCTS"
-      : category.replace(/-/g, " ").toUpperCase();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [outOfStockOnly, setOutOfStockOnly] = useState(false);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  const filteredProducts = useMemo(() => {
-    return MOCK_CATALOG.filter((product) => {
-      // 1. Search Query
-      if (
-        searchQuery &&
-        !product.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false;
-      }
+  // Fetch Category Metadata
+  const { data: categoryData } = useQuery({
+    queryKey: ["category", category],
+    queryFn: () => apiRequest(`/categories/slug/${category}`),
+    enabled: category !== "all",
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
 
-      // 2. Availability
-      if (inStockOnly && !outOfStockOnly && !product.inStock) return false;
-      if (outOfStockOnly && !inStockOnly && product.inStock) return false;
+  // Fetch Products with dynamic filters
+  const { data: productsResponse, isLoading } = useQuery({
+    queryKey: ["products", category, searchQuery, inStockOnly, outOfStockOnly, minPrice, maxPrice],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (category !== "all") params.append("categorySlug", category);
+      if (searchQuery) params.append("searchTerm", searchQuery);
+      if (minPrice) params.append("minPrice", minPrice);
+      if (maxPrice) params.append("maxPrice", maxPrice);
+      
+      if (inStockOnly && !outOfStockOnly) params.append("inStock", "true");
+      if (outOfStockOnly && !inStockOnly) params.append("inStock", "false");
 
-      // 3. Pricing
-      const priceVal = parseFloat(product.price.replace(/[^0-9.]/g, ""));
-      if (minPrice && priceVal < parseFloat(minPrice)) return false;
-      if (maxPrice && priceVal > parseFloat(maxPrice)) return false;
+      return apiRequest(`/products?${params.toString()}`);
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
 
-      return true;
-    });
-  }, [searchQuery, inStockOnly, outOfStockOnly, minPrice, maxPrice]);
+  const products = productsResponse?.data || [];
+  const title = categoryData?.data?.title || (category.toLowerCase() === "all" ? "ALL PRODUCTS" : category.replace(/-/g, " ").toUpperCase());
 
-  const inStockCount = MOCK_CATALOG.filter((p) => p.inStock).length;
-  const outOfStockCount = MOCK_CATALOG.filter((p) => !p.inStock).length;
-  const isFiltering =
-    searchQuery || inStockOnly || outOfStockOnly || minPrice || maxPrice;
+  const inStockCount = products.filter((p) => p.inventory > 0).length;
+  const outOfStockCount = products.filter((p) => p.inventory === 0).length;
+  const isFiltering = searchQuery || inStockOnly || outOfStockOnly || minPrice || maxPrice;
 
   return (
     <div className="w-full flex flex-col min-h-screen bg-white pt-32 pb-24 px-6 lg:px-12 max-w-[1600px] mx-auto">
@@ -126,7 +59,7 @@ export default function CategoryView({ category }) {
           </h1>
         </div>
         <div className="flex text-[10px] md:text-[11px] font-semibold tracking-[0.15em] text-black uppercase pb-1">
-          <span>{filteredProducts.length} ITEMS FOUND</span>
+          <span>{products.length} ITEMS FOUND</span>
         </div>
       </div>
 
@@ -208,7 +141,7 @@ export default function CategoryView({ category }) {
             <div className="flex items-center gap-3 w-full">
               <div className="flex flex-col flex-1">
                 <label className="text-[9px] text-gray-400 mb-2 uppercase tracking-widest font-medium">
-                  Min ($)
+                  Min (৳)
                 </label>
                 <input
                   type="number"
@@ -221,11 +154,11 @@ export default function CategoryView({ category }) {
               <span className="text-gray-300 mt-6">-</span>
               <div className="flex flex-col flex-1">
                 <label className="text-[9px] text-gray-400 mb-2 uppercase tracking-widest font-medium">
-                  Max ($)
+                  Max (৳)
                 </label>
                 <input
                   type="number"
-                  placeholder="500"
+                  placeholder="50000"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   className="w-full border border-gray-200 p-2 text-[11px] font-medium focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
@@ -256,15 +189,23 @@ export default function CategoryView({ category }) {
 
         {/* Product Grid */}
         <div className="flex-1 w-full flex flex-col">
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <div className="w-full h-96 flex items-center justify-center">
+              <div className="w-12 h-12 border-4 border-zinc-100 border-t-black rounded-full animate-spin"></div>
+            </div>
+          ) : products.length > 0 ? (
             <div className="w-full grid grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
-              {filteredProducts.map((product) => (
+              {products.map((product, idx) => (
                 <ProductCard
-                  key={product.id}
-                  id={product.id}
+                  key={product._id}
+                  id={product._id}
                   title={product.title}
                   price={product.price}
-                  image={product.image}
+                  salePrice={product.salePrice}
+                  image={product.images?.[0]}
+                  images={product.images}
+                  priority={idx < 4}
+                  stockStage={product.stockStage}
                 />
               ))}
             </div>

@@ -116,7 +116,13 @@ const EXTRA_REVIEWS = [
   },
 ];
 
-function Stars({ count, size = 12, interactive = false, onRate }) {
+function Stars({
+  count,
+  size = 12,
+  interactive = false,
+  onRate,
+  isBlack = false,
+}) {
   return (
     <div className="flex gap-[3px]">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -126,7 +132,7 @@ function Stars({ count, size = 12, interactive = false, onRate }) {
           fill={i <= count ? "currentColor" : "none"}
           strokeWidth={i <= count ? 0 : 1.5}
           onClick={() => interactive && onRate?.(i)}
-          className={`${i <= count ? "text-black" : "text-gray-300"} ${interactive ? "cursor-pointer hover:text-black hover:scale-110 transition-transform" : ""}`}
+          className={`${i <= count ? (isBlack ? "text-white" : "text-black") : "text-gray-300"} ${interactive ? "cursor-pointer hover:text-black hover:scale-110 transition-transform" : ""}`}
         />
       ))}
     </div>
@@ -223,7 +229,7 @@ function ReviewCard({ review, onClick, variant = "light" }) {
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-2">
-            <Stars count={review.rating} size={11} />
+            <Stars count={review.rating} size={11} isBlack={true} />
             <h3 className="text-[14px] md:text-[16px] font-semibold text-white leading-tight">
               &ldquo;{review.title}&rdquo;
             </h3>
@@ -235,7 +241,7 @@ function ReviewCard({ review, onClick, variant = "light" }) {
       ) : (
         <>
           {review.image && (
-            <div className="aspect-[4/3] w-full overflow-hidden">
+            <div className="aspect-4/3 w-full overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={review.image}
@@ -246,7 +252,7 @@ function ReviewCard({ review, onClick, variant = "light" }) {
           )}
           <div className="p-6 flex flex-col gap-3 flex-1">
             <div className="flex items-center justify-between">
-              <Stars count={review.rating} size={13} />
+              <Stars count={review.rating} size={13} isBlack={isBlack} />
               {review.verified && (
                 <span
                   className={`text-[8px] font-semibold tracking-widest uppercase border px-2 py-[2px] ${isBlack ? "border-white/20 text-white/40" : "border-gray-200 text-gray-400"}`}
@@ -311,7 +317,7 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
       >
         {/* Photo side */}
         {review.image && (
-          <div className="w-full md:w-[240px] shrink-0 aspect-[4/3] md:aspect-auto overflow-hidden bg-gray-100">
+          <div className="w-full md:w-[240px] shrink-0 aspect-4/3 md:aspect-auto overflow-hidden bg-gray-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={review.image}

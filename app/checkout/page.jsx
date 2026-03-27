@@ -7,25 +7,43 @@ import { Button } from "@/components/ui/Button";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 
-const MOCK_ITEMS = [
-  {
-    id: 1,
-    title: "Xiroo™ 4-in-1 Travel Dispensing Bottles Portable Lotion Bottle",
-    price: 2150,
-    quantity: 1,
-    image: "/images/featured-product-main.png",
-    variant: "Gray, Sticker English Version",
-  },
-];
+import { useCart } from "@/context/CartContext";
+import { useUser } from "@/context/UserContext";
+import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function CheckoutPage() {
-  const [items, setItems] = useState(MOCK_ITEMS);
+  const { user, loading } = useUser();
+  const { items, subtotal } = useCart();
   const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
   const [district, setDistrict] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState("normal");
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = district === "Dhaka" ? 80 : district ? 150 : 0;
+  useEffect(() => {
+    if (!loading && !user) {
+      const redirectPath = encodeURIComponent(pathname);
+      router.push(`/login?redirect=${redirectPath}`);
+    }
+  }, [user, loading, router, pathname]);
+
+  const baseShipping = district === "Dhaka" ? 80 : district ? 150 : 0;
+  const shipping = baseShipping + (deliveryMethod === "fast" ? 50 : 0);
   const total = subtotal + shipping;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="text-2xl font-bold tracking-tighter">XIROO</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Verifying Session...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -58,7 +76,17 @@ export default function CheckoutPage() {
               <span className="text-[11px] font-bold uppercase tracking-widest">Return to cart</span>
             </Link>
 
-            <CheckoutForm step={step} setStep={setStep} setProductDistrict={setDistrict} />
+            <CheckoutForm 
+              step={step} 
+              setStep={setStep} 
+              setProductDistrict={setDistrict}
+              deliveryMethod={deliveryMethod}
+              setDeliveryMethod={setDeliveryMethod}
+              items={items}
+              subtotal={subtotal}
+              shipping={shipping}
+              total={total}
+            />
           </div>
 
           {/* Right Column: Summary */}

@@ -1,50 +1,95 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Check, Copy, Download, Lock } from "lucide-react";
+import { Check, CheckCircle2, Copy, Download, Lock, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
+import { apiRequest } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
+import ReceiptTemplate from "@/components/checkout/ReceiptTemplate";
 
-const MOCK_ORDER = {
-  id: "XR-673DCC7F",
-  date: "Mar 22, 2026",
-  estimatedDelivery: "Mar 24 - Mar 26, 2026",
-  paymentMethod: "Cash on Delivery",
-  customer: {
-    name: "John Doe",
-    email: "test@example.com",
-    phone: "+880 1712 345678",
-    address: "House 24, Road 12, Banani",
-    district: "Dhaka",
-    upazila: "Banani",
-    zip: "1212",
-  },
-  items: [
-    {
-      id: 1,
-      title: "Xiroo™ 4-in-1 Travel Dispensing Bottles",
-      price: 2150,
-      quantity: 1,
-      image: "/images/featured-product-main.png",
-      variant: "Gray, Sticker English Version",
-    },
-  ],
-  subtotal: 2150,
-  delivery: 80,
-  taxes: 0,
-  total: 2230,
-};
+const ReceiptFeatures = dynamic(() => import("@/components/checkout/ReceiptFeatures"), { ssr: false });
 
 export default function OrderSuccessPage() {
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("id");
+  const { toast } = useToast();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const receiptRef = useRef(null);
+  const pdfRef = useRef(null);
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      if (!orderId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await apiRequest(`/orders/${orderId}`);
+        if (response.success) {
+          setOrder(response.data);
+        } else {
+          toast.error("Failed to retrieve order record.");
+        }
+      } catch (error) {
+        console.error("Order fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrder();
+  }, [orderId, toast]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 text-black animate-spin stroke-1" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+            Synchronizing Registry...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white p-6">
+        <div className="text-center space-y-6">
+          <h1 className="text-2xl font-bold uppercase tracking-widest">Order Not Found</h1>
+          <p className="text-gray-500 text-sm max-w-sm mx-auto">
+            We couldn&apos;t find the order record you&apos;re looking for. It may still be processing or the link is invalid.
+          </p>
+          <Link href="/">
+            <Button className="h-14 px-10 tracking-widest font-bold uppercase text-[11px]">
+              Return to Shop
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate Breakdown using authoritative order data
+  const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const delivery = order.shippingFee || (order.totalPrice - subtotal);
+
   return (
     <div className="min-h-screen bg-gray-50/50">
-      <main className="px-6 pt-24 flex justify-center">
+      <main className="px-6 pt-24 pb-12 flex justify-center">
         <div className="w-full bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col lg:flex-row overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
           {/* Left Column: Confirmation & Info */}
           <div className="flex-1 p-8 lg:p-14 space-y-12">
             <div className="space-y-8">
               <div className="w-14 h-14 rounded-full border border-black/5 flex items-center justify-center bg-black/5">
-                <Check className="w-6 h-6 text-black" />
+                <CheckCircle2 className="w-8 h-8 text-black stroke-1" />
               </div>
               <div className="space-y-4">
                 <h1 className="text-4xl lg:text-5xl font-bold tracking-tighter text-black uppercase leading-none">
@@ -55,7 +100,7 @@ export default function OrderSuccessPage() {
                 <p className="text-gray-400 text-sm max-w-xs font-medium leading-relaxed">
                   Thank you,{" "}
                   <span className="text-black font-bold underline decoration-black/10 underline-offset-4">
-                    {MOCK_ORDER.customer.name}
+                    {order.user?.firstName || order.user?.name || "Customer"}
                   </span>
                   . Your order is secure and we&apos;re getting it ready for
                   handover.
@@ -84,22 +129,22 @@ export default function OrderSuccessPage() {
                 <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
                   Estimated Delivery
                 </label>
-                <div className="text-sm text-black font-bold">
-                  {MOCK_ORDER.estimatedDelivery}
+                <div className="text-sm text-black font-bold uppercase">
+                  {order.deliveryMethod === 'fast' ? "1 Business Day" : "2-3 Business Days"}
                 </div>
-                <div className="text-[10px] text-gray-500 font-medium">
-                  Standard Delivery
+                <div className="text-[10px] text-gray-500 font-medium font-montserrat uppercase">
+                  {order.deliveryMethod === 'fast' ? "FAST DELIVERY" : "STANDARD DELIVERY"}
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
                   Payment Details
                 </label>
-                <div className="text-sm text-black font-bold">
-                  {MOCK_ORDER.paymentMethod}
+                <div className="text-sm text-black font-bold uppercase">
+                  {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
                 </div>
                 <div className="text-[10px] text-gray-500 font-medium italic">
-                  Billing address: Same as delivery
+                  Status: {order.paymentStatus}
                 </div>
               </div>
             </div>
@@ -110,21 +155,15 @@ export default function OrderSuccessPage() {
               </label>
               <div className="space-y-1">
                 <div className="text-black font-bold uppercase tracking-tight">
-                  {MOCK_ORDER.customer.name}
+                  {order.user?.firstName} {order.user?.lastName}
                 </div>
                 <div className="text-[11px] text-gray-500 font-medium">
-                  {MOCK_ORDER.customer.email}
-                </div>
-                <div className="text-[11px] text-gray-500 font-medium">
-                  {MOCK_ORDER.customer.phone}
+                  {order.user?.email}
                 </div>
               </div>
               <div className="pt-4 space-y-1">
-                <div className="text-[11px] text-gray-600 font-medium leading-relaxed uppercase tracking-widest">
-                  {MOCK_ORDER.customer.address}
-                  <br />
-                  {MOCK_ORDER.customer.upazila}, {MOCK_ORDER.customer.district}{" "}
-                  — {MOCK_ORDER.customer.zip}
+                <div className="text-[11px] text-gray-600 font-bold leading-relaxed uppercase tracking-widest">
+                  {order.shippingAddress}
                   <br />
                   BANGLADESH
                 </div>
@@ -138,43 +177,40 @@ export default function OrderSuccessPage() {
               </div>
               <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                 <Check className="w-3 h-3" />
-                Payment Verified
+                Registry Synchronized
               </div>
             </div>
           </div>
 
-          {/* Right Column: Receipt Section */}
-          <div className="w-full lg:w-[400px] bg-gray-50/50 flex flex-col border-l border-gray-100">
+          <div ref={receiptRef} className="w-full lg:w-[400px] bg-gray-50/50 flex flex-col border-l border-gray-100">
+            {/* Hidden Receipt Template for PDF Export */}
+            <ReceiptTemplate 
+              order={order} 
+              subtotal={subtotal} 
+              delivery={delivery} 
+              receiptRef={pdfRef} 
+            />
+
             <div className="p-8 lg:p-12 flex-1">
-              <div className="flex items-center justify-between mb-10">
-                <div className="space-y-1">
-                  <label className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
-                    Receipt
-                  </label>
-                  <div className="flex items-center gap-2 text-black/80 font-bold text-[13px] tracking-tight">
-                    {MOCK_ORDER.id}
-                    <Copy className="w-3 h-3 text-gray-400 hover:text-black transition-colors cursor-pointer" />
-                  </div>
-                </div>
-                <Download className="w-5 h-5 text-gray-400 hover:text-black transition-colors cursor-pointer" />
-              </div>
+              <ReceiptFeatures order={order} receiptRef={pdfRef} />
 
               {/* Order Items */}
               <div className="space-y-8">
-                {MOCK_ORDER.items.map((item) => (
-                  <div key={item.id} className="flex gap-4 group">
+                {order.items.map((item, idx) => (
+                  <div key={idx} className="flex gap-4 group">
                     <div className="relative w-16 h-16 bg-white border border-gray-100 shrink-0 overflow-hidden">
+                      {/* item.product is likely populated by backend now */}
                       <Image
-                        src={item.image}
-                        alt={item.title}
+                        src={item.product?.images?.[0] || "/images/placeholder.png"}
+                        alt={item.product?.title || "Product"}
                         fill
-                        className="object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                        className="object-cover group-hover:scale-110 transition-all duration-700"
                       />
                     </div>
                     <div className="flex-1 space-y-1">
                       <div className="flex justify-between items-start gap-4">
-                        <h3 className="text-[10px] font-bold text-black uppercase tracking-widest leading-normal">
-                          {item.title}
+                        <h3 className="text-[10px] font-bold text-black uppercase tracking-widest leading-normal line-clamp-2">
+                          {item.product?.title || "Product Registry Title"}
                         </h3>
                         <span className="text-[11px] font-bold text-black tracking-widest">
                           ৳{item.price}
@@ -193,15 +229,11 @@ export default function OrderSuccessPage() {
             <div className="p-8 lg:p-12 bg-gray-100/30 space-y-4">
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-400">
                 <span>Subtotal</span>
-                <span className="text-black">৳{MOCK_ORDER.subtotal}</span>
+                <span className="text-black">৳{subtotal}</span>
               </div>
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-400">
                 <span>Delivery</span>
-                <span className="text-black">৳{MOCK_ORDER.delivery}</span>
-              </div>
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                <span>Taxes</span>
-                <span className="text-black">৳{MOCK_ORDER.taxes}.00</span>
+                <span className="text-black">৳{delivery}</span>
               </div>
 
               <div className="h-px bg-gray-200 my-4" />
@@ -209,10 +241,10 @@ export default function OrderSuccessPage() {
               <div className="flex justify-between items-end pt-2">
                 <div className="space-y-1">
                   <label className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-none">
-                    Total Paid
+                    Total
                   </label>
                   <div className="text-3xl font-bold text-black tracking-tighter">
-                    ৳{MOCK_ORDER.total}
+                    ৳{order.totalPrice}
                   </div>
                 </div>
               </div>
