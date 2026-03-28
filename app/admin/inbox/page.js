@@ -2,11 +2,7 @@
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Button } from "@/components/ui/Button";
 import { useSocket } from "@/context/SocketContext";
-import {
-  useConversations,
-  useDeleteConversation,
-  useSetStatus,
-} from "@/hooks/useInbox";
+import { useInbox } from "@/hooks/api/useInbox";
 import {
   CheckCircle2,
   ExternalLink,
@@ -30,6 +26,8 @@ const PRIORITY_COLORS = {
 export default function AdminInbox() {
   const router = useRouter();
   const [filter, setFilter] = useState("All");
+  const { useConversations } = useInbox();
+  
   const {
     data: conversations,
     isLoading,
@@ -42,6 +40,8 @@ export default function AdminInbox() {
         : {},
   );
   const { socket } = useSocket();
+
+
 
   useEffect(() => {
     if (socket) {
@@ -138,14 +138,14 @@ export default function AdminInbox() {
 
 // ── Isolated card component so each card manages its own mutation state ────────
 function ConversationCard({ conv, onOpen, onRefetch }) {
-  const statusMutation = useSetStatus(conv._id);
-  const deleteMutation = useDeleteConversation(conv._id);
+  const { setStatus, deleteConversation } = useInbox();
 
   const customer =
     conv.customer ||
     conv.participants?.find((p) => p.role === "customer") ||
     conv.participants?.[0] ||
     {};
+
 
   const unreadCount = customer._id ? conv.unreadCount?.[customer._id] || 0 : 0;
   const isUnread = unreadCount > 0;
@@ -163,8 +163,8 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
 
   const handleResolveToggle = (e) => {
     e.stopPropagation();
-    statusMutation.mutate(
-      { status: isResolved ? "active" : "resolved" },
+    setStatus.mutate(
+      { id: conv._id, status: isResolved ? "active" : "resolved" },
       { onSuccess: onRefetch },
     );
   };
@@ -172,8 +172,9 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
   const handleDelete = (e) => {
     e.stopPropagation();
     if (!confirm("Permanently delete this conversation?")) return;
-    deleteMutation.mutate(undefined, { onSuccess: onRefetch });
+    deleteConversation.mutate(conv._id, { onSuccess: onRefetch });
   };
+
 
   return (
     <div
@@ -267,7 +268,7 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
         {/* Resolve / Reopen */}
         <button
           onClick={handleResolveToggle}
-          disabled={statusMutation.isPending}
+          disabled={setStatus.isPending}
           title={isResolved ? "Reopen conversation" : "Resolve conversation"}
           className={`w-9 h-9 flex items-center justify-center transition-all ${
             isResolved
@@ -275,7 +276,7 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
               : "text-[#37352F60] hover:text-green-600 hover:bg-green-50"
           }`}
         >
-          {statusMutation.isPending ? (
+          {setStatus.isPending ? (
             <Loader2 size={15} className="animate-spin" />
           ) : isResolved ? (
             <RotateCcw size={16} />
@@ -287,16 +288,17 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
         {/* Delete */}
         <button
           onClick={handleDelete}
-          disabled={deleteMutation.isPending}
+          disabled={deleteConversation.isPending}
           title="Delete conversation"
           className="w-9 h-9 flex items-center justify-center text-[#37352F60] hover:text-red-500 hover:bg-red-50 transition-all"
         >
-          {deleteMutation.isPending ? (
+          {deleteConversation.isPending ? (
             <Loader2 size={15} className="animate-spin" />
           ) : (
             <Trash2 size={16} />
           )}
         </button>
+
       </div>
 
       {/* Unread left-border accent */}

@@ -1,24 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
-import { apiRequest } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
 import { Package } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
+import { useOrders } from "@/hooks/api/useOrders";
 
 export default function OrdersPage() {
+  const { useMyOrders } = useOrders();
   const {
     data: orders = [],
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => {
-      const response = await apiRequest("/orders/my-orders");
-      if (!response.success) throw new Error("Order Registry Sync Failure");
-      return response.data;
-    },
-  });
+  } = useMyOrders();
+
 
   if (isLoading) {
     return (

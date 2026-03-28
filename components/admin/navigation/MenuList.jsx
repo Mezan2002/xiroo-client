@@ -24,9 +24,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useMenus } from "@/hooks/api/useMenus";
+import { useToast } from "@/hooks/useToast";
 import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import MenuForm from "./MenuForm";
 
@@ -125,47 +124,15 @@ const SortableMenuItem = ({
 };
 
 export default function MenuList() {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { useAllMenus, deleteMenu, reorderMenus } = useMenus();
+  const { data: menusResponse, isLoading } = useAllMenus();
+  const menus = menusResponse?.data || [];
+
   const [editingMenu, setEditingMenu] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-
-  const { data: menus = [], isLoading } = useQuery({
-    queryKey: ["menus"],
-    queryFn: async () => {
-      const response = await apiRequest("/menus");
-      if (!response.success) throw new Error("Registry Sync Failure");
-      return response.data;
-    },
-  });
-
-  const orderMutation = useMutation({
-    mutationFn: (payload) => {
-      return apiRequest("/menus/update-order", { 
-        method: "PATCH", 
-        body: JSON.stringify({ menus: payload }) 
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["menus"]);
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to synchronize sequence");
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => apiRequest(`/menus/${id}`, { method: "DELETE" }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["menus"]);
-      toast.info("Menu successfully archived.");
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to delete menu");
-    }
-  });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -186,7 +153,9 @@ export default function MenuList() {
         order: index,
       }));
 
-      orderMutation.mutate(payload);
+      reorderMenus.mutate(payload, {
+        onError: (err) => toast.error(err.message || "Failed to synchronize sequence")
+      });
     }
   };
 
@@ -207,7 +176,10 @@ export default function MenuList() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      deleteMutation.mutate(itemToDelete);
+      deleteMenu.mutate(itemToDelete, {
+        onSuccess: () => toast.info("Menu successfully archived."),
+        onError: (err) => toast.error(err.message || "Failed to delete menu")
+      });
       setItemToDelete(null);
       setIsDeleteModalOpen(false);
     }

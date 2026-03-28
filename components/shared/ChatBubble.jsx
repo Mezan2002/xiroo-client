@@ -1,7 +1,7 @@
 "use client";
 import { useSocket } from "@/context/SocketContext";
-import { useUser } from "@/context/UserContext";
-import { useCustomerContext, useSendMessage } from "@/hooks/useInbox";
+import { useUser } from "@/hooks/api/useUser";
+import { useInbox } from "@/hooks/api/useInbox";
 import { Loader2, MessageSquare, Send, Shield, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,8 +11,8 @@ export default function ChatBubble() {
   const scrollRef = useRef(null);
 
   const { user } = useUser();
+  const { useCustomerContext, sendMessage: sendMessageMutation } = useInbox();
   const { data: conversation, isLoading, refetch } = useCustomerContext();
-  const sendMessageMutation = useSendMessage();
   const { socket } = useSocket();
 
   // Socket sync & Room Join

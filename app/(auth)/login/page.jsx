@@ -2,18 +2,21 @@
 
 import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
-import { useAuthLayout } from "@/context/AuthContext";
-import { useUser } from "@/context/UserContext";
-import { useToast } from "@/context/ToastContext";
+import { useLayout } from "@/hooks/useLayout";
+import { useAuth } from "@/hooks/api/useAuth";
+import { useToast } from "@/hooks/useToast";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function LoginPage() {
-  const { updateLayout } = useAuthLayout();
+function LoginForm() {
+  const { updateAuthLayout } = useLayout();
+
+
   const searchParams = useSearchParams();
-  const { loginMutation } = useUser();
+  const { loginMutation } = useAuth();
+
   const { toast } = useToast();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +26,7 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
-    updateLayout({
+    updateAuthLayout({
       imageSrc: "/images/auth/login.png",
       heading: (
         <>
@@ -35,7 +38,8 @@ export default function LoginPage() {
         "Xiroo redefines your living space by merging high-performance electronic precision with professional-grade culinary mastery.",
       badgeText: "Limited Edition",
     });
-  }, [updateLayout]);
+  }, [updateAuthLayout]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -178,5 +182,13 @@ export default function LoginPage() {
         </div>
       </form>
     </>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-gray-400 text-sm">Authenticating...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

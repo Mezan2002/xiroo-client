@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
+import { useAuth } from "@/hooks/api/useAuth";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useOrders } from "@/hooks/api/useOrders";
 import {
   ChevronRight,
   Heart,
@@ -17,16 +21,14 @@ import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import { UserAvatar } from "./UserAvatar";
 
-import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
-import { apiRequest } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
-
 export function UserAccountDrawer({ isOpen, onClose }) {
   const [mounted, setMounted] = useState(false);
-  const { user: currentUser, logout } = useUser();
+  const { user: currentUser } = useUser();
+  const { logout } = useAuth();
   const { itemCount: cartItemsCount } = useCart();
   const { itemCount: wishlistItemsCount } = useWishlist();
+  const { useOrderHistory } = useOrders();
+  
   const isLoggedIn = !!currentUser;
   const router = useRouter();
 
@@ -35,15 +37,8 @@ export function UserAccountDrawer({ isOpen, onClose }) {
   }, []);
 
   // Consume cached registries for real-time stats
-  const { data: orders = [] } = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => {
-      const response = await apiRequest("/orders");
-      if (!response.success) throw new Error("Order Registry Sync Failure");
-      return response.data;
-    },
+  const { data: orders = [] } = useOrderHistory({
     enabled: isLoggedIn && isOpen,
-    staleTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {

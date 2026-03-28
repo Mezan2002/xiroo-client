@@ -1,36 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { useAttributes } from "@/hooks/api/useAttributes";
 import { Plus, Edit2, Trash2, Hash } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import AttributeForm from "./AttributeForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
 
 export default function AttributeList() {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { useAttributeRegistry, deleteAttribute } = useAttributes();
+  
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAttribute, setEditingAttribute] = useState(null);
   const [deletingAttribute, setDeletingAttribute] = useState(null);
 
-  const { data: attributes = [], isLoading } = useQuery({
-    queryKey: ["attributes"],
-    queryFn: async () => {
-      const response = await apiRequest("/attributes");
-      return response.data || [];
-    },
-  });
+  const { data: attributesResponse, isLoading } = useAttributeRegistry();
+  const attributes = attributesResponse?.data || [];
 
-  const deleteMutation = useMutation({
-    mutationFn: (id) => apiRequest(`/attributes/${id}`, { method: "DELETE" }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["attributes"]);
-      toast.success("Attribute deleted successfully.");
-      setDeletingAttribute(null);
-    },
-  });
 
   const handleEdit = (attr) => {
     setEditingAttribute(attr);
@@ -130,7 +117,14 @@ export default function AttributeList() {
       <ConfirmModal 
         isOpen={!!deletingAttribute}
         onClose={() => setDeletingAttribute(null)}
-        onConfirm={() => deleteMutation.mutate(deletingAttribute._id)}
+        onConfirm={() => {
+          deleteAttribute.mutate(deletingAttribute._id, {
+            onSuccess: () => {
+              toast.success("Attribute deleted successfully.");
+              setDeletingAttribute(null);
+            }
+          });
+        }}
         title="Acknowledge Deletion?"
         message={`Are you certain you wish to purge the "${deletingAttribute?.name}" attribute from the global registry? This will affect all associated products.`}
       />

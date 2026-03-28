@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bell, Save, Shield, User } from "lucide-react";
 import Link from "next/link";
 
@@ -10,73 +9,19 @@ import { ImageUploader } from "@/components/shared/ImageUploader";
 import { UserAvatar } from "@/components/shared/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { useToast } from "@/context/ToastContext";
-import { useUser } from "@/context/UserContext";
-import { apiRequest } from "@/lib/api";
+
+import { useUser } from "@/hooks/api/useUser";
+import { useAuth } from "@/hooks/api/useAuth";
+import { useToast } from "@/hooks/useToast";
+
 
 export default function SettingsPage() {
-  const { user: currentUser, logout } = useUser();
-  const { toast } = useToast();
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { user: currentUser, updateProfile, syncAvatar, deleteAccount } = useUser();
+  const { logout } = useAuth();
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // 1. Profile Update Mutation
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data) => {
-      const response = await apiRequest("/users/me", {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
-      if (!response.success) throw new Error(response.message || "Update Failure");
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Profile Registry Updated Successfully.");
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to update profile data.");
-    },
-  });
-
-  // 2. Avatar Synchronization Mutation
-  const uploadAvatarMutation = useMutation({
-    mutationFn: async (secureUrl) => {
-      const response = await apiRequest("/users/me", {
-        method: "PATCH",
-        body: JSON.stringify({ profileAvatar: secureUrl }),
-      });
-      if (!response.success) throw new Error(response.message || "Avatar Sync Failure");
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Profile Registry Updated: Avatar Synced.");
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to sync avatar structure.");
-    },
-  });
-
-  // 3. Account Termination Mutation
-  const deleteAccountMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("/users/me", {
-        method: "DELETE",
-      });
-      if (!response.success) throw new Error(response.message || "Termination Failure");
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Account Registry Terminated Successfully.");
-      logout();
-      router.push("/");
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to terminate profile registry.");
-    },
-  });
 
   const lastUpdated = currentUser?.updatedAt
     ? new Intl.DateTimeFormat("en-GB", {
@@ -89,7 +34,18 @@ export default function SettingsPage() {
       }).format(new Date(currentUser.updatedAt))
     : "Recently";
 
-  const handleDeleteAccount = () => deleteAccountMutation.mutate();
+  const handleDeleteAccount = () => {
+    deleteAccount.mutate(undefined, {
+      onSuccess: () => {
+        toast.success("Account Registry Terminated Successfully.");
+        logout();
+        router.push("/");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to terminate profile registry.");
+      }
+    });
+  };
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
@@ -97,7 +53,6 @@ export default function SettingsPage() {
     const data = {
       firstName: formData.get("firstName"),
       lastName: formData.get("lastName"),
-      email: formData.get("email"),
       phoneNumber: formData.get("phoneNumber")
         ? `+880${formData.get("phoneNumber").replace(/\s+/g, "")}`
         : "",
@@ -109,12 +64,29 @@ export default function SettingsPage() {
       ),
     );
 
-    updateProfileMutation.mutate(sanitizedData);
+    updateProfile.mutate(sanitizedData, {
+      onSuccess: () => {
+        toast.success("Profile Registry Updated Successfully.");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to update profile data.");
+      }
+    });
   };
 
-  const handleAvatarUpload = (secureUrl) => uploadAvatarMutation.mutate(secureUrl);
+  const handleAvatarUpload = (secureUrl) => {
+    syncAvatar.mutate(secureUrl, {
+      onSuccess: () => {
+        toast.success("Profile Registry Updated: Avatar Synced.");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to sync avatar structure.");
+      }
+    });
+  };
 
   if (!currentUser) return null;
+
 
   return (
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -235,10 +207,11 @@ export default function SettingsPage() {
 
             <Button 
                type="submit" 
-               disabled={updateProfileMutation.isPending}
+               disabled={updateProfile.isPending}
                className="bg-black text-white hover:bg-zinc-800 px-12 h-14 tracking-widest font-bold uppercase text-[11px] rounded-none group transition-all"
             >
-              {updateProfileMutation.isPending ? "SYNCHRONIZING..." : (
+              {updateProfile.isPending ? "SYNCHRONIZING..." : (
+
                 <span className="flex items-center gap-3">
                   SAVE REGISTRY <Save size={14} className="group-hover:translate-x-1 transition-transform" />
                 </span>

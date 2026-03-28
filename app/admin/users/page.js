@@ -4,75 +4,51 @@ import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Button } from "@/components/ui/Button";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Select } from "@/components/ui/Select";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
 import { ExternalLink, Search, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useUsers } from "@/hooks/api/useUsers";
+import { useToast } from "@/hooks/useToast";
 
 export default function AdminUsers() {
   const router = useRouter();
   const { toast } = useToast();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { useAllUsers, updateRole, deleteUser } = useUsers();
+  const { data: rawUsers = [], isLoading: loading, refetch } = useAllUsers();
+
+
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await apiRequest("/users");
-      if (response.success) {
-        setUsers(response.data);
-      }
-    } catch (err) {
-      toast.error(err.message || "Failed to synchronize user registry.");
-      console.error("User Registry Sync Failure:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
   const handleRoleUpdate = async (userId, newRole) => {
-    try {
-      const response = await apiRequest(`/users/${userId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ role: newRole }),
-      });
-      if (response.success) {
-        toast.success(
-          `Identity Elevated: Role set to ${newRole.toUpperCase()}.`,
-        );
-        fetchUsers();
+    updateRole.mutate({ id: userId, role: newRole }, {
+      onSuccess: () => {
+        toast.success(`Identity Elevated: Role set to ${newRole.toUpperCase()}.`);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to modify security clearance.");
       }
-    } catch (err) {
-      toast.error(err.message || "Failed to modify security clearance.");
-    }
+    });
   };
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
-    try {
-      const response = await apiRequest(`/users/${selectedUser._id}`, {
-        method: "DELETE",
-      });
-      if (response.success) {
+    deleteUser.mutate(selectedUser._id, {
+      onSuccess: () => {
         toast.success("User Registry Purged Successfully.");
-        fetchUsers();
+        setIsDeleteModalOpen(false);
+        setSelectedUser(null);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to purge user record.");
       }
-    } catch (err) {
-      toast.error(err.message || "Failed to purge user record.");
-    } finally {
-      setIsDeleteModalOpen(false);
-      setSelectedUser(null);
-    }
+    });
   };
+
+  const users = rawUsers;
+
 
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
@@ -243,10 +219,11 @@ export default function AdminUsers() {
           <Button
             variant="secondary"
             className="h-10 text-[12px] font-bold tracking-wider"
-            onClick={fetchUsers}
+            onClick={() => refetch()}
           >
             REFRESH SYNC
           </Button>
+
         </div>
       </div>
 

@@ -7,47 +7,24 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useOrders } from "@/hooks/api/useOrders";
 import ReceiptTemplate from "@/components/checkout/ReceiptTemplate";
 
 const ReceiptFeatures = dynamic(() => import("@/components/checkout/ReceiptFeatures"), { ssr: false });
 
-export default function OrderSuccessPage() {
+import { Suspense } from "react";
+
+function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("id");
-  const { toast } = useToast();
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { useOrderDetail } = useOrders();
+  const { data: order, isLoading } = useOrderDetail(orderId);
   const receiptRef = useRef(null);
   const pdfRef = useRef(null);
-
-  useEffect(() => {
-    const fetchOrder = async () => {
-      if (!orderId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await apiRequest(`/orders/${orderId}`);
-        if (response.success) {
-          setOrder(response.data);
-        } else {
-          toast.error("Failed to retrieve order record.");
-        }
-      } catch (error) {
-        console.error("Order fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrder();
-  }, [orderId, toast]);
-
-  if (loading) {
+  
+  if (isLoading) {
     return (
+
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-black animate-spin stroke-1" />
@@ -253,5 +230,13 @@ export default function OrderSuccessPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><Loader2 className="w-12 h-12 text-black animate-spin stroke-1" /></div>}>
+      <OrderSuccessContent />
+    </Suspense>
   );
 }

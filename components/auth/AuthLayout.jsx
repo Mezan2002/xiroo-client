@@ -1,10 +1,12 @@
-import { useAuthLayout } from "@/context/AuthContext";
+"use client";
+import { useLayout } from "@/hooks/useLayout";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function AuthLayout({ children, showEditorialBorder = true }) {
-  const { layoutProps } = useAuthLayout();
-  const { imageSrc, imageAlt, heading, description, badgeText } = layoutProps;
+  const { authLayout } = useLayout();
+  const { imageSrc, imageAlt, heading, description, badgeText } = authLayout;
+
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-black flex flex-col font-montserrat selection:bg-black selection:text-white">

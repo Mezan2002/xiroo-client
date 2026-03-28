@@ -4,9 +4,6 @@ import TiptapEditor from "@/components/admin/shared/TiptapEditor";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
 import { Circle, Plus, Star, Trash2, X } from "lucide-react";
 import {
   forwardRef,
@@ -15,6 +12,9 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useToast } from "@/hooks/useToast";
+import { useCategories } from "@/hooks/api/useCategories";
+import { useAttributes } from "@/hooks/api/useAttributes";
 
 const Label = ({ children }) => (
   <label className="text-[10px] font-bold text-zinc-900 uppercase block mb-3 font-montserrat tracking-[0.2em]">
@@ -36,14 +36,19 @@ const SectionHeader = ({ label, title, action }) => (
 
 const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
   const { toast } = useToast();
+  const { useCategoryTree } = useCategories();
+  const { data: categories = [] } = useCategoryTree();
+  
+  const { useAttributeRegistry } = useAttributes();
+  const { data: attributes = [] } = useAttributeRegistry();
 
   const [product, setProduct] = useState({
     title: "",
     description: "",
     price: "",
     salePrice: "",
-    saleStartDate: "", // Added
-    saleEndDate: "", // Added
+    saleStartDate: "",
+    saleEndDate: "",
     inventory: "",
     sku: "",
     tax: "15",
@@ -57,7 +62,6 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
     isFeatured: false,
   });
 
-  // Helper to format Date to YYYY-MM-DD for input[type="date"]
   const formatDate = (date) => {
     if (!date) return "";
     const d = new Date(date);
@@ -65,7 +69,6 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
     return d.toISOString().split("T")[0];
   };
 
-  // Inject IDs for tracking complex fields and sync state
   useEffect(() => {
     if (initialData) {
       setProduct({
@@ -116,22 +119,6 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
     },
   }));
 
-  // --- Classification Data ---
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await apiRequest("/categories");
-      return response.data || [];
-    },
-  });
-
-  const { data: attributes = [] } = useQuery({
-    queryKey: ["attributes"],
-    queryFn: async () => {
-      const response = await apiRequest("/attributes");
-      return response.data || [];
-    },
-  });
 
   const selectedCategoryData = useMemo(() => {
     const cid = product.subCategory || product.category;

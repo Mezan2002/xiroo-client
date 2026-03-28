@@ -14,41 +14,18 @@ import {
   Zap,
   Loader2
 } from "lucide-react";
-import { apiRequest } from "@/lib/api";
+import { useOrders } from "@/hooks/api/useOrders";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState([
-    { label: "Total Revenue", value: "৳0", icon: TrendingUp, key: "totalRevenue" },
-    { label: "Total Orders", value: "0", icon: ShoppingBag, key: "totalOrders" },
-    { label: "Pending Registry", value: "0", icon: Clock, key: "pending" },
-  ]);
-  const [loading, setLoading] = useState(true);
+  const { useOrderStats } = useOrders();
+  const { data, isLoading } = useOrderStats();
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await apiRequest("/orders/stats");
-        if (response.success) {
-          const data = response.data;
-          
-          // Map status distribution for pending
-          const pendingCount = data.statusDistribution.find(s => s._id === 'pending')?.count || 0;
+  const stats = [
+    { label: "Total Revenue", value: `৳${(data?.totalRevenue || 0).toLocaleString()}`, icon: TrendingUp },
+    { label: "Total Orders", value: (data?.totalOrders || 0).toString(), icon: ShoppingBag },
+    { label: "Pending Registry", value: (data?.statusDistribution?.find(s => s._id === 'pending')?.count || 0).toString(), icon: Clock },
+  ];
 
-          setStats([
-            { label: "Total Revenue", value: `৳${data.totalRevenue.toLocaleString()}`, icon: TrendingUp },
-            { label: "Total Orders", value: data.totalOrders.toString(), icon: ShoppingBag },
-            { label: "Pending Registry", value: pendingCount.toString(), icon: Clock },
-          ]);
-        }
-      } catch (error) {
-        console.error("Dashboard stats fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
 
   return (
     <div className="space-y-12 pb-24">
@@ -61,12 +38,13 @@ export default function AdminDashboard() {
 
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {loading ? (
+        {isLoading ? (
           [1, 2, 3].map((i) => (
             <div key={i} className="h-48 bg-gray-50 animate-pulse border border-black/5"></div>
           ))
         ) : (
           stats.map((stat) => (
+
             <div
               key={stat.label}
               className="group relative p-8 bg-white border border-black/5 hover:border-black transition-all cursor-default"

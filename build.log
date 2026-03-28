@@ -1,0 +1,22 @@
+
+> xiroo-client@0.1.0 build
+> next build
+
+▲ Next.js 16.2.0 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 51s
+  Running TypeScript ...
+  Finished TypeScript in 165ms ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/40) ...
+Error occurred prerendering page "/forgot-password". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: This function is not supported in React Server Components. Please only use this export in a Client Component.
+    at e (F:\Working Files\Personal Works\Own E-commerce\xiroo-shop\xiroo-client\.next\server\chunks\ssr\app_(auth)_layout_0p4aro4.js:1:77)
+    at aY (F:\Working Files\Personal Works\Own E-commerce\xiroo-shop\xiroo-client\.next\server\chunks\ssr\app_(auth)_layout_0p4aro4.js:1:19214)
+    at stringify (<anonymous>) {
+  digest: '724413632'
+}
+Export encountered an error on /(auth)/forgot-password/page: /forgot-password, exiting the build.
+⨯ Next.js build worker exited with code: 1 and signal: null

@@ -1,19 +1,30 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useOrders } from "@/hooks/api/useOrders";
+import { useUser } from "@/hooks/api/useUser";
+import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/hooks/useToast";
 import { ChevronRight, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import SearchableDistrict from "../ui/SearchableDistrict";
-import { useUser } from "@/context/UserContext";
-import { useCart } from "@/context/CartContext";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
 
-export default function CheckoutForm({ step, setStep, setProductDistrict, deliveryMethod, setDeliveryMethod, items, subtotal, shipping, total }) {
+export default function CheckoutForm({
+  step,
+  setStep,
+  setProductDistrict,
+  deliveryMethod,
+  setDeliveryMethod,
+  items,
+  subtotal,
+  shipping,
+  total,
+}) {
   const router = useRouter();
   const { user } = useUser();
   const { clearCart } = useCart();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { placeOrder } = useOrders();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -30,15 +41,21 @@ export default function CheckoutForm({ step, setStep, setProductDistrict, delive
   // Pre-fill user data
   useEffect(() => {
     if (user) {
-      const defaultAddress = user.addresses?.find(addr => addr.isDefault) || user.addresses?.[0];
-      
-      setFormData(prev => ({
+      const defaultAddress =
+        user.addresses?.find((addr) => addr.isDefault) || user.addresses?.[0];
+
+      setFormData((prev) => ({
         ...prev,
         email: user.email || prev.email,
-        firstName: user.firstName || user.name?.split(' ')[0] || prev.firstName,
-        lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || prev.lastName,
+        firstName: user.firstName || user.name?.split(" ")[0] || prev.firstName,
+        lastName:
+          user.lastName ||
+          user.name?.split(" ").slice(1).join(" ") ||
+          prev.lastName,
         phone: user.phoneNumber || user.phone || prev.phone,
-        address: defaultAddress ? `${defaultAddress.addressLine1}${defaultAddress.addressLine2 ? ', ' + defaultAddress.addressLine2 : ''}` : prev.address,
+        address: defaultAddress
+          ? `${defaultAddress.addressLine1}${defaultAddress.addressLine2 ? ", " + defaultAddress.addressLine2 : ""}`
+          : prev.address,
         district: defaultAddress?.state || prev.district,
         upazila: defaultAddress?.city || prev.upazila,
         postalCode: defaultAddress?.postalCode || prev.postalCode,
@@ -71,16 +88,17 @@ export default function CheckoutForm({ step, setStep, setProductDistrict, delive
 
   const handlePlaceOrder = async () => {
     try {
-      setIsSubmitting(true);
-      
-      const orderItems = items.map(item => ({
+      const orderItems = items.map((item) => ({
         product: item.id || item._id,
         quantity: item.quantity,
-        price: parseFloat((item.salePrice || item.price)?.toString().replace(/[^0-9.]/g, "") || 0)
+        price: parseFloat(
+          (item.salePrice || item.price)?.toString().replace(/[^0-9.]/g, "") ||
+            0,
+        ),
       }));
 
       const shippingAddress = `${formData.address}, ${formData.upazila}, ${formData.district} - ${formData.postalCode}`;
-      
+
       const orderPayload = {
         user: user?._id || user?.id,
         items: orderItems,
@@ -91,10 +109,7 @@ export default function CheckoutForm({ step, setStep, setProductDistrict, delive
         shippingAddress: shippingAddress,
       };
 
-      const response = await apiRequest("/orders", {
-        method: "POST",
-        body: JSON.stringify(orderPayload),
-      });
+      const response = await placeOrder.mutateAsync(orderPayload);
 
       if (response.success) {
         toast.success("Order placed successfully!");
@@ -106,11 +121,14 @@ export default function CheckoutForm({ step, setStep, setProductDistrict, delive
       }
     } catch (error) {
       console.error("Order submission error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      toast.error(
+        error.response?.data?.message ||
+          "An unexpected error occurred. Please try again.",
+      );
     }
   };
+
+  const isSubmitting = placeOrder.isPending;
 
   return (
     <div className="space-y-12">
@@ -343,14 +361,21 @@ export default function CheckoutForm({ step, setStep, setProductDistrict, delive
         )}
 
         <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-gray-100">
-          <Button type="submit" size="lg" className="flex-1" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            size="lg"
+            className="flex-1"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Processing...
               </div>
+            ) : step === 3 ? (
+              "Complete Purchase"
             ) : (
-              step === 3 ? "Complete Purchase" : "Continue to Delivery"
+              "Continue to Delivery"
             )}
           </Button>
           {step > 1 && (

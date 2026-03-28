@@ -1,29 +1,23 @@
 "use client";
 import React, { useEffect } from "react";
 import { Shield, TrendingUp, Sparkles, Award, Zap } from "lucide-react";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
-import { useUser } from "@/context/UserContext";
-import { useQuery } from "@tanstack/react-query";
+import { useLoyalty } from "@/hooks/api/useLoyalty";
+import { useToast } from "@/hooks/useToast";
+import { useUser } from "@/hooks/api/useUser";
 
 export default function LoyaltyPage() {
   const { toast } = useToast();
   const { user: currentUser, loading: isUserLoading } = useUser();
 
   // Unified Prestige & Loyalty Synchronization
+  const { useLoyaltySettings } = useLoyalty();
   const { 
-    data: loyaltySettings, 
+    data: settingsResponse, 
     isLoading: isLoyaltyLoading,
     error: loyaltyError 
-  } = useQuery({
-    queryKey: ["loyaltySettings"],
-    queryFn: async () => {
-      const response = await apiRequest("/loyalty-settings");
-      if (!response.success) throw new Error("Loyalty Registry Sync Failure");
-      return response.data;
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes cache for settings
-  });
+  } = useLoyaltySettings();
+  
+  const loyaltySettings = settingsResponse?.data || settingsResponse;
 
   // Effect-based error reporting for the query
   useEffect(() => {

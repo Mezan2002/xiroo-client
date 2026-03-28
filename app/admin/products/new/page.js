@@ -2,9 +2,8 @@
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Package, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
+import { useProducts } from "@/hooks/api/useProducts";
 import ProductForm from "@/components/admin/products/ProductForm";
 import { useRef } from "react";
 
@@ -12,24 +11,21 @@ export default function NewProductPage() {
   const router = useRouter();
   const { toast } = useToast();
   const formRef = useRef();
-
-  const createProductMutation = useMutation({
-    mutationFn: (data) => apiRequest("/products", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-    onSuccess: () => {
-      toast.success("Product Registry Synchronized Successfully.");
-      router.push("/admin/products");
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to synchronize registry.");
-    }
-  });
+  const { useProductMutation } = useProducts();
+  const { createMutation: createProductMutation } = useProductMutation();
 
   const handleSave = (payload) => {
-    createProductMutation.mutate(payload);
+    createProductMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success("Product Registry Synchronized Successfully.");
+        router.push("/admin/products");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to synchronize registry.");
+      }
+    });
   };
+
 
   return (
     <div className="space-y-24 font-montserrat antialiased text-zinc-900 animate-in fade-in duration-700">

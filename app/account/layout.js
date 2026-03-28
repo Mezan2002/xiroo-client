@@ -13,7 +13,7 @@ const SIDEBAR_ITEMS = [
 ];
 
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
 
 export default function AccountLayout({ children }) {
   const pathname = usePathname();

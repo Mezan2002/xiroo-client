@@ -2,11 +2,10 @@
 import { Button } from "@/components/ui/Button";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import { useUser } from "@/context/UserContext";
+import { useProducts } from "@/hooks/api/useProducts";
+import { useUser } from "@/hooks/api/useUser";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
 import LoadingOverlay from "@/components/shared/LoadingOverlay";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
@@ -17,14 +16,11 @@ export default function ProductView({ productId }) {
   const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();
+  const { useProductDetail } = useProducts();
+  const { data: product, isLoading, error } = useProductDetail(productId);
 
-  const { data: productResponse, isLoading, error } = useQuery({
-    queryKey: ["product", productId],
-    queryFn: () => apiRequest(`/products/${productId}`),
-    enabled: !!productId,
-  });
 
-  const product = productResponse?.success ? productResponse.data : null;
+
 
   // Sticky bar: shows once cart buttons scroll past the top, stays visible until page end
   const [showStickyBar, setShowStickyBar] = useState(false);

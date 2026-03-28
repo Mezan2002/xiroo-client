@@ -2,9 +2,8 @@
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
+import { useProducts } from "@/hooks/api/useProducts";
 import ProductForm from "@/components/admin/products/ProductForm";
 import { useRef } from "react";
 
@@ -15,36 +14,22 @@ export default function EditProductPage() {
   const formRef = useRef();
 
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: productData, isLoading: isProductLoading } = useQuery({
-    queryKey: ["product", id],
-    queryFn: async () => {
-      const response = await apiRequest(`/products/${id}`);
-      return response.data;
-    },
-    enabled: !!id,
-  });
-
-  const updateProductMutation = useMutation({
-    mutationFn: (data) => apiRequest(`/products/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }),
-    onSuccess: () => {
-      toast.success("Product Registry Specification Reconfigured.");
-      queryClient.invalidateQueries(["product", id]);
-      queryClient.invalidateQueries(["products"]);
-      router.push("/admin/products");
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to update registry.");
-    }
-  });
+  const { useProductDetail, useProductMutation } = useProducts();
+  const { data: productData, isLoading: isProductLoading } = useProductDetail(id);
+  const { updateMutation: updateProductMutation } = useProductMutation();
 
   const handleSave = (payload) => {
-    updateProductMutation.mutate(payload);
+    updateProductMutation.mutate({ id, data: payload }, {
+      onSuccess: () => {
+        toast.success("Product Registry Specification Reconfigured.");
+        router.push("/admin/products");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to update registry.");
+      }
+    });
   };
+
 
   return (
     <div className="space-y-24 font-montserrat antialiased text-zinc-900 animate-in fade-in duration-700">

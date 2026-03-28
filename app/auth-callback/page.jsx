@@ -3,7 +3,7 @@
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setToken } from "@/lib/auth";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
 import { RefreshCw } from "lucide-react";
 
 function AuthCallbackContent() {

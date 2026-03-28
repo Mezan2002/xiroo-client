@@ -1,48 +1,36 @@
 "use client";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
 import { Info, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLoyalty } from "@/hooks/api/useLoyalty";
+import { useToast } from "@/hooks/useToast";
+
+
 
 export default function AdminLoyalty() {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const { useLoyaltySettings, updateLoyaltySettings } = useLoyalty();
+  const { data: fetchedSettings, isLoading } = useLoyaltySettings();
+
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await apiRequest("/loyalty-settings");
-        if (response.success) {
-          setSettings(response.data);
-        }
-      } catch (err) {
-        toast.error("Failed to retrieve loyalty registry.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchSettings();
-  }, [toast]);
+    if (fetchedSettings) {
+      setSettings(fetchedSettings);
+    }
+  }, [fetchedSettings]);
 
   const handleUpdate = async () => {
-    setIsSaving(true);
-    try {
-      const response = await apiRequest("/loyalty-settings", {
-        method: "PATCH",
-        body: JSON.stringify(settings),
-      });
-      if (response.success) {
+    updateLoyaltySettings.mutate(settings, {
+      onSuccess: () => {
         toast.success("Loyalty Matrix Calibrated Successfully.");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Calibration Failure.");
       }
-    } catch (err) {
-      toast.error(err.message || "Calibration Failure.");
-    } finally {
-      setIsSaving(false);
-    }
+    });
   };
+
 
   const updateTierConfig = (index, field, value) => {
     const newTierConfig = [...settings.tierConfig];
@@ -252,10 +240,10 @@ export default function AdminLoyalty() {
           </div>
           <button
             onClick={handleUpdate}
-            disabled={isSaving}
+            disabled={updateLoyaltySettings.isPending}
             className="h-14 px-12 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-800 transition-all disabled:opacity-50 active:scale-[0.98] flex items-center gap-3"
           >
-            {isSaving ? (
+            {updateLoyaltySettings.isPending ? (
               "Calibrating..."
             ) : (
               <>
@@ -264,6 +252,7 @@ export default function AdminLoyalty() {
               </>
             )}
           </button>
+
         </div>
       </div>
     </div>

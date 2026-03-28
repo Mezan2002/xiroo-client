@@ -2,18 +2,19 @@
 
 import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
-import { useAuthLayout } from "@/context/AuthContext";
-import { useUser } from "@/context/UserContext";
-import { useToast } from "@/context/ToastContext";
+import { useLayout } from "@/hooks/useLayout";
+import { useAuth } from "@/hooks/api/useAuth";
+import { useToast } from "@/hooks/useToast";
 import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function RegisterPage() {
-  const { updateLayout } = useAuthLayout();
+function RegisterForm() {
+  const { updateAuthLayout } = useLayout();
   const searchParams = useSearchParams();
-  const { registerMutation } = useUser();
+  const { registerMutation } = useAuth();
+
   const { toast } = useToast();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +26,7 @@ export default function RegisterPage() {
   });
 
   useEffect(() => {
-    updateLayout({
+    updateAuthLayout({
       imageSrc: "/images/auth/register.png",
       heading: (
         <>
@@ -37,7 +38,8 @@ export default function RegisterPage() {
         "Step into a world where technology becomes an art form. Your membership grants you priority access to limited edition drops.",
       badgeText: "Elite Access",
     });
-  }, [updateLayout]);
+  }, [updateAuthLayout]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -224,5 +226,13 @@ export default function RegisterPage() {
         </div>
       </form>
     </>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-gray-400 text-sm">Initializing Registry...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

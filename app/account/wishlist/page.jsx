@@ -1,17 +1,15 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { Heart, ShoppingBag, Trash2 } from "lucide-react";
-import Image from "next/image";
+import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
-import { apiRequest } from "@/lib/api";
+import { useWishlist } from "@/hooks/api/useWishlist";
 
-import { useWishlist } from "@/context/WishlistContext";
 
 export default function WishlistPage() {
-  const { items: wishlistItems, toggleItem } = useWishlist();
-  const isLoading = false; // Persistent LocalStorage is instantaneous
+  const { wishlistItems, toggleItem } = useWishlist();
+  const isLoading = false;
+
 
   if (isLoading) {
     return (

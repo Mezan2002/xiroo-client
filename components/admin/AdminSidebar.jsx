@@ -39,21 +39,21 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-import { useNotifications } from "@/context/NotificationContext";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { useNotifications } from "@/hooks/api/useNotifications";
 import { useSocket } from "@/context/SocketContext";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
 import { useEffect } from "react";
-import { useConversations } from "@/hooks/useInbox";
+import { useInbox } from "@/hooks/api/useInbox";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { unreadCount: notificationUnread } = useNotifications();
+  const { unreadCount } = useNotifications();
+  const notificationUnread = typeof unreadCount === 'object' ? (unreadCount?.unreadCount || 0) : (unreadCount || 0);
   const { user } = useUser();
   const { socket } = useSocket();
 
   // Dynamic Inbox Sync
+  const { useConversations } = useInbox();
   const { data: conversations, refetch: refetchInbox } = useConversations({ status: 'active' });
 
   useEffect(() => {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy, Download, Loader2 } from "lucide-react";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 

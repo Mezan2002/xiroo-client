@@ -5,8 +5,9 @@ import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Plus, ShoppingBag, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useOrders } from "@/hooks/api/useOrders";
+import { useToast } from "@/hooks/useToast";
+import { useMemo } from "react";
 
 const COLUMNS = [
   { key: "orderId", label: "Order ID", type: "text", mono: true },
@@ -20,38 +21,20 @@ const COLUMNS = [
 export default function AdminOrders() {
   const router = useRouter();
   const { toast } = useToast();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { useOrderHistory, deleteOrder } = useOrders();
+  const { data: rawOrders = [], isLoading: loading, refetch } = useOrderHistory();
+
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [confirming, setConfirming] = useState(false);
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await apiRequest("/orders");
-      if (response.success) {
-        // Map backend data to table format
-        const formattedOrders = response.data.map(order => ({
-          ...order,
-          id: order._id,
-          customerName: order.user?.firstName ? `${order.user.firstName} ${order.user.lastName || ''}` : order.user?.name || "N/A",
-        }));
-        setOrders(formattedOrders);
-      } else {
-        toast.error("Failed to fetch order registry.");
-      }
-    } catch (error) {
-      console.error("Order fetch error:", error);
-      toast.error("System error while retrieving orders.");
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+  const orders = useMemo(() => {
+    return rawOrders.map(order => ({
+      ...order,
+      id: order._id,
+      customerName: order.user?.firstName ? `${order.user.firstName} ${order.user.lastName || ''}` : order.user?.name || "N/A",
+    }));
+  }, [rawOrders]);
 
   const handleView = (row) => {
     router.push(`/admin/orders/${row._id}`);
@@ -64,26 +47,17 @@ export default function AdminOrders() {
 
   const confirmDelete = async () => {
     if (!selectedOrder) return;
-    try {
-      setConfirming(true);
-      const response = await apiRequest(`/orders/${selectedOrder._id}`, {
-        method: "DELETE",
-      });
-
-      if (response.success) {
+    deleteOrder.mutate(selectedOrder._id, {
+      onSuccess: () => {
         toast.success(`Protocol: Order ${selectedOrder.orderId} permanently excised.`);
-        fetchOrders(); // Refresh registry
-      } else {
-        toast.error("Deletion protocol failed.");
+        setIsDeleteModalOpen(false);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Deletion protocol failed.");
       }
-      setIsDeleteModalOpen(false);
-    } catch (error) {
-      console.error("Deletion error:", error);
-      toast.error(error.message || "System error during deletion.");
-    } finally {
-      setConfirming(false);
-    }
+    });
   };
+
 
   return (
     <div className="space-y-6">
@@ -97,9 +71,10 @@ export default function AdminOrders() {
         primaryAction={{
           label: "Refresh",
           icon: Loader2,
-          onClick: fetchOrders
+          onClick: () => refetch()
         }}
       />
+
       
       {loading ? (
         <div className="h-[400px] border border-dashed border-gray-100 flex items-center justify-center">

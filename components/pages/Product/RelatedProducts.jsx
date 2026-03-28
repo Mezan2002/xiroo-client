@@ -1,16 +1,19 @@
 "use client";
 import React from "react";
 import ProductCard from "@/components/ui/ProductCard";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { useProducts } from "@/hooks/api/useProducts";
 
 export default function RelatedProducts({ categoryId, currentProductId }) {
-  const { data: productsResponse, isLoading } = useQuery({
-    queryKey: ["related-products", categoryId],
-    queryFn: () => apiRequest(`/products?category=${categoryId}&limit=6`),
+  const { useAllProducts } = useProducts({
     enabled: !!categoryId,
     staleTime: 10 * 60 * 1000,
   });
+
+  const { data: productsResponse, isLoading } = useAllProducts({
+    category: categoryId,
+    limit: 6,
+  });
+
 
   const products = productsResponse?.success
     ? productsResponse.data.filter((p) => p._id !== currentProductId).slice(0, 3)

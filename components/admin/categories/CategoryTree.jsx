@@ -25,11 +25,11 @@ import {
   Layers,
 } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useCategories } from "@/hooks/api/useCategories";
+import { useToast } from "@/hooks/useToast";
 import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import CategoryDetailsSidebar from "@/components/admin/categories/CategoryDetailsSidebar";
+
 
 // --- Types & Constants ---
 const INDENTATION_WIDTH = 24;
@@ -186,8 +186,17 @@ const SortableCategoryItem = ({
 // --- Main Component ---
 
 export default function CategoryTree() {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { 
+    useCategoryTree, 
+    createCategory, 
+    updateCategory, 
+    deleteCategory, 
+    reorderCategories 
+  } = useCategories();
+
+  const { data: categories = [], isLoading } = useCategoryTree();
+
   const [expanded, setExpanded] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [activeId, setActiveId] = useState(null);
@@ -201,74 +210,6 @@ export default function CategoryTree() {
   const [projectedDepth, setProjectedDepth] = useState(0);
   const [projectedParentId, setProjectedParentId] = useState(null);
 
-  // 1. Data Fetching
-  const { data: categories = [], isLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await apiRequest("/categories");
-      if (!response.success) throw new Error("Registry Sync Failure");
-      return response.data;
-    },
-  });
-
-  // 2. Mutations
-  const createMutation = useMutation({
-    mutationFn: (payload) => {
-      console.log("Creating category with payload:", payload);
-      return apiRequest("/categories", { method: "POST", body: JSON.stringify(payload) });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["categories"]);
-      toast.success("Category created successfully.");
-    },
-    onError: (err) => {
-      console.error("Category Creation Error:", err);
-      toast.error(err.message || "Failed to create category");
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, ...payload }) => {
-      console.log(`Updating category ${id} with:`, payload);
-      return apiRequest(`/categories/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["categories"]);
-    },
-    onError: (err) => {
-      console.error("Category Update Error:", err);
-      toast.error(err.message || "Failed to update category");
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => {
-      console.log(`Deleting category ${id}`);
-      return apiRequest(`/categories/${id}`, { method: "DELETE" });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["categories"]);
-      toast.info("Category moved to archive.");
-    },
-    onError: (err) => {
-      console.error("Category Deletion Error:", err);
-      toast.error(err.message || "Failed to delete category");
-    }
-  });
-
-  const orderMutation = useMutation({
-    mutationFn: (payload) => {
-      console.log("Synchronizing sequence:", payload);
-      return apiRequest("/categories/reorder", { method: "PATCH", body: JSON.stringify({ categories: payload }) });
-    },
-    onSuccess: () => {
-       queryClient.invalidateQueries(["categories"]);
-    },
-    onError: (err) => {
-      console.error("Order Synchronization Error:", err);
-      toast.error(err.message || "Failed to synchronize sequence");
-    }
-  });
 
   // 3. Tree Logic Helpers
   const sortedItems = useMemo(() => {
@@ -409,10 +350,14 @@ export default function CategoryTree() {
       const payload = reordered.map((item, index) => ({
         id: item._id,
         order: index,
-        parentId: item._id === active.id ? newParentId : item.parentId
+        parentId: item._id === activeId ? newParentId : item.parentId
       }));
 
-      orderMutation.mutate(payload);
+      reorderCategories.mutate(payload, {
+        onError: (err) => {
+          toast.error(err.message || "Failed to synchronize sequence");
+        }
+      });
     }
   };
 
@@ -420,7 +365,14 @@ export default function CategoryTree() {
   const addTopLevel = () => {
     const existingRoots = categories.filter(c => !c.parentId);
     const name = `New Category ${existingRoots.length + 1}`;
-    createMutation.mutate({ name, order: categories.length });
+    createCategory.mutate({ name, order: categories.length }, {
+      onSuccess: () => {
+        toast.success("Category Registry Initialized.");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to create category");
+      }
+    });
   };
 
   const addSub = (parentId) => {
@@ -429,7 +381,14 @@ export default function CategoryTree() {
     }
     const existingSubs = categories.filter(c => c.parentId && c.parentId.toString() === parentId.toString());
     const name = `Sub-category ${existingSubs.length + 1}`;
-    createMutation.mutate({ name, parentId, order: 999 });
+    createCategory.mutate({ name, parentId, order: 999 }, {
+      onSuccess: () => {
+        toast.success("Sub-category Mapped Successfully.");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to create category");
+      }
+    });
   };
 
   const toggleExpand = (id) => {
@@ -443,20 +402,36 @@ export default function CategoryTree() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      deleteMutation.mutate(itemToDelete);
-      setItemToDelete(null);
+      deleteCategory.mutate(itemToDelete, {
+        onSuccess: () => {
+          setIsDeleteModalOpen(false);
+          setItemToDelete(null);
+          toast.info("Category moved to archive.");
+        },
+        onError: (err) => {
+          toast.error(err.message || "Deletion Failure.");
+        }
+      });
     }
   };
 
   const handleRename = (id, name) => {
-    updateMutation.mutate({ id, name });
+    updateCategory.mutate({ id, data: { name } }, {
+      onError: (err) => {
+        toast.error(err.message || "Rename Failure.");
+      }
+    });
   };
 
   const handleDetailedSave = (payload) => {
-    updateMutation.mutate(payload, {
+    const { id, ...data } = payload;
+    updateCategory.mutate({ id, data }, {
       onSuccess: () => {
         setSelectedCategory(null);
         toast.success("Protocol updated successfully.");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Update Failure.");
       }
     });
   };
@@ -528,7 +503,7 @@ export default function CategoryTree() {
 
       <button 
         onClick={addTopLevel}
-        disabled={createMutation.isLoading}
+        disabled={createCategory.isPending}
         className="flex items-center gap-3 px-4 py-3 w-full text-left text-[#37352F40] hover:bg-[#F7F7F5] border border-dashed border-[#EDECE9] transition-all group active:scale-[0.99]"
       >
         <Plus size={16} className="group-hover:text-[#37352F] transition-colors" />
@@ -563,7 +538,7 @@ export default function CategoryTree() {
         category={selectedCategory}
         onClose={() => setSelectedCategory(null)}
         onSave={handleDetailedSave}
-        isLoading={updateMutation.isLoading}
+        isLoading={updateCategory.isPending}
       />
 
       <ConfirmationModal
@@ -581,3 +556,4 @@ export default function CategoryTree() {
     </div>
   );
 }
+

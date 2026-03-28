@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { X, Save, Image as ImageIcon, Trash2, Check, AlertCircle, Hash } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { ImageUploader } from "@/components/shared/ImageUploader";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { useAttributes } from "@/hooks/api/useAttributes";
 
 export default function CategoryDetailsSidebar({ 
   category, 
@@ -22,13 +22,10 @@ export default function CategoryDetailsSidebar({
     allowedAttributes: category?.allowedAttributes || [],
   });
 
-  const { data: attributes = [] } = useQuery({
-    queryKey: ["attributes"],
-    queryFn: async () => {
-      const response = await apiRequest("/attributes");
-      return response.data || [];
-    },
-  });
+  const { useAttributeRegistry } = useAttributes();
+  const { data: attributesResponse } = useAttributeRegistry();
+  const attributes = attributesResponse?.data || [];
+
 
   if (!category) return null;
 
@@ -123,10 +120,11 @@ export default function CategoryDetailsSidebar({
               >
                 {formData.image ? (
                   <div className="relative w-full h-full">
-                    <img 
+                    <Image 
                       src={formData.image} 
                       alt="Category" 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105" 
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                       <span className="text-white text-[10px] font-bold uppercase tracking-widest border border-white/40 px-4 py-2">Update Visuals</span>

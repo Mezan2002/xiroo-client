@@ -7,32 +7,32 @@ import { Button } from "@/components/ui/Button";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 
-import { useCart } from "@/context/CartContext";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useCart } from "@/hooks/useCart";
 
 export default function CheckoutPage() {
-  const { user, loading } = useUser();
+  const { user, isLoading } = useUser();
   const { items, subtotal } = useCart();
   const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
   const router = useRouter();
   const pathname = usePathname();
-
+ 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !user) {
       const redirectPath = encodeURIComponent(pathname);
       router.push(`/login?redirect=${redirectPath}`);
     }
-  }, [user, loading, router, pathname]);
-
+  }, [user, isLoading, router, pathname]);
+ 
   const baseShipping = district === "Dhaka" ? 80 : district ? 150 : 0;
   const shipping = baseShipping + (deliveryMethod === "fast" ? 50 : 0);
   const total = subtotal + shipping;
-
-  if (loading) {
+ 
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-pulse flex flex-col items-center gap-4">

@@ -4,30 +4,28 @@ import { useRouter } from "next/navigation";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import UserForm from "@/components/admin/users/UserForm";
 import { UserPlus } from "lucide-react";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useUsers } from "@/hooks/api/useUsers";
+import { useToast } from "@/hooks/useToast";
 
 export default function NewUser() {
   const router = useRouter();
   const { toast } = useToast();
+  const { createUser } = useUsers();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = (data) => {
     setIsLoading(true);
-    try {
-      const response = await apiRequest("/users/create-user", {
-        method: "POST",
-        body: JSON.stringify({ user: data }),
-      });
-      if (response.success) {
+    createUser.mutate(data, {
+      onSuccess: () => {
         toast.success("User Registry Created Successfully.");
         router.push("/admin/users");
+        setIsLoading(false);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to create user registry.");
+        setIsLoading(false);
       }
-    } catch (err) {
-      toast.error(err.message || "Failed to create user registry.");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (

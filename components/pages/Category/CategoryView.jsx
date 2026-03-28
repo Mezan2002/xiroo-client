@@ -4,8 +4,8 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import ProductCard from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
 import { Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { useProducts } from "@/hooks/api/useProducts";
+import { useCategories } from "@/hooks/api/useCategories";
 import { useMemo, useState, useEffect } from "react";
 
 export default function CategoryView({ category }) {
@@ -15,31 +15,25 @@ export default function CategoryView({ category }) {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  // Fetch Category Metadata
-  const { data: categoryData } = useQuery({
-    queryKey: ["category", category],
-    queryFn: () => apiRequest(`/categories/slug/${category}`),
-    enabled: category !== "all",
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
-  });
+  const { useCategoryDetail } = useCategories();
+  const { data: categoryData } = useCategoryDetail(category);
 
-  // Fetch Products with dynamic filters
-  const { data: productsResponse, isLoading } = useQuery({
-    queryKey: ["products", category, searchQuery, inStockOnly, outOfStockOnly, minPrice, maxPrice],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (category !== "all") params.append("categorySlug", category);
-      if (searchQuery) params.append("searchTerm", searchQuery);
-      if (minPrice) params.append("minPrice", minPrice);
-      if (maxPrice) params.append("maxPrice", maxPrice);
-      
-      if (inStockOnly && !outOfStockOnly) params.append("inStock", "true");
-      if (outOfStockOnly && !inStockOnly) params.append("inStock", "false");
+  const { useAllProducts } = useProducts();
+  
+  // Prepare params
+  const queryParams = useMemo(() => {
+    const p = {};
+    if (category !== "all") p.categorySlug = category;
+    if (searchQuery) p.searchTerm = searchQuery;
+    if (minPrice) p.minPrice = minPrice;
+    if (maxPrice) p.maxPrice = maxPrice;
+    if (inStockOnly && !outOfStockOnly) p.inStock = "true";
+    if (outOfStockOnly && !inStockOnly) p.inStock = "false";
+    return p;
+  }, [category, searchQuery, minPrice, maxPrice, inStockOnly, outOfStockOnly]);
 
-      return apiRequest(`/products?${params.toString()}`);
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
-  });
+  const { data: productsResponse, isLoading } = useAllProducts(queryParams);
+
 
   const products = productsResponse?.data || [];
   const title = categoryData?.data?.title || (category.toLowerCase() === "all" ? "ALL PRODUCTS" : category.replace(/-/g, " ").toUpperCase());

@@ -1,19 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { useAuthLayout } from "@/context/AuthContext";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useLayout } from "@/hooks/useLayout";
+import { useToast } from "@/hooks/useToast";
 import { Mail, RefreshCw, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/hooks/api/useAuth";
 
 function VerifyEmailContent() {
-  const { updateLayout } = useAuthLayout();
+  const { updateAuthLayout } = useLayout();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { verifyOtpMutation, resendOtpMutation } = useUser();
+  const { verifyOtpMutation, resendOtpMutation } = useAuth();
   const { toast } = useToast();
   const email = searchParams.get("email") || "your email";
   const mode = searchParams.get("mode");
@@ -23,7 +22,7 @@ function VerifyEmailContent() {
   const inputRefs = useRef([]);
 
   useEffect(() => {
-    updateLayout({
+    updateAuthLayout({
       imageSrc: isOtp ? "/images/auth/forgot.png" : "/images/auth/verify.png",
       heading: isOtp ? (
         <>
@@ -41,7 +40,8 @@ function VerifyEmailContent() {
         : "Confirming your identity is the final step to accessing the Xiroo collection. Please check your inbox for the security code.",
       badgeText: isOtp ? "Shield Protected" : "Identity Locked",
     });
-  }, [updateLayout, isOtp]);
+  }, [updateAuthLayout, isOtp]);
+
 
   const handlePaste = (e) => {
     e.preventDefault();

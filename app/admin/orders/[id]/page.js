@@ -3,8 +3,8 @@ import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Button } from "@/components/ui/Button";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Select } from "@/components/ui/Select";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
+import { useToast } from "@/hooks/useToast";
+import { useOrders } from "@/hooks/api/useOrders";
 import {
   AlertCircle,
   CheckCircle2,
@@ -13,10 +13,13 @@ import {
   Loader2,
   ShoppingBag,
   Truck,
+  MapPin,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+
+
 
 // --- Sub-components ---
 const Card = ({ children, title, action, className = "" }) => (
@@ -99,55 +102,23 @@ export default function OrderDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier } = useOrders();
+  const { data: order, isLoading: loading } = useOrderDetail(params.id);
+
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [isDispatching, setIsDispatching] = useState(false);
   const [selectedCourier, setSelectedCourier] = useState("steadfast");
   const [manualTrackingId, setManualTrackingId] = useState("");
 
-  const fetchOrder = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await apiRequest(`/orders/${params.id}`);
-      if (response.success) {
-        setOrder(response.data);
-      } else {
-        toast.error("Failed to retrieve order record.");
-      }
-    } catch (error) {
-      console.error("Order detail fetch error:", error);
-      toast.error("Registry synchronization failure.");
-    } finally {
-      setLoading(false);
-    }
-  }, [params.id, toast]);
-
-  useEffect(() => {
-    if (params.id) fetchOrder();
-  }, [fetchOrder, params.id]);
-
   const handleStatusChange = async (newStatus) => {
-    try {
-      setIsUpdatingStatus(true);
-      const response = await apiRequest(`/orders/${params.id}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (response.success) {
+    updateStatus.mutate({ id: params.id, status: newStatus }, {
+      onSuccess: () => {
         toast.success(`Order status updated to ${newStatus}`);
-        await fetchOrder(); // High-Fidelity Refresh: Ensure all nested data is restored
-      } else {
-        toast.error(response.message || "Failed to update status");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to update status");
       }
-    } catch (error) {
-      toast.error("Status synchronization error.");
-    } finally {
-      setIsUpdatingStatus(false);
-    }
+    });
   };
 
   const handleCancelOrder = () => {
@@ -155,58 +126,41 @@ export default function OrderDetailsPage() {
   };
 
   const handleConfirmCancellation = async () => {
-    try {
-      setIsCancelling(true);
-      const response = await apiRequest(`/orders/${params.id}/cancel`, {
-        method: "PATCH",
-      });
-
-      if (response.success) {
+    cancelOrder.mutate(params.id, {
+      onSuccess: () => {
         toast.success("Order cancelled and inventory restored.");
         setIsCancelModalOpen(false);
-        await fetchOrder(); // High-Fidelity Refresh: Ensure all nested data is restored
-      } else {
-        toast.error(response.message || "Cancellation failed");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Cancellation failed");
       }
-    } catch (error) {
-      toast.error("System error during cancellation.");
-    } finally {
-      setIsCancelling(false);
-    }
+    });
   };
 
   const handleCourierDispatch = async () => {
-    try {
-      if (selectedCourier === "manual" && !manualTrackingId) {
-        toast.error("Please enter a Tracking ID for manual dispatch");
-        return;
-      }
-
-      setIsDispatching(true);
-      const response = await apiRequest(`/orders/${params.id}/dispatch`, {
-        method: "POST",
-        body: JSON.stringify({
-          provider: selectedCourier,
-          trackingId:
-            selectedCourier === "manual" ? manualTrackingId : undefined,
-        }),
-      });
-
-      if (response.success) {
-        toast.success(response.message || `Dispatched to ${provider}`);
-        await fetchOrder();
-      } else {
-        toast.error(response.message || "Dispatch failed");
-      }
-    } catch (error) {
-      console.error("Dispatch Error:", error);
-      toast.error(
-        error.message || "System error during courier synchronization.",
-      );
-    } finally {
-      setIsDispatching(false);
+    if (selectedCourier === "manual" && !manualTrackingId) {
+      toast.error("Please enter a Tracking ID for manual dispatch");
+      return;
     }
+
+    dispatchCourier.mutate({
+      id: params.id,
+      provider: selectedCourier,
+      trackingId: selectedCourier === "manual" ? manualTrackingId : undefined,
+    }, {
+      onSuccess: (response) => {
+        toast.success(response.message || `Dispatched to ${selectedCourier}`);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Dispatch failed");
+      }
+    });
   };
+
+  const isUpdatingStatus = updateStatus.isPending;
+  const isCancelling = cancelOrder.isPending;
+  const isDispatching = dispatchCourier.isPending;
+
 
   if (loading) {
     return (

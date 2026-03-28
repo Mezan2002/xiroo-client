@@ -1,25 +1,23 @@
 "use client";
 import { useState, useEffect } from "react";
 import { X, Check, Search, GripVertical } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
+import { useCategories } from "@/hooks/api/useCategories";
+import { useMenus } from "@/hooks/api/useMenus";
 
 export default function MenuForm({ isOpen, onClose, menu }) {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { useCategoryTree } = useCategories();
+  const { createMenu, updateMenu } = useMenus();
+  
   const [name, setName] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. Fetch Categories for selection
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await apiRequest("/categories");
-      return response.data || [];
-    },
-  });
+  const { data: categoryTreeResponse } = useCategoryTree();
+  const categories = categoryTreeResponse?.data || [];
 
   useEffect(() => {
     if (isOpen) {
@@ -33,30 +31,35 @@ export default function MenuForm({ isOpen, onClose, menu }) {
     }
   }, [menu, isOpen]);
 
-  const mutation = useMutation({
-    mutationFn: (payload) => {
-      const method = menu ? "PATCH" : "POST";
-      const url = menu ? `/menus/${menu._id}` : "/menus";
-      return apiRequest(url, {
-        method,
-        body: JSON.stringify(payload),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["menus"]);
-      toast.success(menu ? "Menu updated successfully." : "Menu created successfully.");
-      onClose();
-    },
-    onError: (err) => {
-      toast.error(err.message || "An error occurred.");
-    },
-  });
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    mutation.mutate({ name, categories: selectedCategories });
+
+    setIsSubmitting(true);
+    const payload = { name, categories: selectedCategories };
+    const successCallback = () => {
+      toast.success(menu ? "Menu updated successfully." : "Menu created successfully.");
+      setIsSubmitting(false);
+      onClose();
+    };
+    const errorCallback = (err) => {
+      toast.error(err.message || "An error occurred.");
+      setIsSubmitting(false);
+    };
+
+    if (menu) {
+      updateMenu.mutate({ id: menu._id, payload }, {
+        onSuccess: successCallback,
+        onError: errorCallback
+      });
+    } else {
+      createMenu.mutate(payload, {
+        onSuccess: successCallback,
+        onError: errorCallback
+      });
+    }
   };
+
 
   const toggleCategory = (catId) => {
     setSelectedCategories(prev => 
@@ -186,10 +189,10 @@ export default function MenuForm({ isOpen, onClose, menu }) {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={mutation.isLoading || !name.trim()}
+            disabled={isSubmitting || !name.trim()}
             className="flex-2 px-8 py-3 bg-black text-white rounded-lg text-[13px] font-bold hover:bg-black/90 transition-all active:scale-[0.98] shadow-xl shadow-black/10 disabled:opacity-30"
           >
-            {mutation.isLoading ? "Syncing..." : menu ? "Update Protocol" : "Authorize Creation"}
+            {isSubmitting ? "Syncing..." : menu ? "Update Protocol" : "Authorize Creation"}
           </button>
         </div>
       </div>

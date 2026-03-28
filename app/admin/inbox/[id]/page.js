@@ -1,16 +1,9 @@
 "use client";
 import { useSocket } from "@/context/SocketContext";
-import { useUser } from "@/context/UserContext";
-import {
-  useAssignConversation,
-  useConversation,
-  useFlagConversation,
-  useMarkAsRead,
-  useSendMessage,
-  useSetPriority,
-  useSetStatus,
-} from "@/hooks/useInbox";
-import { apiRequest } from "@/lib/api";
+import { useAuth } from "@/hooks/api/useAuth";
+import { useUsers } from "@/hooks/api/useUsers";
+import { useInbox } from "@/hooks/api/useInbox";
+import { useToast } from "@/hooks/useToast";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -21,6 +14,7 @@ import {
   Send,
   Shield,
   UserCheck,
+  RotateCcw
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -47,41 +41,37 @@ const PRIORITY_STYLES = {
 export default function MessagingTerminal() {
   const router = useRouter();
   const { id } = useParams();
+  const { toast } = useToast();
+
+  const {
+    useConversation,
+    sendMessage,
+    assignConversation,
+    flagConversation,
+    setStatus,
+    setPriority,
+    markAsRead
+  } = useInbox();
 
   const { data: conversation, isLoading, refetch } = useConversation(id);
-  const sendMessageMutation = useSendMessage();
-  const assignMutation = useAssignConversation(id);
-  const flagMutation = useFlagConversation(id);
-  const statusMutation = useSetStatus(id);
-  const priorityMutation = useSetPriority(id);
-  const { mutate: markAsRead } = useMarkAsRead();
+  const { useAllUsers } = useUsers();
+  const { data: adminRegistry = [] } = useAllUsers({ role: "admin" });
 
   const { socket } = useSocket();
-  const { user: currentUser } = useUser();
+  const { user: currentUser } = useAuth();
 
   const [reply, setReply] = useState("");
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const [showAssignMenu, setShowAssignMenu] = useState(false);
-  const [admins, setAdmins] = useState([]);
 
   const scrollRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    apiRequest(`/users?role=admin`)
-      .then((d) => {
-        // Double check filtering on client side for security/robustness
-        const filteredAdmins = (d.data || []).filter(u => u.role === 'admin');
-        setAdmins(filteredAdmins);
-      })
-      .catch(() => {});
-  }, []);
-
   const lastMarkedId = useRef(null);
   useEffect(() => {
     if (id && lastMarkedId.current !== id) {
-      markAsRead(id);
+      markAsRead.mutate(id);
       lastMarkedId.current = id;
     }
   }, [id, markAsRead]);
@@ -119,16 +109,26 @@ export default function MessagingTerminal() {
   const handleSend = (e) => {
     e?.preventDefault();
     if (!reply.trim()) return;
-    sendMessageMutation.mutate({ content: reply, conversationId: id });
-    setReply("");
+    sendMessage.mutate({ content: reply, conversationId: id }, {
+      onSuccess: () => {
+        setReply("");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to transmit message.");
+      }
+    });
   };
 
-  <div className="flex flex-col items-center justify-center h-screen gap-4 bg-white">
-    <Loader2 className="w-10 h-10 animate-spin text-zinc-300" />
-    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600">
-      Synchronizing...
-    </p>
-  </div>;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4 bg-white">
+        <Loader2 className="w-10 h-10 animate-spin text-zinc-300" />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600">
+          Synchronizing...
+        </p>
+      </div>
+    );
+  }
 
   const customer =
     conversation?.customer ||
@@ -178,18 +178,19 @@ export default function MessagingTerminal() {
             <div className="w-px h-6 bg-zinc-200 mx-2" />
             <button
               onClick={() =>
-                statusMutation.mutate({
+                setStatus.mutate({
+                  id,
                   status: isResolved ? "active" : "resolved",
                 })
               }
-              disabled={statusMutation.isPending}
+              disabled={setStatus.isPending}
               className={`h-9 px-5 rounded-none text-[11px] font-semibold tracking-wide transition-all ${
                 isResolved
                   ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                   : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-zinc-200"
               }`}
             >
-              {statusMutation.isPending ? (
+              {setStatus.isPending ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : isResolved ? (
                 "Reopen Case"
@@ -231,7 +232,6 @@ export default function MessagingTerminal() {
                 <div
                   className={`max-w-[75%] flex flex-col ${isAdminMsg ? "items-end" : "items-start"} gap-1.5`}
                 >
-                  {/* Bubble */}
                   <div
                     className={`px-5 py-3.5 rounded-none text-[14px] leading-relaxed tracking-tight ${
                       isAdminMsg
@@ -277,7 +277,6 @@ export default function MessagingTerminal() {
                     ))}
                   </div>
 
-                  {/* Metadata */}
                   <div className="flex items-center gap-2 px-1 opacity-70">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-900">
                       {isAdminMsg
@@ -336,19 +335,19 @@ export default function MessagingTerminal() {
                     }
                   }}
                   placeholder="Type your response…"
-                  disabled={sendMessageMutation.isPending}
+                  disabled={sendMessage.isPending}
                   className="w-full bg-transparent px-2 py-4 text-[14px] text-zinc-800 placeholder:text-zinc-400 outline-none resize-none max-h-[160px] leading-relaxed font-medium"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={!reply.trim() || sendMessageMutation.isPending}
+                disabled={!reply.trim() || sendMessage.isPending}
                 className="h-14 w-14 flex items-center justify-center rounded-none transition-all shadow-xl shadow-zinc-200/50 mb-0.5 shrink-0
                   enabled:bg-zinc-900 enabled:text-white enabled:hover:bg-zinc-700 enabled:hover:scale-105 active:scale-95
                   disabled:bg-zinc-100 disabled:text-zinc-300"
               >
-                {sendMessageMutation.isPending ? (
+                {sendMessage.isPending ? (
                   <Loader2 size={20} className="animate-spin" />
                 ) : (
                   <Send size={20} className="ml-0.5" />
@@ -360,7 +359,7 @@ export default function MessagingTerminal() {
       </div>
 
       {/* ══ Sidebar ═══════════════════════════════════════════════════════ */}
-      <aside className="w-[320px] shrink-0 flex flex-col bg-white overflow-y-auto custom-scrollbar">
+      <aside className="w-[320px] shrink-0 flex flex-col bg-white overflow-y-auto custom-scrollbar border-l border-zinc-100">
         {/* User Card */}
         <div className="p-8 text-center bg-zinc-50/50 border-b border-zinc-100">
           <div className="w-20 h-20 rounded-none bg-white border border-zinc-100 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-zinc-200/50 font-bold text-2xl text-zinc-900 uppercase">
@@ -400,7 +399,6 @@ export default function MessagingTerminal() {
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
               Case Management
             </p>
-
             <div className="space-y-3">
               {/* Priority Dropdown */}
               <div className="relative">
@@ -423,12 +421,12 @@ export default function MessagingTerminal() {
                   />
                 </button>
                 {showPriorityMenu && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_40px_rgba(0,0,0,0.06)] rounded-none z-30 py-2 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_40px_rgba(0,0,0,0.06)] rounded-none z-30 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
                     {PRIORITY_OPTIONS.map((p) => (
                       <button
                         key={p}
                         onClick={() => {
-                          priorityMutation.mutate({ priority: p });
+                          setPriority.mutate({ id, priority: p });
                           setShowPriorityMenu(false);
                         }}
                         className="w-full text-left px-5 py-2.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors flex items-center gap-3"
@@ -466,12 +464,12 @@ export default function MessagingTerminal() {
                   />
                 </button>
                 {showAssignMenu && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_40px_rgba(0,0,0,0.06)] rounded-none z-30 py-2 max-h-56 overflow-y-auto animate-in fade-in slide-in-from-top-2">
-                    {admins.map((admin) => (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_40px_rgba(0,0,0,0.06)] rounded-none z-30 py-2 max-h-56 overflow-y-auto animate-in fade-in slide-in-from-top-2 custom-scrollbar">
+                    {adminRegistry.map((admin) => (
                       <button
                         key={admin._id}
                         onClick={() => {
-                          assignMutation.mutate({ assignedTo: admin._id });
+                          assignConversation.mutate({ id, assignedTo: admin._id });
                           setShowAssignMenu(false);
                         }}
                         className="w-full text-left px-5 py-2.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors flex items-center gap-3"
@@ -488,7 +486,7 @@ export default function MessagingTerminal() {
 
               {/* Flag Toggle */}
               <button
-                onClick={() => flagMutation.mutate()}
+                onClick={() => flagConversation.mutate(id)}
                 className={`w-full flex items-center gap-3 px-5 h-12 rounded-none border transition-all text-[12px] font-semibold ${
                   conversation?.isFlagged
                     ? "bg-blue-50 border-blue-100 text-blue-700 shadow-sm"
@@ -533,7 +531,7 @@ export default function MessagingTerminal() {
 
           {/* Activity Timeline */}
           {conversation?.activityLog?.length > 0 && (
-            <div className="space-y-6 pt-4 border-t border-zinc-50">
+            <div className="space-y-6 pt-8 border-t border-zinc-50">
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">
                 Activity History
               </p>
@@ -556,7 +554,7 @@ export default function MessagingTerminal() {
                         </span>
                       </div>
                       <p className="text-[10px] text-zinc-500 font-bold capitalize mt-0.5">
-                        {entry.action.replace(/_/g, " ")}
+                        {entry.action?.replace(/_/g, " ")}
                       </p>
                     </div>
                   </div>

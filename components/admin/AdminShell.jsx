@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminSidebar from "./AdminSidebar";
 import SearchModal from "./SearchModal";
 
 export default function AdminShell({ children }) {
-  const { user, loading } = useUser();
+  const { user, isLoading } = useUser();
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -17,10 +17,10 @@ export default function AdminShell({ children }) {
   }, []);
 
   useEffect(() => {
-    if (mounted && !loading && (!user || user.role !== "admin")) {
+    if (mounted && !isLoading && (!user || user.role !== "admin")) {
       router.push("/login");
     }
-  }, [user, loading, router, mounted]);
+  }, [user, isLoading, router, mounted]);
 
   useEffect(() => {
     const handleOpenSearch = () => setIsSearchOpen(true);
@@ -29,7 +29,7 @@ export default function AdminShell({ children }) {
       window.removeEventListener("open-admin-search", handleOpenSearch);
   }, []);
 
-  if (!mounted || loading) {
+  if (!mounted || isLoading) {
     return (
       <div className="h-screen flex items-center justify-center italic text-gray-400">
         Synchronizing Identity...

@@ -1,42 +1,52 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { useAttributes } from "@/hooks/api/useAttributes";
 import { X, Save, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
 
 export default function AttributeForm({ isOpen, onClose, attribute }) {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { createAttribute, updateAttribute } = useAttributes();
+  
   const [name, setName] = useState(attribute?.name || "");
   const [values, setValues] = useState(attribute?.values || []);
   const [newValue, setNewValue] = useState("");
-
-  const mutation = useMutation({
-    mutationFn: (payload) => {
-      const method = attribute ? "PATCH" : "POST";
-      const url = attribute ? `/attributes/${attribute._id}` : "/attributes";
-      return apiRequest(url, {
-        method,
-        body: JSON.stringify(payload),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["attributes"]);
-      toast.success(attribute ? "Attribute updated." : "Attribute created.");
-      onClose();
-    },
-    onError: (err) => {
-      toast.error(err.message || "An error occurred.");
-    },
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return toast.error("Name is required.");
     if (values.length === 0) return toast.error("At least one value is required.");
-    mutation.mutate({ name, values });
+    
+    setIsSubmitting(true);
+    const payload = { name, values };
+
+    if (attribute) {
+      updateAttribute.mutate({ id: attribute._id, data: payload }, {
+        onSuccess: () => {
+          toast.success("Attribute updated.");
+          setIsSubmitting(false);
+          onClose();
+        },
+        onError: (err) => {
+          toast.error(err.message || "An error occurred.");
+          setIsSubmitting(false);
+        }
+      });
+    } else {
+      createAttribute.mutate(payload, {
+        onSuccess: () => {
+          toast.success("Attribute created.");
+          setIsSubmitting(false);
+          onClose();
+        },
+        onError: (err) => {
+          toast.error(err.message || "An error occurred.");
+          setIsSubmitting(false);
+        }
+      });
+    }
   };
 
   const addValue = () => {
@@ -143,10 +153,10 @@ export default function AttributeForm({ isOpen, onClose, attribute }) {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={mutation.isPending}
+            disabled={isSubmitting}
             className="flex-1 bg-black hover:bg-zinc-800 text-white h-14 text-[10px] font-bold uppercase tracking-[0.2em] rounded-none transition-all shadow-xl shadow-black/10 disabled:opacity-50"
           >
-            {mutation.isPending ? "Syncing..." : (
+            {isSubmitting ? "Syncing..." : (
               <div className="flex items-center justify-center gap-2">
                 <Save size={14} />
                 <span>Save Registry</span>

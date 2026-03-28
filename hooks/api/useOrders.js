@@ -1,0 +1,124 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axios";
+
+/** 
+ * Senior Dev Hook: useOrders
+ * Robust order lifecycle management and logistical orchestration.
+ */
+export const useOrders = () => {
+  const queryClient = useQueryClient();
+
+  // 1. Transactional Protocol: Create Order Registry
+  const placeOrder = useMutation({
+    mutationFn: async (orderData) => {
+      const response = await axiosInstance.post("/orders", orderData);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  // 2. Registry Retrieval: List Orders (Admin)
+  const useOrderHistory = (params = {}) => {
+    return useQuery({
+      queryKey: ["orders", params],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/orders", { params });
+        return response.data;
+      },
+    });
+  };
+
+  // 2.1 Personalized Registry: User specific order history
+  const useMyOrders = () => {
+    return useQuery({
+      queryKey: ["my-orders"],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/orders/my-orders");
+        return response.data;
+      },
+    });
+  };
+
+  // 2.2 Analytics Protocol: Order Statistics
+  const useOrderStats = () => {
+    return useQuery({
+      queryKey: ["order-stats"],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/orders/stats");
+        return response.data;
+      },
+    });
+  };
+
+  // 3. Single Order Discovery
+  const useOrderDetail = (id) => {
+    return useQuery({
+      queryKey: ["order", id],
+      queryFn: async () => {
+        const response = await axiosInstance.get(`/orders/${id}`);
+        return response.data;
+      },
+      enabled: !!id,
+    });
+  };
+
+  // 4. Admin Management protocols: Status synchronization
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }) => {
+      const response = await axiosInstance.patch(`/orders/${id}/status`, { status });
+      return response.data;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
+  const dispatchCourier = useMutation({
+    mutationFn: async ({ id, provider, trackingId }) => {
+      const response = await axiosInstance.post(`/orders/${id}/dispatch`, { provider, trackingId });
+      return response.data;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+    },
+  });
+
+  const cancelOrder = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.patch(`/orders/${id}/cancel`);
+      return response.data;
+    },
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
+  const deleteOrder = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.delete(`/orders/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
+  return {
+    placeOrder,
+    useOrderHistory,
+    useMyOrders,
+    useOrderStats,
+    useOrderDetail,
+    updateStatus,
+    dispatchCourier,
+    cancelOrder,
+    deleteOrder,
+  };
+};

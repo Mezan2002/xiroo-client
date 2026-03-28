@@ -5,36 +5,18 @@ import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Plus, Package } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { useToast } from "@/hooks/useToast";
+import { useProducts } from "@/hooks/api/useProducts";
 
 export default function AdminInventory() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { useAllProducts, useProductMutation } = useProducts();
+  const { data: products = [], isLoading } = useAllProducts();
+  const { deleteMutation } = useProductMutation();
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const { data: products = [], isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const response = await apiRequest("/products");
-      return response.data || [];
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => apiRequest(`/products/${id}`, { method: "DELETE" }),
-    onSuccess: () => {
-      toast.success("Product Registry Deactivated.");
-      queryClient.invalidateQueries(["products"]);
-      setIsDeleteModalOpen(false);
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to terminate registry.");
-    }
-  });
 
   const handleEdit = (product) => {
     router.push(`/admin/products/${product._id}`);
@@ -45,11 +27,20 @@ export default function AdminInventory() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedProduct) {
-      deleteMutation.mutate(selectedProduct._id);
+      deleteMutation.mutate(selectedProduct._id, {
+        onSuccess: () => {
+          toast.success("Product Registry Deactivated.");
+          setIsDeleteModalOpen(false);
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to terminate registry.");
+        }
+      });
     }
   };
+
 
   const COLUMNS = useMemo(() => [
     { 

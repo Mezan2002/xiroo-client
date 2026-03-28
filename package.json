@@ -22,6 +22,7 @@
     "@tiptap/pm": "^3.20.4",
     "@tiptap/react": "^3.20.4",
     "@tiptap/starter-kit": "^3.20.4",
+    "axios": "^1.14.0",
     "html-to-image": "^1.11.13",
     "js-cookie": "^3.0.5",
     "jspdf": "^4.2.1",

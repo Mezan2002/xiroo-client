@@ -16,45 +16,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { useToast } from "@/context/ToastContext";
-import { useUser } from "@/context/UserContext";
-import { apiRequest } from "@/lib/api";
-
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/hooks/api/useUser";
+import { useToast } from "@/hooks/useToast";
 
 export default function AddressesPage() {
-  const { user: currentUser } = useUser();
+  const { user: currentUser, syncAddresses } = useUser();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState(null);
   const [editingAddress, setEditingAddress] = useState(null);
   const addresses = currentUser?.addresses || [];
 
-  // 1. Address Synchronization Mutation
-  const syncAddressesMutation = useMutation({
-    mutationFn: async ({ updatedArray, successMsg }) => {
-      const response = await apiRequest("/users/me", {
-        method: "PATCH",
-        body: JSON.stringify({ addresses: updatedArray }),
-      });
-      if (!response.success) throw new Error(response.message || "Sync Failure");
-      return { data: response.data, successMsg };
-    },
-    onSuccess: ({ successMsg }) => {
-      toast.success(successMsg);
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      handleCloseModal();
-      setIsDeleteModalOpen(false);
-      setAddressToDelete(null);
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to synchronize address registry.");
-    },
-  });
-
   const [formData, setFormData] = useState({
+
     address: "",
     district: "",
     upazila: "",
@@ -138,11 +114,16 @@ export default function AddressesPage() {
       updatedAddresses[0].isDefault = true;
     }
 
-    syncAddressesMutation.mutate({
-      updatedArray: updatedAddresses,
-      successMsg: editingAddress
-        ? "Shipping Profile Updated."
-        : "New Shipping Profile Added.",
+    syncAddresses.mutate(updatedAddresses, {
+      onSuccess: () => {
+        toast.success(editingAddress
+          ? "Shipping Profile Updated."
+          : "New Shipping Profile Added.");
+        handleCloseModal();
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to synchronize address registry.");
+      }
     });
   };
 
@@ -154,11 +135,18 @@ export default function AddressesPage() {
     ) {
       updatedAddresses[0].isDefault = true;
     }
-    syncAddressesMutation.mutate({
-      updatedArray: updatedAddresses,
-      successMsg: "Shipping Profile Removed.",
+    syncAddresses.mutate(updatedAddresses, {
+      onSuccess: () => {
+        toast.success("Shipping Profile Removed.");
+        setIsDeleteModalOpen(false);
+        setAddressToDelete(null);
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to synchronize address registry.");
+      }
     });
   };
+
 
   const confirmDelete = (id) => {
     setAddressToDelete(id);

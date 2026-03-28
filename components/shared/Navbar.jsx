@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { Button } from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
-import { useUser } from "@/context/UserContext";
-import { useQuery } from "@tanstack/react-query";
 import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -25,8 +23,12 @@ const UserAccountDrawer = dynamic(
 
 // Dynamic Navigation Architecture Hooked to Admin Modules
 
-import { useCart } from "@/context/CartContext";
-import { apiRequest } from "@/lib/api";
+import { useUser } from "@/hooks/api/useUser";
+import { useCart } from "@/hooks/useCart";
+import { useProducts } from "@/hooks/api/useProducts";
+import { useCategories } from "@/hooks/api/useCategories";
+import axiosInstance from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -45,20 +47,17 @@ export function Navbar() {
 
   const { data: menuResponse } = useQuery({
     queryKey: ["menus"],
-    queryFn: () => apiRequest("/menus"),
-    staleTime: 10 * 60 * 1000, // 10 minutes cache
-  });
-
-  const { data: productsData } = useQuery({
-    queryKey: ["mega-menu-products"],
-    queryFn: () => apiRequest("/products?limit=50"),
+    queryFn: () => axiosInstance.get("/menus"),
     staleTime: 10 * 60 * 1000,
   });
 
+  const { useAllProducts } = useProducts();
+  const { data: productsResponse } = useAllProducts({ limit: 50 });
+
   useEffect(() => {
     setMounted(true);
-    if (menuResponse?.success) {
-      const allProducts = productsData?.data || [];
+    if (menuResponse) {
+      const allProducts = productsResponse?.data || [];
       const items = menuResponse.data.map((menu) => {
         const categories = menu.categories || [];
         const catIds = categories.map((c) => c._id || c.id || c);
@@ -88,7 +87,7 @@ export function Navbar() {
       });
       setMenusData(data);
     }
-  }, [menuResponse, productsData]);
+  }, [menuResponse, productsResponse]);
 
   useEffect(() => {
     const handleScroll = () => {

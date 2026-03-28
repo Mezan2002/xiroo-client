@@ -1,19 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { useAuthLayout } from "@/context/AuthContext";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
+import { useToast } from "@/hooks/useToast";
 import { Eye, EyeOff, Lock, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useLayout } from "@/hooks/useLayout";
+import { useAuth } from "@/hooks/api/useAuth";
 import { useEffect, useState, Suspense } from "react";
 
+
 function ResetPasswordContent() {
-  const { updateLayout } = useAuthLayout();
+  const { updateAuthLayout } = useLayout();
+
+
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { resetPasswordMutation } = useUser();
+  const { resetPasswordMutation } = useAuth();
   
   const email = searchParams.get("email");
   const otp = searchParams.get("code");
@@ -26,7 +29,7 @@ function ResetPasswordContent() {
   const { toast } = useToast();
 
   useEffect(() => {
-    updateLayout({
+    updateAuthLayout({
       imageSrc: "/images/auth/reset.png",
       heading: (
         <>
@@ -38,7 +41,8 @@ function ResetPasswordContent() {
         "Create a new secure gateway to your Xiroo account. We recommend a complex combination of characters for maximum prestige and security.",
       badgeText: "Security Protocol",
     });
-  }, [updateLayout]);
+  }, [updateAuthLayout]);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

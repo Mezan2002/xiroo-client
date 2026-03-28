@@ -1,23 +1,25 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { useAuthLayout } from "@/context/AuthContext";
-import { useToast } from "@/context/ToastContext";
-import { apiRequest } from "@/lib/api";
+import { useToast } from "@/hooks/useToast";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLayout } from "@/hooks/useLayout";
+import { useAuth } from "@/hooks/api/useAuth";
 import { useEffect, useState } from "react";
+
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { updateLayout } = useAuthLayout();
-  const { forgotPasswordMutation } = useUser();
+  const { updateAuthLayout } = useLayout();
+  const { forgotPasswordMutation } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    updateLayout({
+    updateAuthLayout({
       imageSrc: "/images/auth/forgot.png",
       heading: (
         <>
@@ -29,7 +31,8 @@ export default function ForgotPasswordPage() {
         "Our dedicated concierge team is standing by to ensure your boutique experience remains uninterrupted and secure.",
       badgeText: "Support & Care",
     });
-  }, [updateLayout]);
+  }, [updateAuthLayout]);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

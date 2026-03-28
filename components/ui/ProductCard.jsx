@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/api/useUser";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 
 export default function ProductCard({
   id,
@@ -26,7 +26,7 @@ export default function ProductCard({
 }) {
   const { user } = useUser();
   const { addItem } = useCart();
-  const { toggleItem, isInWishlist } = useWishlist();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const router = useRouter();
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
@@ -139,7 +139,7 @@ export default function ProductCard({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                toggleItem({ id, title, price, salePrice, image });
+                toggleWishlist({ id, title, price, salePrice, image });
               }}
               className="absolute right-0 top-0 z-20 size-8 md:size-10 rounded-none bg-white hover:bg-red-50 text-zinc-400 hover:text-red-500 border-l border-b border-zinc-100 transition-all duration-300"
               aria-label="Remove from wishlist"
@@ -163,7 +163,7 @@ export default function ProductCard({
                   router.push(`/login?redirect=${redirectPath}`);
                   return;
                 }
-                toggleItem({ id, title, price, salePrice, image });
+                toggleWishlist({ id, title, price, salePrice, image });
               }}
             >
               <Heart 

@@ -1,12 +1,14 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import UserForm from "@/components/admin/users/UserForm";
 import DataTable from "@/components/admin/shared/DataTable";
-import { User, ShoppingBag, Clock, Shield } from "lucide-react";
-import { apiRequest } from "@/lib/api";
-import { useToast } from "@/context/ToastContext";
+import { Shield, Clock, User, ShoppingBag } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import { useUsers } from "@/hooks/api/useUsers";
+import { useLoyalty } from "@/hooks/api/useLoyalty";
+
 
 const ORDER_COLUMNS = [
   { key: "id", label: "Registry ID", type: "text" },
@@ -20,57 +22,29 @@ export default function UserDetail() {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
-  const [loyaltySettings, setLoyaltySettings] = useState(null);
+  
+  const { useUserDetail, updateUser } = useUsers();
+  const { useLoyaltySettings } = useLoyalty();
+  
+  const { data: userData, isLoading: isUserLoading } = useUserDetail(id);
+  const { data: loyaltySettings, isLoading: isLoyaltyLoading } = useLoyaltySettings();
 
-  const fetchUserDetail = useCallback(async () => {
-    setIsPageLoading(true);
-    try {
-      const [userResponse, loyaltyResponse] = await Promise.all([
-        apiRequest(`/users/${id}`),
-        apiRequest(`/loyalty-settings`)
-      ]);
-      
-      if (userResponse.success) {
-        setUserData(userResponse.data);
-      }
-      if (loyaltyResponse.success) {
-        setLoyaltySettings(loyaltyResponse.data);
-      }
-    } catch (err) {
-      toast.error("Failed to retrieve user identity.");
-      router.push("/admin/users");
-    } finally {
-      setIsPageLoading(false);
-    }
-  }, [id, router, toast]);
-
-  useEffect(() => {
-    if (id) fetchUserDetail();
-  }, [id, fetchUserDetail]);
+  const isPageLoading = isUserLoading || isLoyaltyLoading;
 
   const currentTierConfig = loyaltySettings?.tierConfig?.find(
     t => t.tier.toLowerCase() === (userData?.tier || "bronze").toLowerCase()
   );
 
   const handleSubmit = async (data) => {
-    setIsLoading(true);
-    try {
-      const response = await apiRequest(`/users/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
-      if (response.success) {
+    updateUser.mutate({ id, data }, {
+      onSuccess: () => {
         toast.success("User Registry Synchronized Successfully.");
         router.push("/admin/users");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to modify user registry.");
       }
-    } catch (err) {
-      toast.error(err.message || "Failed to modify user registry.");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   if (isPageLoading) return <div className="h-screen flex items-center justify-center italic text-gray-400">Synchronizing Identity...</div>;

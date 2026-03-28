@@ -14,7 +14,7 @@ import {
   Clock
 } from "lucide-react";
 
-import { useNotifications } from "@/context/NotificationContext";
+import { useNotifications } from "@/hooks/api/useNotifications";
 import Link from "next/link";
 
 const formatTimeAgo = (date) => {

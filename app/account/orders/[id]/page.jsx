@@ -3,8 +3,6 @@
 import { use, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
 import { 
   ChevronLeft, 
   Package, 
@@ -15,24 +13,20 @@ import {
   ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useOrders } from "@/hooks/api/useOrders";
+
 
 export default function OrderDetailsPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
   const orderId = params.id;
 
+  const { useOrderDetail } = useOrders();
   const { 
     data: order, 
     isLoading,
     error 
-  } = useQuery({
-    queryKey: ["order", orderId],
-    queryFn: async () => {
-      const response = await apiRequest(`/orders/${orderId}`);
-      if (!response.success) throw new Error("Order Details Sync Failure");
-      return response.data;
-    },
-    enabled: !!orderId,
-  });
+  } = useOrderDetail(orderId);
+
 
   if (isLoading) {
     return (
