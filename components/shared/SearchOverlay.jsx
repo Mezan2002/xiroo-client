@@ -5,8 +5,6 @@ import ProductCard from "@/components/ui/ProductCard";
 import { useProducts } from "@/hooks/api/useProducts";
 import { clearRecentViews } from "@/redux/slices/recentlyViewedSlice";
 import { Loader2, Search, Sparkles, X } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -36,12 +34,15 @@ export function SearchOverlay({ isOpen, onClose }) {
   const debouncedQuery = useDebounce(query, 350);
 
   const { useSearchProducts, useNewArrivals } = useProducts();
-  const { data: searchData, isFetching: isSearching } = useSearchProducts(debouncedQuery);
+  const { data: searchData, isFetching: isSearching } =
+    useSearchProducts(debouncedQuery);
   const { data: trendingData } = useNewArrivals(4);
 
   // Normalize product arrays from the API response shape
-  const searchResults = searchData?.data || searchData?.products || searchData || [];
-  const trendingProducts = trendingData?.data || trendingData?.products || trendingData || [];
+  const searchResults =
+    searchData?.data || searchData?.products || searchData || [];
+  const trendingProducts =
+    trendingData?.data || trendingData?.products || trendingData || [];
 
   const isSearchMode = debouncedQuery.trim().length > 0;
 
@@ -54,7 +55,9 @@ export function SearchOverlay({ isOpen, onClose }) {
       document.body.style.overflow = "unset";
       setQuery("");
     }
-    return () => { document.body.style.overflow = "unset"; };
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
   const handleClearRecent = () => dispatch(clearRecentViews());
@@ -63,7 +66,7 @@ export function SearchOverlay({ isOpen, onClose }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[1001] transition-all duration-300 ${
+      className={`fixed inset-0 z-1001 transition-all duration-300 ${
         isOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
       }`}
     >
@@ -78,7 +81,9 @@ export function SearchOverlay({ isOpen, onClose }) {
       {/* Modal Container */}
       <div
         className={`absolute inset-0 flex items-start justify-center pt-[8vh] px-4 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isOpen ? "translate-y-0 opacity-100 scale-100" : "-translate-y-8 opacity-0 scale-95"
+          isOpen
+            ? "translate-y-0 opacity-100 scale-100"
+            : "-translate-y-8 opacity-0 scale-95"
         }`}
       >
         {/* Modal Panel */}
@@ -115,13 +120,14 @@ export function SearchOverlay({ isOpen, onClose }) {
 
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto px-8 md:px-12 py-10 scrollbar-hide space-y-14">
-
             {/* ─── SEARCH MODE ─── */}
             {isSearchMode && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                    {isSearching ? "Searching..." : `Results for &ldquo;${debouncedQuery}&rdquo;`}
+                    {isSearching
+                      ? "Searching..."
+                      : `Results for &ldquo;${debouncedQuery}&rdquo;`}
                   </h3>
                   {!isSearching && searchResults.length > 0 && (
                     <span className="text-[11px] font-semibold text-gray-400">
@@ -141,18 +147,18 @@ export function SearchOverlay({ isOpen, onClose }) {
                 {!isSearching && searchResults.length > 0 && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-6">
                     {searchResults.map((product) => (
-                        <div key={product._id} onClick={onClose}>
-                          <ProductCard
-                            id={product._id}
-                            title={product.title}
-                            price={product.price}
-                            salePrice={product.salePrice}
-                            image={product.images?.[0]}
-                            images={product.images}
-                            variants={product.variants}
-                          />
-                        </div>
-                      ))}
+                      <div key={product._id} onClick={onClose}>
+                        <ProductCard
+                          id={product._id}
+                          title={product.title}
+                          price={product.price}
+                          salePrice={product.salePrice}
+                          image={product.images?.[0]}
+                          images={product.images}
+                          variants={product.variants}
+                        />
+                      </div>
+                    ))}
                   </div>
                 )}
 
@@ -162,7 +168,9 @@ export function SearchOverlay({ isOpen, onClose }) {
                     <Search className="w-12 h-12 text-gray-100 mx-auto stroke-1" />
                     <p className="text-[13px] font-medium text-gray-400 tracking-wide">
                       No products found for{" "}
-                      <span className="text-black font-semibold">&ldquo;{debouncedQuery}&rdquo;</span>
+                      <span className="text-black font-semibold">
+                        &ldquo;{debouncedQuery}&rdquo;
+                      </span>
                     </p>
                     <p className="text-[11px] text-gray-300 uppercase tracking-widest font-semibold">
                       Try a different keyword

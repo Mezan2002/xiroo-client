@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
 import { Button } from "../ui/Button";
 import { useEffect, useState } from "react";
@@ -130,27 +131,35 @@ export function CartSidebar({ isOpen, onClose }) {
                   {items.map((item) => (
                     <div key={`${item._id || item.id}-${item.variant}`} className="flex gap-4">
                       {/* Thumbnail */}
-                      <div className="relative w-24 h-24 bg-gray-50 overflow-hidden shrink-0 border border-gray-100">
+                      <Link 
+                        href={`/product/${item._id || item.id}`}
+                        onClick={onClose}
+                        className="relative w-24 h-24 bg-gray-50 overflow-hidden shrink-0 border border-gray-100 group/img"
+                      >
                         <Image
                           src={item.image}
                           alt={item.title}
                           fill
                           sizes="96px"
-                          className="object-cover"
+                          className="object-cover group-hover/img:scale-110 transition-transform duration-700"
                         />
-                      </div>
-
+                      </Link>
                       {/* Info Area */}
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-4 mb-1">
-                          <h3 className="text-[14px] font-medium text-black leading-tight line-clamp-2">
-                            {item.title}
-                          </h3>
+                          <div className="line-clamp-2">
+                            <Link 
+                              href={`/product/${item._id || item.id}`}
+                              onClick={onClose}
+                              className="text-[14px] font-medium text-black leading-tight hover:underline underline-offset-4"
+                            >
+                              {item.title}
+                            </Link>
+                          </div>
                           <span className="text-[14px] font-medium text-black whitespace-nowrap">
                             ৳{parseFloat(((item.salePrice && item.salePrice > 0) ? item.salePrice : item.price)?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
                           </span>
                         </div>
-
                         <p className="text-[13px] text-gray-400 mb-1">
                           {item.variant}
                         </p>

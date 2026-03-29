@@ -44,7 +44,7 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
         const status = row[col.key];
         return (
           <span className={`text-[10px] font-bold px-2 py-[2px] rounded-none border uppercase tracking-widest ${
-            status?.toLowerCase() === 'active' || status?.toLowerCase() === 'completed' || status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'delivered'
+            status?.toLowerCase() === 'active' || status?.toLowerCase() === 'completed' || status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'delivered' || status?.toLowerCase() === 'approved'
               ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
               : status?.toLowerCase() === 'draft' || status?.toLowerCase() === 'processing' || status?.toLowerCase() === 'pending'
               ? 'bg-amber-50 text-amber-700 border-amber-100'

@@ -18,6 +18,7 @@ import {
   Users,
   Bell,
   Hash,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Categories", href: "/admin/categories", icon: LayoutGrid },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { label: "Reviews", href: "/admin/reviews", icon: MessageSquare },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Loyalty Matrix", href: "/admin/loyalty", icon: Shield },
   { label: "Discounts", href: "/admin/discounts", icon: Tag },

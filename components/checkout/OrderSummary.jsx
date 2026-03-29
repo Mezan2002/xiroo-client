@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Tag } from "lucide-react";
 import { Button } from "../ui/Button";
 
@@ -13,21 +14,31 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
       <div className="space-y-8">
         {items.map((item) => (
           <div key={`${item._id || item.id}-${item.variant}`} className="flex gap-6">
-            <div className="relative w-24 h-24 bg-white border border-gray-100 shrink-0">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover"
-              />
+            <Link 
+              href={`/product/${item._id || item.id}`}
+              className="relative w-24 h-24 bg-white border border-gray-100 shrink-0 group/img"
+            >
+              <div className="w-full h-full overflow-hidden">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover group-hover/img:scale-110 transition-transform duration-700"
+                />
+              </div>
               <span className="absolute -top-3 -right-3 w-6 h-6 bg-black text-white text-[10px] font-bold flex items-center justify-center rounded-full z-10">
                 {item.quantity}
               </span>
-            </div>
+            </Link>
             <div className="flex flex-col justify-center min-w-0">
-              <h3 className="text-sm font-bold text-black leading-tight line-clamp-2 mb-2 uppercase tracking-tight">
-                {item.title}
-              </h3>
+              <div className="line-clamp-2 mb-2">
+                <Link 
+                  href={`/product/${item._id || item.id}`}
+                  className="text-sm font-bold text-black uppercase tracking-tight hover:underline underline-offset-4 decoration-black hover:text-zinc-600 transition-colors"
+                >
+                  {item.title}
+                </Link>
+              </div>
               <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">
                 {item.variant}
               </p>

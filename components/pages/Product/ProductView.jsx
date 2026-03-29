@@ -94,7 +94,7 @@ export default function ProductView({ productId }) {
         categoryId={product.category?._id || product.category}
         currentProductId={product._id}
       />
-      <ProductReviews />
+      <ProductReviews productId={product._id} />
 
       {/* Sticky Add to Cart Bar — controlled at ProductView level */}
       <div
