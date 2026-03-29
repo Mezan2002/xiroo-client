@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/hooks/api/useUser";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function ProtectedRoute({ children }) {

@@ -1,5 +1,6 @@
 const CART_STORAGE_KEY = "xiroo_cart_registry";
 const WISHLIST_STORAGE_KEY = "xiroo_wishlist_registry";
+const RECENTLY_VIEWED_KEY = "xiroo_recently_viewed";
 
 /** 
  * Senior Dev Pattern: Persistence Middleware
@@ -21,6 +22,12 @@ export const persistenceMiddleware = (store) => (next) => (action) => {
       const wishlistItems = store.getState().wishlist.items;
       localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistItems));
     }
+
+    // Handling Recently Viewed Registry
+    if (action.type.startsWith("recentlyViewed/")) {
+      const recentItems = store.getState().recentlyViewed.items;
+      localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(recentItems));
+    }
   }
 
   return result;
@@ -32,9 +39,11 @@ export const rehydrateState = () => {
   
   const cartItems = localStorage.getItem(CART_STORAGE_KEY);
   const wishlistItems = localStorage.getItem(WISHLIST_STORAGE_KEY);
+  const recentItems = localStorage.getItem(RECENTLY_VIEWED_KEY);
 
   return {
     cart: cartItems ? { items: JSON.parse(cartItems), subtotal: 0, itemCount: 0 } : undefined,
     wishlist: wishlistItems ? { items: JSON.parse(wishlistItems) } : undefined,
+    recentlyViewed: recentItems ? { items: JSON.parse(recentItems) } : undefined,
   };
 };

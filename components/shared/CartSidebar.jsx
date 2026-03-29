@@ -128,7 +128,7 @@ export function CartSidebar({ isOpen, onClose }) {
               {items.length > 0 ? (
                 <div className="flex flex-col gap-10">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-4">
+                    <div key={`${item._id || item.id}-${item.variant}`} className="flex gap-4">
                       {/* Thumbnail */}
                       <div className="relative w-24 h-24 bg-gray-50 overflow-hidden shrink-0 border border-gray-100">
                         <Image
@@ -172,7 +172,7 @@ export function CartSidebar({ isOpen, onClose }) {
                               variant="ghost"
                               size="icon"
                               showHoverIcon={false}
-                              onClick={() => updateQuantity({ id: item.id, variant: item.variant, delta: -1 })}
+                               onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: -1 })}
                               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                               aria-label="Decrease quantity"
                             >
@@ -185,7 +185,7 @@ export function CartSidebar({ isOpen, onClose }) {
                               variant="ghost"
                               size="icon"
                               showHoverIcon={false}
-                              onClick={() => updateQuantity({ id: item.id, variant: item.variant, delta: 1 })}
+                               onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: 1 })}
                               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                               aria-label="Increase quantity"
                             >
@@ -197,7 +197,7 @@ export function CartSidebar({ isOpen, onClose }) {
                             variant="ghost"
                             size="icon"
                             showHoverIcon={false}
-                            onClick={() => removeItem({ id: item.id, variant: item.variant })}
+                             onClick={() => removeItem({ id: item._id || item.id, variant: item.variant })}
                             className="p-2 text-gray-400 hover:text-black transition-colors"
                             aria-label="Remove item"
                           >

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { Button } from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
 import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
@@ -23,10 +22,9 @@ const UserAccountDrawer = dynamic(
 
 // Dynamic Navigation Architecture Hooked to Admin Modules
 
+import { useProducts } from "@/hooks/api/useProducts";
 import { useUser } from "@/hooks/api/useUser";
 import { useCart } from "@/hooks/useCart";
-import { useProducts } from "@/hooks/api/useProducts";
-import { useCategories } from "@/hooks/api/useCategories";
 import axiosInstance from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 
@@ -47,7 +45,10 @@ export function Navbar() {
 
   const { data: menuResponse } = useQuery({
     queryKey: ["menus"],
-    queryFn: () => axiosInstance.get("/menus"),
+    queryFn: async () => {
+      const response = await axiosInstance.get("/menus");
+      return response.data || response;
+    },
     staleTime: 10 * 60 * 1000,
   });
 
@@ -57,8 +58,9 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
     if (menuResponse) {
-      const allProducts = productsResponse?.data || [];
-      const items = menuResponse.data.map((menu) => {
+      const allProducts = productsResponse?.data || productsResponse || [];
+      const menusArray = Array.isArray(menuResponse) ? menuResponse : (menuResponse.data || []);
+      const items = menusArray.map((menu) => {
         const categories = menu.categories || [];
         const catIds = categories.map((c) => c._id || c.id || c);
 
@@ -169,33 +171,51 @@ export function Navbar() {
                 }`}
               >
                 {/* Left: Mega Menu Categories */}
-                <div className="flex flex-col gap-6 min-w-[250px]">
-                  {currentMenuData.categories.map((category) => (
-                    <Link
-                      key={category._id}
-                      href={`/collections/${category.slug}`}
-                      className="text-[15px] font-medium tracking-wide text-gray-800 hover:text-black hover:translate-x-1 transition-transform inline-block"
-                      onClick={() => setActiveMenu(null)}
-                    >
-                      {category.name.toUpperCase()}
-                    </Link>
-                  ))}
+                <div className="flex flex-col gap-3 min-w-[250px]">
+                  {currentMenuData.categories.length > 0 ? (
+                    currentMenuData.categories.map((category) => (
+                      <Link
+                        key={category._id}
+                        href={`/collections/${category.slug}`}
+                        className="text-lg font-medium tracking-wide text-gray-800 hover:text-black inline-block"
+                        onClick={() => setActiveMenu(null)}
+                      >
+                        {category.name.toUpperCase()}
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="flex flex-col gap-1">
+                      <p className="text-[13px] font-medium text-gray-400 italic">
+                        No categories added yet
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right: Featured Products Grid using reusable ProductCard */}
-                <div className="flex gap-6 items-start">
-                  {currentMenuData.products.map((product, idx) => (
-                    <div key={idx} className="w-[180px] shrink-0">
-                      <ProductCard
-                        id={product._id}
-                        title={product.title}
-                        price={product.price}
-                        image={product.images?.[0]}
-                        images={product.images}
-                        hoverImage={product.images?.[1]}
-                      />
+                <div className="flex gap-6 items-start min-h-[150px]">
+                  {currentMenuData.products.length > 0 ? (
+                    currentMenuData.products.map((product, idx) => (
+                      <div key={idx} className="w-[180px] shrink-0">
+                        <ProductCard
+                          id={product._id}
+                          title={product.title}
+                          price={product.price}
+                          salePrice={product.salePrice}
+                          image={product.images?.[0]}
+                          images={product.images}
+                          hoverImage={product.images?.[1]}
+                          variants={product.variants}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center w-[380px] h-full border border-dashed border-gray-100 bg-gray-50/50 rounded-sm">
+                      <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+                        No Featured Selection
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

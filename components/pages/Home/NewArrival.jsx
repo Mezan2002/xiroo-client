@@ -5,7 +5,8 @@ import { useProducts } from "@/hooks/api/useProducts";
 
 export default function NewArrival() {
   const { useNewArrivals } = useProducts();
-  const { data: products = [], isLoading } = useNewArrivals(4);
+  const { data: response, isLoading } = useNewArrivals(4);
+  const products = response?.data || [];
 
   if (isLoading) {
     return (
@@ -50,6 +51,7 @@ export default function NewArrival() {
             salePrice={product.salePrice}
             images={product.images}
             image={product.images?.[0]}
+            variants={product.variants}
             stockStage={product.stockStage}
             priority={idx === 0}
           />

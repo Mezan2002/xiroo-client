@@ -12,7 +12,7 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
       {/* Items List */}
       <div className="space-y-8">
         {items.map((item) => (
-          <div key={item.id} className="flex gap-6">
+          <div key={`${item._id || item.id}-${item.variant}`} className="flex gap-6">
             <div className="relative w-24 h-24 bg-white border border-gray-100 shrink-0">
               <Image
                 src={item.image}

@@ -1,12 +1,14 @@
 "use client";
+import LoadingOverlay from "@/components/shared/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
-import { ShoppingCart } from "lucide-react";
-import Image from "next/image";
 import { useProducts } from "@/hooks/api/useProducts";
 import { useUser } from "@/hooks/api/useUser";
-import { useRouter, usePathname } from "next/navigation";
+import { addRecentView } from "@/redux/slices/recentlyViewedSlice";
+import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import LoadingOverlay from "@/components/shared/LoadingOverlay";
+import { useDispatch } from "react-redux";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
 import ProductReviews from "./ProductReviews";
@@ -17,10 +19,24 @@ export default function ProductView({ productId }) {
   const router = useRouter();
   const pathname = usePathname();
   const { useProductDetail } = useProducts();
-  const { data: product, isLoading, error } = useProductDetail(productId);
+  const { data: response, isLoading, error } = useProductDetail(productId);
+  const product = response?.data;
 
+  const dispatch = useDispatch();
 
-
+  // Track product view for Recently Viewed feature
+  useEffect(() => {
+    if (!product) return;
+    dispatch(
+      addRecentView({
+        _id: product._id,
+        title: product.title,
+        price: product.price,
+        salePrice: product.salePrice || null,
+        images: product.images?.slice(0, 1) || [],
+      }),
+    );
+  }, [product, dispatch]);
 
   // Sticky bar: shows once cart buttons scroll past the top, stays visible until page end
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -46,7 +62,9 @@ export default function ProductView({ productId }) {
   if (error || !product) {
     return (
       <div className="w-full h-[60vh] flex flex-col items-center justify-center gap-4">
-        <h2 className="text-xl font-semibold tracking-tight">Product not found</h2>
+        <h2 className="text-xl font-semibold tracking-tight">
+          Product not found
+        </h2>
         <Button onClick={() => router.push("/")}>Return to Home</Button>
       </div>
     );
@@ -72,16 +90,17 @@ export default function ProductView({ productId }) {
         </div>
       </div>
 
-      <RelatedProducts 
-        categoryId={product.category?._id || product.category} 
-        currentProductId={product._id} 
+      <RelatedProducts
+        categoryId={product.category?._id || product.category}
+        currentProductId={product._id}
       />
       <ProductReviews />
 
       {/* Sticky Add to Cart Bar — controlled at ProductView level */}
       <div
         className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center px-4 pb-4 pt-2 pointer-events-none transition-all duration-300 ${
-          showStickyBar && (!["out-of-stock", "upcoming"].includes(product.stockStage))
+          showStickyBar &&
+          !["out-of-stock", "upcoming"].includes(product.stockStage)
             ? "translate-y-0 opacity-100"
             : "translate-y-6 opacity-0"
         }`}
@@ -110,7 +129,8 @@ export default function ProductView({ productId }) {
               {product.title}
             </span>
             <span className="text-[11px] text-gray-500 mt-px truncate">
-              {product.variants?.[0]?.name}: {product.variants?.[0]?.values?.[0] || "Standard"}
+              {product.variants?.[0]?.name}:{" "}
+              {product.variants?.[0]?.values?.[0] || "Standard"}
             </span>
           </div>
 

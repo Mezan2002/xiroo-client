@@ -27,6 +27,7 @@ export default function AdminOrders() {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const confirming = deleteOrder.isPending;
 
   const orders = useMemo(() => {
     return rawOrders.map(order => ({

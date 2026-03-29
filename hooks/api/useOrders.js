@@ -12,7 +12,7 @@ export const useOrders = () => {
   const placeOrder = useMutation({
     mutationFn: async (orderData) => {
       const response = await axiosInstance.post("/orders", orderData);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
@@ -20,40 +20,43 @@ export const useOrders = () => {
   });
 
   // 2. Registry Retrieval: List Orders (Admin)
-  const useOrderHistory = (params = {}) => {
+  const useOrderHistory = (params = {}, options = {}) => {
     return useQuery({
       queryKey: ["orders", params],
       queryFn: async () => {
         const response = await axiosInstance.get("/orders", { params });
         return response.data;
       },
+      ...options,
     });
   };
 
   // 2.1 Personalized Registry: User specific order history
-  const useMyOrders = () => {
+  const useMyOrders = (options = {}) => {
     return useQuery({
       queryKey: ["my-orders"],
       queryFn: async () => {
         const response = await axiosInstance.get("/orders/my-orders");
         return response.data;
       },
+      ...options,
     });
   };
 
   // 2.2 Analytics Protocol: Order Statistics
-  const useOrderStats = () => {
+  const useOrderStats = (options = {}) => {
     return useQuery({
       queryKey: ["order-stats"],
       queryFn: async () => {
         const response = await axiosInstance.get("/orders/stats");
         return response.data;
       },
+      ...options,
     });
   };
 
   // 3. Single Order Discovery
-  const useOrderDetail = (id) => {
+  const useOrderDetail = (id, options = {}) => {
     return useQuery({
       queryKey: ["order", id],
       queryFn: async () => {
@@ -61,6 +64,7 @@ export const useOrders = () => {
         return response.data;
       },
       enabled: !!id,
+      ...options,
     });
   };
 
@@ -68,7 +72,7 @@ export const useOrders = () => {
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }) => {
       const response = await axiosInstance.patch(`/orders/${id}/status`, { status });
-      return response.data;
+      return response;
     },
     onSuccess: (data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
@@ -80,7 +84,7 @@ export const useOrders = () => {
   const dispatchCourier = useMutation({
     mutationFn: async ({ id, provider, trackingId }) => {
       const response = await axiosInstance.post(`/orders/${id}/dispatch`, { provider, trackingId });
-      return response.data;
+      return response;
     },
     onSuccess: (data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
@@ -90,7 +94,7 @@ export const useOrders = () => {
   const cancelOrder = useMutation({
     mutationFn: async (id) => {
       const response = await axiosInstance.patch(`/orders/${id}/cancel`);
-      return response.data;
+      return response;
     },
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
@@ -102,7 +106,7 @@ export const useOrders = () => {
   const deleteOrder = useMutation({
     mutationFn: async (id) => {
       const response = await axiosInstance.delete(`/orders/${id}`);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });

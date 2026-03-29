@@ -127,7 +127,7 @@ export default function MenuList() {
   const { toast } = useToast();
   const { useAllMenus, deleteMenu, reorderMenus } = useMenus();
   const { data: menusResponse, isLoading } = useAllMenus();
-  const menus = menusResponse?.data || [];
+  const menus = menusResponse || [];
 
   const [editingMenu, setEditingMenu] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);

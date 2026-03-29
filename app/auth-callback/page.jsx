@@ -3,31 +3,52 @@
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setToken } from "@/lib/auth";
+import axiosInstance from "@/lib/axios";
 import { useUser } from "@/hooks/api/useUser";
 import { RefreshCw } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/redux/slices/authSlice";
 
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refreshUser } = useUser();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const token = searchParams.get("token");
 
     if (token) {
-      // 1. Session Registry Persistence
-      setToken(token);
+      // 1. Session Registry Persistence (Redux + LocalStorage)
+      dispatch(setCredentials({ token }));
       
-      // 2. Global Identity Synchronization
-      refreshUser().then(() => {
-        // 3. High-Performance Redirection to Home
-        router.push("/");
-      });
+      // 2. High-Performance Identity Synchronization
+      // We wait for the profile refresh to complete before moving the user
+      // to the home page, ensuring a seamless "identified" state.
+      const syncIdentity = async () => {
+        try {
+          // Protocol Check: Ensure the token is valid before entry
+          // Initial verify with explicit header to avoid interceptor lag
+          await axiosInstance.get("/users/me", {
+            headers: { Authorization: token },
+          });
+          
+          // Re-trigger global query refetch to hydrate UI
+          await refreshUser();
+          
+          router.push("/");
+        } catch (error) {
+          console.error("Identity Sync Protocol Breach:", error);
+          router.push("/login?error=sync_failed");
+        }
+      };
+
+      syncIdentity();
     } else {
       // Fail-Safe: Redirect to login on protocol failure
       router.push("/login?error=auth_failed");
     }
-  }, [searchParams, router, refreshUser]);
+  }, [searchParams, router, refreshUser, dispatch]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center space-y-8 bg-white">

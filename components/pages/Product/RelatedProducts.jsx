@@ -38,6 +38,7 @@ export default function RelatedProducts({ categoryId, currentProductId }) {
             image={item.images?.[0]}
             images={item.images}
             hoverImage={item.images?.[1]}
+            variants={item.variants}
             stockStage={item.stockStage}
           />
         ))}

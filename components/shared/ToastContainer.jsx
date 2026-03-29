@@ -26,7 +26,14 @@ const ToastItem = ({ toast, onRemove }) => {
 
   useEffect(() => {
     const timer = requestAnimationFrame(() => setIsVisible(true));
-    return () => cancelAnimationFrame(timer);
+    
+    // Auto-dismissal protocol: 5s default or custom registry duration
+    const dismissTimer = setTimeout(handleClose, toast.duration || 5000);
+
+    return () => {
+      cancelAnimationFrame(timer);
+      clearTimeout(dismissTimer);
+    };
   }, []);
 
   const handleClose = () => {

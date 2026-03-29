@@ -120,7 +120,7 @@ export default function ProductInfo({ product, cartRef }) {
     setTimeLeft(calculateTimeLeft());
     const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
     return () => clearInterval(timer);
-  }, [product.salePrice, product.saleEndDate]);
+  }, [product.salePrice, product.saleEndDate, product.price]);
 
   // --- Product State ---
   const hasBundles = product.bundles && product.bundles.length > 0;
@@ -147,12 +147,7 @@ export default function ProductInfo({ product, cartRef }) {
       ];
 
   const [selectedBundleId, setSelectedBundleId] = useState(hasBundles ? 1 : 1); // Default to 1 even if no bundles, assuming single unit is always available
-  const [selectedVariants, setSelectedVariants] = useState(
-    product.variants?.reduce(
-      (acc, v) => ({ ...acc, [v.name]: v.values[0] }),
-      {},
-    ) || {},
-  );
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
@@ -212,8 +207,8 @@ export default function ProductInfo({ product, cartRef }) {
                   <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
                     {variant.name}
                   </span>
-                  <span className="text-[11px] font-medium text-gray-400">
-                    {selectedVariants[variant.name]}
+                  <span className={`text-[11px] font-medium ${!selectedVariants[variant.name] ? "text-red-400 animate-pulse" : "text-gray-400"}`}>
+                    {selectedVariants[variant.name] || "PLEASE CHOOSE"}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -475,6 +470,16 @@ export default function ProductInfo({ product, cartRef }) {
                   return;
                 }
 
+                // --- Technical Validation: Ensure all Registry Variants are Selected ---
+                const totalRequired = product.variants?.length || 0;
+                const totalSelected = Object.keys(selectedVariants).length;
+
+                if (totalSelected < totalRequired) {
+                  toast.info("Please select all options before adding to bag.");
+                  // Scroll to variants if needed or highlight them
+                  return;
+                }
+
                 // Construct the standardized item payload
                 const variantString = Object.entries(selectedVariants)
                   .map(([k, v]) => `${k}: ${v}`)
@@ -488,20 +493,23 @@ export default function ProductInfo({ product, cartRef }) {
                   image: product.images?.[0] || "",
                   bundleId: selectedBundleId,
                   bundleTitle: selectedBundle?.title,
-                  // If it's a bundle, the effective price is the bundle price
-                  // If not, it's already handled in CartContext/Sidebar via salePrice
                 };
 
                 // If a bundle is selected (and it's not the virtual SINGLE UNIT),
-                // the price in the cart should probably reflect the bundle price
-                if (hasBundles && selectedBundleId > 0) {
+                // the price in the cart should reflect the bundle price
+                if (hasBundles && selectedBundleId > 1) {
                   cartProduct.price = selectedBundle.price;
                   cartProduct.salePrice = undefined; // Bundles have fixed prices for now
+                } else if (isSaleActive) {
+                  // Ensure single unit uses sale price if active
+                  cartProduct.price = product.price;
+                  cartProduct.salePrice = product.salePrice;
                 }
 
                 addItem({
                   product: cartProduct,
                   variant: variantString || "Standard",
+                  silent: true,
                 });
 
                 toast.success(
@@ -525,6 +533,16 @@ export default function ProductInfo({ product, cartRef }) {
                   router.push(`/login?redirect=${redirectPath}`);
                   return;
                 }
+
+                // --- Technical Validation: Ensure all Registry Variants are Selected ---
+                const totalRequired = product.variants?.length || 0;
+                const totalSelected = Object.keys(selectedVariants).length;
+
+                if (totalSelected < totalRequired) {
+                  toast.info("Please select all options before checkout.");
+                  return;
+                }
+
                 // Buy It Now logic would typically redirect to checkout
                 const variantString = Object.entries(selectedVariants)
                   .map(([k, v]) => `${k}: ${v}`)
@@ -534,8 +552,8 @@ export default function ProductInfo({ product, cartRef }) {
                   product: {
                     id: product._id,
                     title: product.title,
-                    price: selectedBundle?.price || product.price,
-                    salePrice: selectedBundle ? undefined : product.salePrice,
+                    price: (hasBundles && selectedBundleId > 1) ? selectedBundle.price : product.price,
+                    salePrice: (hasBundles && selectedBundleId > 1) ? undefined : (isSaleActive ? product.salePrice : undefined),
                     image: product.images?.[0] || "",
                   },
                   variant: variantString || "Standard",

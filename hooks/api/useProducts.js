@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-/** 
+/**
  * Senior Dev Hook: useProducts
  * Optimized data discovery and lifecycle management for the storefront.
  */
@@ -14,7 +14,7 @@ export const useProducts = (options = {}) => {
       queryKey: ["products", params],
       queryFn: async () => {
         const response = await axiosInstance.get("/products", { params });
-        return response.data;
+        return response;
       },
       ...options,
     });
@@ -25,8 +25,10 @@ export const useProducts = (options = {}) => {
     return useQuery({
       queryKey: ["products", "featured"],
       queryFn: async () => {
-        const response = await axiosInstance.get("/products", { params: { isFeatured: true } });
-        return response.data;
+        const response = await axiosInstance.get("/products", {
+          params: { isFeatured: true },
+        });
+        return response;
       },
       staleTime: 10 * 60 * 1000, // 10 minutes fresh
     });
@@ -37,10 +39,27 @@ export const useProducts = (options = {}) => {
     return useQuery({
       queryKey: ["products", "new-arrivals", limit],
       queryFn: async () => {
-        const response = await axiosInstance.get("/products", { params: { limit, sort: "-createdAt" } });
-        return response.data;
+        const response = await axiosInstance.get("/products", {
+          params: { limit, sort: "-createdAt" },
+        });
+        return response;
       },
       staleTime: 5 * 60 * 1000,
+    });
+  };
+
+  // 4. Global Search: Debounce-optimized product discovery
+  const useSearchProducts = (query = "") => {
+    return useQuery({
+      queryKey: ["products", "search", query],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/products", {
+          params: { searchTerm: query, limit: 12 },
+        });
+        return response;
+      },
+      enabled: query.trim().length > 0,
+      staleTime: 30 * 1000, // 30 seconds — fresh enough for a search session
     });
   };
 
@@ -50,7 +69,7 @@ export const useProducts = (options = {}) => {
       queryKey: ["product", id],
       queryFn: async () => {
         const response = await axiosInstance.get(`/products/${id}`);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -96,7 +115,8 @@ export const useProducts = (options = {}) => {
     useAllProducts,
     useFeaturedProducts,
     useNewArrivals,
+    useSearchProducts,
     useProductDetail,
-    useProductMutation
+    useProductMutation,
   };
 };

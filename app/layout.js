@@ -26,6 +26,7 @@ import QueryProvider from "@/components/providers/QueryProvider";
 import { SocketProvider } from "@/context/SocketContext";
 import AppInitializer from "@/components/AppInitializer";
 import ToastContainer from "@/components/shared/ToastContainer";
+import RouteGuard from "@/components/shared/RouteGuard";
 
 export default function RootLayout({ children }) {
   return (
@@ -35,7 +36,9 @@ export default function RootLayout({ children }) {
           <QueryProvider>
             <SocketProvider>
               <AppInitializer>
-                <ConditionalLayout>{children}</ConditionalLayout>
+                <RouteGuard>
+                  <ConditionalLayout>{children}</ConditionalLayout>
+                </RouteGuard>
                 <ToastContainer />
               </AppInitializer>
             </SocketProvider>

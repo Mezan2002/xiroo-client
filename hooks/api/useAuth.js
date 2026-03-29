@@ -1,11 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/lib/axios";
-import { useDispatch } from "react-redux";
-import { setCredentials, logout as logoutAction } from "@/redux/slices/authSlice";
 import { useToast } from "@/hooks/useToast";
+import axiosInstance from "@/lib/axios";
+import {
+  logout as logoutAction,
+  setCredentials,
+} from "@/redux/slices/authSlice";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 
-/** 
+/**
  * Senior Dev Hook: useAuth
  * Orchestrates technical identity verification and session lifecycle.
  */
@@ -39,7 +42,11 @@ export const useAuth = () => {
 
   const verifyOtpMutation = useMutation({
     mutationFn: async ({ email, otp, type }) => {
-      const response = await axiosInstance.post("/auth/verify-otp", { email, otp, type });
+      const response = await axiosInstance.post("/auth/verify-otp", {
+        email,
+        otp,
+        type,
+      });
       return response.data;
     },
   });
@@ -56,7 +63,11 @@ export const useAuth = () => {
 
   const resetPasswordMutation = useMutation({
     mutationFn: async ({ email, otp, newPassword }) => {
-      const response = await axiosInstance.post("/auth/reset-password", { email, otp, newPassword });
+      const response = await axiosInstance.post("/auth/reset-password", {
+        email,
+        otp,
+        newPassword,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -66,7 +77,9 @@ export const useAuth = () => {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: async ({ email }) => {
-      const response = await axiosInstance.post("/auth/forgot-password", { email });
+      const response = await axiosInstance.post("/auth/forgot-password", {
+        email,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -75,7 +88,6 @@ export const useAuth = () => {
   });
 
   const logout = () => {
-
     dispatch(logoutAction());
     queryClient.clear();
     toast.info("Session Terminated. Securely signed out.");
@@ -92,7 +104,3 @@ export const useAuth = () => {
     logout,
   };
 };
-
-
-
-

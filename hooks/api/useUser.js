@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
-/** 
+/**
  * Senior Dev Hook: useUser
  * Professional-grade profile and identity data management.
  * Synchronizes server-side user data with the client session.
@@ -31,7 +31,7 @@ export const useUser = () => {
   const updateProfile = useMutation({
     mutationFn: async (profileData) => {
       const response = await axiosInstance.patch("/users/me", profileData);
-      return response.data;
+      return response;
     },
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(["currentUser", token], updatedUser);
@@ -41,8 +41,10 @@ export const useUser = () => {
 
   const syncAvatar = useMutation({
     mutationFn: async (secureUrl) => {
-      const response = await axiosInstance.patch("/users/me", { profileAvatar: secureUrl });
-      return response.data;
+      const response = await axiosInstance.patch("/users/me", {
+        profileAvatar: secureUrl,
+      });
+      return response;
     },
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(["currentUser", token], updatedUser);
@@ -53,7 +55,7 @@ export const useUser = () => {
   const deleteAccount = useMutation({
     mutationFn: async () => {
       const response = await axiosInstance.delete("/users/me");
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ["currentUser"] });
@@ -63,7 +65,7 @@ export const useUser = () => {
   const syncAddresses = useMutation({
     mutationFn: async (addresses) => {
       const response = await axiosInstance.patch("/users/me", { addresses });
-      return response.data;
+      return response;
     },
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(["currentUser", token], updatedUser);
@@ -84,5 +86,3 @@ export const useUser = () => {
     error,
   };
 };
-
-

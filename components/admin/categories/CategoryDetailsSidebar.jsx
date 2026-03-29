@@ -24,7 +24,7 @@ export default function CategoryDetailsSidebar({
 
   const { useAttributeRegistry } = useAttributes();
   const { data: attributesResponse } = useAttributeRegistry();
-  const attributes = attributesResponse?.data || [];
+  const attributes = attributesResponse || [];
 
 
   if (!category) return null;

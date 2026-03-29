@@ -17,7 +17,7 @@ export default function MenuForm({ isOpen, onClose, menu }) {
 
   // 1. Fetch Categories for selection
   const { data: categoryTreeResponse } = useCategoryTree();
-  const categories = categoryTreeResponse?.data || [];
+  const categories = categoryTreeResponse || [];
 
   useEffect(() => {
     if (isOpen) {

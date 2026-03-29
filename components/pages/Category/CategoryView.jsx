@@ -36,7 +36,7 @@ export default function CategoryView({ category }) {
 
 
   const products = productsResponse?.data || [];
-  const title = categoryData?.data?.title || (category.toLowerCase() === "all" ? "ALL PRODUCTS" : category.replace(/-/g, " ").toUpperCase());
+  const title = categoryData?.data?.name || (category.toLowerCase() === "all" ? "ALL PRODUCTS" : category.replace(/-/g, " ").toUpperCase());
 
   const inStockCount = products.filter((p) => p.inventory > 0).length;
   const outOfStockCount = products.filter((p) => p.inventory === 0).length;
@@ -198,6 +198,7 @@ export default function CategoryView({ category }) {
                   salePrice={product.salePrice}
                   image={product.images?.[0]}
                   images={product.images}
+                  variants={product.variants}
                   priority={idx < 4}
                   stockStage={product.stockStage}
                 />

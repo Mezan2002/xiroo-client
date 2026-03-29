@@ -1,25 +1,31 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { useCart } from "@/hooks/useCart";
-import { useUser } from "@/hooks/api/useUser";
 import { useProducts } from "@/hooks/api/useProducts";
+import { useUser } from "@/hooks/api/useUser";
+import { useCart } from "@/hooks/useCart";
 import { ArrowLeft, ArrowRight, Plus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function FeaturedProduct() {
   const { useFeaturedProducts } = useProducts();
-  const { data: featuredProducts = [], isLoading } = useFeaturedProducts();
+  const { data: response, isLoading } = useFeaturedProducts();
+  const featuredProducts = response?.data || [];
 
   const product = featuredProducts[0] || null;
   const images = product?.images || [];
-  // Start at index 1 so the right card differs from the left hero (index 0).
-  // Clamped so we never exceed the array bounds (e.g. single-image products stay at 0).
-  const safeStartIndex = Math.min(1, Math.max(0, images.length - 1));
-  const [currentImageIndex, setCurrentImageIndex] = useState(safeStartIndex);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Sync index once product data is available: Start at index 1 for the right card
+  // to differ from the left hero (index 0).
+  useEffect(() => {
+    if (images.length > 1) {
+      setCurrentImageIndex(1);
+    }
+  }, [images.length]);
 
   const { user } = useUser();
   const { addItem } = useCart();
@@ -165,6 +171,11 @@ export default function FeaturedProduct() {
                     router.push(`/login?redirect=${redirectPath}`);
                     return;
                   }
+                  if (product.variants?.length > 0) {
+                    router.push(`/product/${product._id}`);
+                    return;
+                  }
+
                   addItem({
                     product: {
                       id: product._id,

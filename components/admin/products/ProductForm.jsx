@@ -329,31 +329,18 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Inventory Registry</span>
                 <span className="text-[11px] font-black uppercase tracking-tighter text-black">Target Stage</span>
               </div>
-              <div className="flex bg-white border border-zinc-200 p-1 gap-1">
-                {[
-                  { id: "in-stock", label: "In Stock", color: "bg-green-500" },
-                  { id: "out-of-stock", label: "Out of Stock", color: "bg-red-500" },
-                  { id: "pre-order", label: "Pre-order", color: "bg-blue-500" },
-                  { id: "upcoming", label: "Upcoming", color: "bg-amber-500" },
-                ].map((stage) => (
-                  <button
-                    key={stage.id}
-                    type="button"
-                    onClick={() => setProduct({ ...product, stockStage: stage.id })}
-                    className={`
-                      flex items-center gap-3 px-4 py-2 transition-all duration-300
-                      ${product.stockStage === stage.id 
-                        ? "bg-black text-white shadow-lg" 
-                        : "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50"
-                      }
-                    `}
-                  >
-                    <div className={`w-1.5 h-1.5 rounded-full ${stage.color} ${product.stockStage === stage.id ? "ring-2 ring-white/20" : ""}`} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
-                      {stage.label}
-                    </span>
-                  </button>
-                ))}
+              <div className="w-48">
+                <Select
+                  options={[
+                    { value: "in-stock", label: "In Stock" },
+                    { value: "out-of-stock", label: "Out of Stock" },
+                    { value: "pre-order", label: "Pre-order" },
+                    { value: "upcoming", label: "Upcoming" },
+                  ]}
+                  value={product.stockStage}
+                  onChange={(val) => setProduct({ ...product, stockStage: val })}
+                  size="sm"
+                />
               </div>
             </div>
             <div className="flex items-center gap-3 bg-zinc-50 px-6 py-3 border border-zinc-100">

@@ -27,7 +27,7 @@ export function UserAccountDrawer({ isOpen, onClose }) {
   const { logout } = useAuth();
   const { itemCount: cartItemsCount } = useCart();
   const { itemCount: wishlistItemsCount } = useWishlist();
-  const { useOrderHistory } = useOrders();
+  const { useMyOrders } = useOrders();
   
   const isLoggedIn = !!currentUser;
   const router = useRouter();
@@ -37,7 +37,7 @@ export function UserAccountDrawer({ isOpen, onClose }) {
   }, []);
 
   // Consume cached registries for real-time stats
-  const { data: orders = [] } = useOrderHistory({
+  const { data: orders = [] } = useMyOrders({
     enabled: isLoggedIn && isOpen,
   });
 

@@ -4,6 +4,7 @@ import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
 import { useLayout } from "@/hooks/useLayout";
 import { useAuth } from "@/hooks/api/useAuth";
+import { useUser } from "@/hooks/api/useUser";
 import { useToast } from "@/hooks/useToast";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
@@ -15,10 +16,19 @@ function LoginForm() {
 
 
   const searchParams = useSearchParams();
+  const { user, isAuthenticated } = useUser();
   const { loginMutation } = useAuth();
 
   const { toast } = useToast();
   const router = useRouter();
+  
+  // High-Performance Redirect for Authenticated Protocol
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const redirect = searchParams.get("redirect");
+      router.replace(redirect ? decodeURIComponent(redirect) : "/");
+    }
+  }, [isAuthenticated, user, router, searchParams]);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",

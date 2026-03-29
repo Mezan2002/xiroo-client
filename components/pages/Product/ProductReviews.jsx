@@ -354,7 +354,9 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
               {review.name.charAt(0)}
             </div>
             <div className="flex-1">
-              <p className="text-[13px] font-semibold text-black">{review.name}</p>
+              <p className="text-[13px] font-semibold text-black">
+                {review.name}
+              </p>
               <p className="text-[11px] text-gray-400">
                 {review.location} · {review.date}
               </p>

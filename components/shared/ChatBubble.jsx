@@ -1,7 +1,7 @@
 "use client";
 import { useSocket } from "@/context/SocketContext";
-import { useUser } from "@/hooks/api/useUser";
 import { useInbox } from "@/hooks/api/useInbox";
+import { useUser } from "@/hooks/api/useUser";
 import { Loader2, MessageSquare, Send, Shield, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -60,7 +60,7 @@ export default function ChatBubble() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-8 right-8 w-16 h-16 bg-black text-white flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 transition-all z-50 group overflow-hidden"
+          className="fixed bottom-8 right-8 w-16 h-16 bg-black text-white flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 transition-all z-50 group overflow-hidden border border-white"
         >
           <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
           <div className="relative z-10">

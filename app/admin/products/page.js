@@ -12,7 +12,8 @@ export default function AdminInventory() {
   const router = useRouter();
   const { toast } = useToast();
   const { useAllProducts, useProductMutation } = useProducts();
-  const { data: products = [], isLoading } = useAllProducts();
+  const { data: response, isLoading } = useAllProducts();
+  const products = response?.data || [];
   const { deleteMutation } = useProductMutation();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

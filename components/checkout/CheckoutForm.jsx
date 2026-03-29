@@ -120,11 +120,24 @@ export default function CheckoutForm({
         toast.error(response.message || "Failed to place order");
       }
     } catch (error) {
-      console.error("Order submission error:", error);
-      toast.error(
+      console.error("DEBUG: Order Payload Sent:", {
+        user: user?._id || user?.id,
+        items,
+        total,
+        shipping,
+        deliveryMethod,
+        formData,
+      });
+      console.error("DEBUG: Backend Validation Error:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.errorSources
+          ?.map((err) => `${err.path}: ${err.message}`)
+          .join(", ") ||
         error.response?.data?.message ||
-          "An unexpected error occurred. Please try again.",
-      );
+        "An unexpected error occurred. Please try again.";
+
+      toast.error(errorMessage);
     }
   };
 

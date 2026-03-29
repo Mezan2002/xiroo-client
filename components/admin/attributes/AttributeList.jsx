@@ -16,7 +16,7 @@ export default function AttributeList() {
   const [deletingAttribute, setDeletingAttribute] = useState(null);
 
   const { data: attributesResponse, isLoading } = useAttributeRegistry();
-  const attributes = attributesResponse?.data || [];
+  const attributes = attributesResponse || [];
 
 
   const handleEdit = (attr) => {

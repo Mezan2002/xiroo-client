@@ -37,7 +37,7 @@ export const useCategories = () => {
   const createCategory = useMutation({
     mutationFn: async (data) => {
       const response = await axiosInstance.post("/categories", data);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -47,7 +47,7 @@ export const useCategories = () => {
   const updateCategory = useMutation({
     mutationFn: async ({ id, data }) => {
       const response = await axiosInstance.patch(`/categories/${id}`, data);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -57,7 +57,7 @@ export const useCategories = () => {
   const deleteCategory = useMutation({
     mutationFn: async (id) => {
       const response = await axiosInstance.delete(`/categories/${id}`);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -67,7 +67,7 @@ export const useCategories = () => {
   const reorderCategories = useMutation({
     mutationFn: async (orderData) => {
       const response = await axiosInstance.patch("/categories/reorder", { orderData });
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.setQueryData(["categories"], (old) => {

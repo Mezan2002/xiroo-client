@@ -19,6 +19,7 @@ export default function ProductCard({
   image,
   images: imagesProp,
   hoverImage,
+  variants = [],
   showRemove = false,
   onRemove = null,
   priority = false,
@@ -33,9 +34,8 @@ export default function ProductCard({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = imagesProp && imagesProp.length > 0 ? imagesProp : (hoverImage ? [image, hoverImage] : [image]);
-  const idStr = String(id || "0");
-  const hasVariants = parseInt(idStr.replace(/\D/g, "") || "0") % 2 !== 0;
-  const buttonText = hasVariants ? "CHOOSE" : "ADD";
+  const hasVariants = variants && variants.length > 0;
+  const buttonText = hasVariants ? "CHOOSE OPTIONS" : (stockStage === "pre-order" ? "PRE-ORDER" : "ADD TO CART");
   const hasMultipleImages = images.length > 1;
 
   const isSaved = isInWishlist(id);
@@ -186,20 +186,27 @@ export default function ProductCard({
                 : "translate-y-full opacity-0"
             }`}
             onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!user) {
-              const redirectPath = encodeURIComponent(pathname);
-              router.push(`/login?redirect=${redirectPath}`);
-              return;
-            }
-            addItem({ 
-              product: { id, title, price, salePrice, image }, 
-              variant: hasVariants ? "Default" : "Standard" 
-            });
-          }}
-        >
-            {buttonText} {stockStage === "pre-order" ? "PRE-ORDER" : "TO CART"}
+              e.preventDefault();
+              e.stopPropagation();
+
+              if (hasVariants) {
+                router.push(`/product/${id}`);
+                return;
+              }
+
+              if (!user) {
+                const redirectPath = encodeURIComponent(pathname);
+                router.push(`/login?redirect=${redirectPath}`);
+                return;
+              }
+
+              addItem({
+                product: { id, title, price, salePrice, image },
+                variant: "Standard",
+              });
+            }}
+          >
+            {buttonText}
           </button>
         )}
       </div>
