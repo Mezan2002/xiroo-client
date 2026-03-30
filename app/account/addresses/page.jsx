@@ -174,12 +174,12 @@ export default function AddressesPage() {
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-montserrat font-semibold">My Addresses</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
+        <h2 className="text-xl md:text-2xl font-montserrat font-semibold">My Addresses</h2>
         <Button
           variant="outline"
           size="sm"
-          className="h-10 px-6"
+          className="h-10 px-6 w-full sm:w-auto"
           onClick={() => handleOpenModal()}
         >
           <Plus className="w-3.5 h-3.5 mr-2" />
@@ -187,11 +187,11 @@ export default function AddressesPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {addresses.map((address) => (
           <div
             key={address._id || address.id}
-            className="group relative p-8 border border-black/5 hover:border-black transition-all duration-500 bg-white hover:shadow-2xl hover:shadow-black/5 flex flex-col"
+            className="group relative p-5 sm:p-8 border border-black/5 hover:border-black transition-all duration-500 bg-white hover:shadow-2xl hover:shadow-black/5 flex flex-col"
           >
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-3">
@@ -252,12 +252,12 @@ export default function AddressesPage() {
 
         <button
           onClick={() => handleOpenModal()}
-          className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-200 hover:border-black hover:bg-gray-50 transition-all duration-500 group"
+          className="flex flex-col items-center justify-center p-8 md:p-12 border border-dashed border-gray-200 hover:border-black hover:bg-gray-50 transition-all duration-500 group"
         >
-          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-white border border-transparent group-hover:border-gray-100 transition-all">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-4 md:mb-6 group-hover:bg-white border border-transparent group-hover:border-gray-100 transition-all">
             <Plus className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
           </div>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-black transition-colors">
+          <p className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-black transition-colors">
             Add New Address
           </p>
         </button>
@@ -271,13 +271,14 @@ export default function AddressesPage() {
             onClick={handleCloseModal}
           />
           <div className="relative w-full max-w-[600px] bg-white shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between px-10 py-8 border-b border-gray-100 bg-white shrink-0">
-              <h3 className="text-[20px] font-bold tracking-tight uppercase">
+            <div className="flex items-center justify-between px-5 sm:px-8 md:px-10 py-6 md:py-8 border-b border-gray-100 bg-white shrink-0">
+              <h3 className="text-[16px] md:text-[20px] font-bold tracking-tight uppercase leading-tight">
                 {editingAddress ? "Edit Address" : "ADD NEW ADDRESS"}
               </h3>
               <button
                 onClick={handleCloseModal}
-                className="p-2 text-gray-400 hover:text-black transition-colors"
+                className="p-2 -mr-2 text-gray-400 hover:text-black transition-colors"
+                aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -285,7 +286,7 @@ export default function AddressesPage() {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               <form
-                className="p-10 space-y-10"
+                className="p-5 sm:p-8 md:p-10 space-y-8 md:space-y-10"
                 onSubmit={(e) => e.preventDefault()}
               >
                 <div className="space-y-4">
@@ -302,7 +303,7 @@ export default function AddressesPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                   <div className="space-y-2 group">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-none mb-2 block group-focus-within:text-black transition-colors">
                       District
@@ -330,7 +331,7 @@ export default function AddressesPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                   <div className="space-y-4">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
                       Postal Code
@@ -348,7 +349,7 @@ export default function AddressesPage() {
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
                       Address Type
                     </label>
-                    <div className="flex gap-4 pt-1">
+                    <div className="flex gap-2 sm:gap-4 pt-1">
                       {["HOME", "OFFICE", "OTHERS"].map((type) => (
                         <button
                           key={type}
@@ -356,7 +357,7 @@ export default function AddressesPage() {
                           onClick={() =>
                             setFormData((prev) => ({ ...prev, type }))
                           }
-                          className={`flex-1 text-[10px] font-bold uppercase tracking-widest px-4 py-3 border transition-all ${formData.type === type ? "bg-black text-white border-black" : "bg-transparent text-gray-400 border-gray-100 hover:border-black hover:text-black"}`}
+                          className={`flex-1 text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 sm:px-4 py-3 border transition-all truncate ${formData.type === type ? "bg-black text-white border-black" : "bg-transparent text-gray-400 border-gray-100 hover:border-black hover:text-black"}`}
                         >
                           {type}
                         </button>
@@ -366,7 +367,7 @@ export default function AddressesPage() {
                 </div>
 
                 <div
-                  className="flex items-center gap-3 py-4 group cursor-pointer"
+                  className="flex items-start gap-3 py-2 md:py-4 group cursor-pointer"
                   onClick={() =>
                     setFormData((prev) => ({
                       ...prev,
@@ -388,10 +389,10 @@ export default function AddressesPage() {
               </form>
             </div>
 
-            <div className="p-10 border-t border-gray-100 bg-white shrink-0">
+            <div className="p-5 sm:p-8 md:p-10 border-t border-gray-100 bg-white shrink-0">
               <Button
                 variant="primary"
-                className="w-full h-16 tracking-[0.2em] group"
+                className="w-full h-14 md:h-16 tracking-[0.2em] group text-[10px] md:text-[11px]"
                 onClick={saveAddress}
               >
                 {editingAddress ? "SAVE CHANGES" : "ADD ADDRESS"}

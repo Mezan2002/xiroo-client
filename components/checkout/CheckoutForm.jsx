@@ -146,15 +146,15 @@ export default function CheckoutForm({
   return (
     <div className="space-y-12">
       {/* Steps Indicator */}
-      <div className="flex gap-4 md:gap-8">
+      <div className="flex flex-wrap gap-2 md:gap-8">
         {[
           { id: 1, label: "Information" },
           { id: 2, label: "Delivery" },
           { id: 3, label: "Payment" },
         ].map((s) => (
-          <div key={s.id} className="flex items-center gap-3">
+          <div key={s.id} className="flex items-center gap-2 md:gap-3">
             <span
-              className={`text-[11px] font-bold uppercase tracking-widest ${step === s.id ? "text-black" : "text-gray-300"}`}
+              className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest ${step === s.id ? "text-black" : "text-gray-300"}`}
             >
               {s.label}
             </span>
@@ -190,7 +190,7 @@ export default function CheckoutForm({
               <h2 className="text-[18px] font-bold uppercase tracking-widest">
                 Delivery Address
               </h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <input
                     type="text"
@@ -283,45 +283,45 @@ export default function CheckoutForm({
                 Delivery Method
               </h2>
               <div className="border border-gray-100 divide-y divide-gray-100 overflow-hidden">
-                <label className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-colors">
+                <label className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 gap-3 sm:gap-0 cursor-pointer hover:bg-gray-50/50 transition-colors">
                   <div className="flex items-center gap-4">
                     <input
                       type="radio"
                       name="shipping"
                       checked={deliveryMethod === "normal"}
                       onChange={() => setDeliveryMethod("normal")}
-                      className="w-4 h-4 accent-black"
+                      className="w-4 h-4 accent-black shrink-0"
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold uppercase tracking-widest">
+                      <span className="text-sm font-bold uppercase tracking-widest leading-tight">
                         Normal Delivery
                       </span>
-                      <span className="text-[11px] text-gray-400 font-medium">
+                      <span className="text-[11px] text-gray-400 font-medium mt-0.5">
                         2-3 business days
                       </span>
                     </div>
                   </div>
-                  <span className="text-sm font-bold uppercase">Free</span>
+                  <span className="text-sm font-bold uppercase sm:text-right pl-8 sm:pl-0">Free</span>
                 </label>
-                <label className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-colors">
+                <label className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 gap-3 sm:gap-0 cursor-pointer hover:bg-gray-50/50 transition-colors">
                   <div className="flex items-center gap-4">
                     <input
                       type="radio"
                       name="shipping"
                       checked={deliveryMethod === "fast"}
                       onChange={() => setDeliveryMethod("fast")}
-                      className="w-4 h-4 accent-black"
+                      className="w-4 h-4 accent-black shrink-0"
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold uppercase tracking-widest">
+                      <span className="text-sm font-bold uppercase tracking-widest leading-tight">
                         Fast Delivery
                       </span>
-                      <span className="text-[11px] text-gray-400 font-medium">
+                      <span className="text-[11px] text-gray-400 font-medium mt-0.5">
                         1 business day
                       </span>
                     </div>
                   </div>
-                  <span className="text-sm font-bold uppercase">৳50</span>
+                  <span className="text-sm font-bold uppercase sm:text-right pl-8 sm:pl-0">৳50</span>
                 </label>
               </div>
             </div>
@@ -335,36 +335,36 @@ export default function CheckoutForm({
                 Payment Method
               </h2>
               <div className="space-y-4">
-                <label className="flex items-center gap-4 p-6 border border-black cursor-pointer bg-gray-50/50">
+                <label className="flex items-center gap-4 p-4 sm:p-6 border border-black cursor-pointer bg-gray-50/50">
                   <input
                     type="radio"
                     name="payment"
                     defaultChecked
-                    className="w-4 h-4 accent-black"
+                    className="w-4 h-4 accent-black shrink-0"
                   />
-                  <span className="text-sm font-bold uppercase tracking-widest">
+                  <span className="text-[13px] md:text-sm font-bold uppercase tracking-widest leading-tight mt-px">
                     Cash on Delivery
                   </span>
                 </label>
-                <label className="flex items-center gap-4 p-6 border border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors opacity-50 grayscale">
+                <label className="flex items-center gap-4 p-4 sm:p-6 border border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors opacity-50 grayscale">
                   <input
                     type="radio"
                     name="payment"
                     disabled
-                    className="w-4 h-4 accent-black"
+                    className="w-4 h-4 accent-black shrink-0"
                   />
-                  <span className="text-sm font-bold uppercase tracking-widest">
+                  <span className="text-[13px] md:text-sm font-bold uppercase tracking-widest leading-tight mt-px">
                     Credit Card (Coming Soon)
                   </span>
                 </label>
-                <label className="flex items-center gap-4 p-6 border border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors opacity-50 grayscale">
+                <label className="flex items-center gap-4 p-4 sm:p-6 border border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors opacity-50 grayscale">
                   <input
                     type="radio"
                     name="payment"
                     disabled
-                    className="w-4 h-4 accent-black"
+                    className="w-4 h-4 accent-black shrink-0"
                   />
-                  <span className="text-sm font-bold uppercase tracking-widest">
+                  <span className="text-[13px] md:text-sm font-bold uppercase tracking-widest leading-tight mt-px">
                     Mobile Banking (Coming Soon)
                   </span>
                 </label>

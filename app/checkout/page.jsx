@@ -60,8 +60,8 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-12 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-24">
+      <main className="container mx-auto px-4 lg:px-6 py-8 md:py-12 lg:py-20">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-10 lg:gap-16 xl:gap-24">
           {/* Left Column: Form */}
           <div className="lg:col-span-7">
             <Link 
@@ -70,10 +70,10 @@ export default function CheckoutPage() {
                 // If we're on mobile and the cart is a sidebar, maybe just go back?
                 // For now, simplicity.
               }}
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-black transition-colors mb-10 group"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-black transition-colors mb-8 md:mb-10 group"
             >
               <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-[11px] font-bold uppercase tracking-widest">Return to cart</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest">Return to store</span>
             </Link>
 
             <CheckoutForm 
@@ -91,7 +91,7 @@ export default function CheckoutPage() {
 
           {/* Right Column: Summary */}
           <div className="lg:col-span-5">
-            <div className="sticky top-10">
+            <div className="lg:sticky lg:top-10">
               <OrderSummary 
                 items={items} 
                 subtotal={subtotal} 

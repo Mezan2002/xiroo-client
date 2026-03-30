@@ -80,16 +80,16 @@ export function SearchOverlay({ isOpen, onClose }) {
 
       {/* Modal Container */}
       <div
-        className={`absolute inset-0 flex items-start justify-center pt-[8vh] px-4 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`absolute inset-0 flex items-start justify-center sm:pt-[8vh] sm:px-4 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen
             ? "translate-y-0 opacity-100 scale-100"
             : "-translate-y-8 opacity-0 scale-95"
         }`}
       >
         {/* Modal Panel */}
-        <aside className="w-full max-w-[1000px] bg-white text-black shadow-2xl pointer-events-auto overflow-hidden flex flex-col max-h-[84vh]">
+        <aside className="w-full max-w-[1000px] bg-white text-black shadow-2xl pointer-events-auto overflow-hidden flex flex-col h-full sm:h-auto max-h-full sm:max-h-[84vh]">
           {/* Search Bar Header */}
-          <div className="flex items-center gap-4 px-8 py-6 border-b border-gray-100">
+          <div className="flex items-center gap-2 md:gap-4 px-4 md:px-8 py-4 md:py-6 border-b border-gray-100">
             <Search className="w-5 h-5 text-gray-400 stroke-[1.5] shrink-0" />
             <input
               ref={inputRef}
@@ -97,7 +97,7 @@ export function SearchOverlay({ isOpen, onClose }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products..."
-              className="flex-1 bg-transparent text-[20px] font-light text-gray-800 placeholder:text-gray-300 outline-none"
+              className="flex-1 bg-transparent text-[16px] md:text-[20px] font-light text-gray-800 placeholder:text-gray-300 outline-none min-w-0"
             />
             {query && (
               <button
@@ -119,7 +119,7 @@ export function SearchOverlay({ isOpen, onClose }) {
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-y-auto px-8 md:px-12 py-10 scrollbar-hide space-y-14">
+          <div className="flex-1 overflow-y-auto px-6 md:px-12 py-8 md:py-10 scrollbar-hide space-y-10 md:space-y-14">
             {/* ─── SEARCH MODE ─── */}
             {isSearchMode && (
               <div className="space-y-6">

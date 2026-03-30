@@ -101,7 +101,13 @@ function PhotoLightbox({ photos, initialIndex, onClose }) {
 }
 
 // ── Review Card ──
-function ReviewCard({ review, onClick, variant = "light", allPhotos = [], setLightboxIndex }) {
+function ReviewCard({
+  review,
+  onClick,
+  variant = "light",
+  allPhotos = [],
+  setLightboxIndex,
+}) {
   const isBlack = variant === "black";
   return (
     <div
@@ -132,7 +138,11 @@ function ReviewCard({ review, onClick, variant = "light", allPhotos = [], setLig
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-semibold overflow-hidden shrink-0 bg-white/10 text-white ring-1 ring-white/20">
                 {review.userImage ? (
-                  <img src={review.userImage} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={review.userImage}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   (review.name || "C").charAt(0).toUpperCase()
                 )}
@@ -155,21 +165,25 @@ function ReviewCard({ review, onClick, variant = "light", allPhotos = [], setLig
                   className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700"
                 />
               </div>
-              
+
               {/* Secondary Thumbnails Row */}
               {review.images?.length > 1 && (
                 <div className="flex gap-1 p-1 bg-white/50 border-t border-gray-100 overflow-x-auto scrollbar-hide">
                   {review.images.slice(1, 5).map((img, i) => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       onClick={(e) => {
-                         e.stopPropagation();
-                         setLightboxIndex(allPhotos.indexOf(img));
+                        e.stopPropagation();
+                        setLightboxIndex(allPhotos.indexOf(img));
                       }}
                       className="w-10 h-10 shrink-0 overflow-hidden rounded-[2px] opacity-70 hover:opacity-100 transition-opacity"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   ))}
                   {review.images.length > 5 && (
@@ -221,7 +235,11 @@ function ReviewCard({ review, onClick, variant = "light", allPhotos = [], setLig
                 }`}
               >
                 {review.userImage ? (
-                  <img src={review.userImage} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={review.userImage}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   (review.name || "C").charAt(0).toUpperCase()
                 )}
@@ -272,7 +290,7 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
         {gallery.length > 0 && (
           <div className="w-full md:w-[320px] lg:w-[400px] shrink-0 bg-[#F7F7F5] flex flex-col border-b md:border-b-0 md:border-r border-gray-100">
             {/* Main Stage */}
-            <div 
+            <div
               className="flex-1 relative group cursor-zoom-in overflow-hidden bg-white/50"
               onClick={() => setIsLightboxOpen(true)}
             >
@@ -284,11 +302,11 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
                   className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-1000 scale-[0.98] group-hover:scale-100"
                 />
               </div>
-              
+
               {/* Pagination Label */}
               {gallery.length > 1 && (
                 <div className="absolute top-6 left-6 z-10 bg-black/5 backdrop-blur-md px-2.5 py-1 text-[8px] font-bold text-black uppercase tracking-widest border border-black/5">
-                   {activeIndex + 1} / {gallery.length} Perspective
+                  {activeIndex + 1} / {gallery.length} Perspective
                 </div>
               )}
             </div>
@@ -301,16 +319,16 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
                     key={i}
                     onClick={() => setActiveIndex(i)}
                     className={`w-12 h-12 shrink-0 border transition-all duration-300 ${
-                      i === activeIndex 
-                        ? "border-black scale-105" 
+                      i === activeIndex
+                        ? "border-black scale-105"
                         : "border-gray-100 opacity-40 hover:opacity-100"
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={img} 
-                      alt="" 
-                      className="w-full h-full object-cover grayscale-sm hover:grayscale-0" 
+                    <img
+                      src={img}
+                      alt=""
+                      className="w-full h-full object-cover grayscale-sm hover:grayscale-0"
                     />
                   </button>
                 ))}
@@ -320,7 +338,7 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
         )}
 
         {isLightboxOpen && (
-          <PhotoLightbox 
+          <PhotoLightbox
             photos={gallery}
             initialIndex={activeIndex}
             onClose={() => setIsLightboxOpen(false)}
@@ -348,7 +366,11 @@ function ReviewModal({ review, onClose, onPrev, onNext }) {
           <div className="flex items-center gap-3 mt-6 pt-5 border-t border-gray-100">
             <div className="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center text-[12px] font-semibold shrink-0 overflow-hidden">
               {review.userImage ? (
-                <img src={review.userImage} alt="" className="w-full h-full object-cover" />
+                <img
+                  src={review.userImage}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 (review.name || "C").charAt(0).toUpperCase()
               )}
@@ -789,7 +811,7 @@ export default function ProductReviews({ productId }) {
 
   return (
     <section className="w-full mt-16 border-t border-gray-100 pb-28 overflow-hidden">
-      <div className="px-4 md:px-10 xl:px-16 mt-14">
+      <div className="px-0 md:px-10 xl:px-16 mt-14">
         {/* ── Top row ── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
@@ -841,9 +863,9 @@ export default function ProductReviews({ productId }) {
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                   />
                   <div className="absolute inset-x-0 bottom-0 bg-black/40 py-1 px-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                     <span className="text-[7px] text-white font-bold uppercase tracking-widest truncate block">
-                        View Discovery
-                     </span>
+                    <span className="text-[7px] text-white font-bold uppercase tracking-widest truncate block">
+                      View Discovery
+                    </span>
                   </div>
                 </div>
               ))}
@@ -905,12 +927,12 @@ export default function ProductReviews({ productId }) {
           onClose={() => setShowForm(false)}
         />
       )}
-      
+
       {lightboxIndex !== null && (
-        <PhotoLightbox 
-          photos={allPhotos} 
-          initialIndex={lightboxIndex} 
-          onClose={() => setLightboxIndex(null)} 
+        <PhotoLightbox
+          photos={allPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
         />
       )}
     </section>

@@ -14,6 +14,7 @@ import {
   Package,
   Shield,
   User,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -84,9 +85,21 @@ export function UserAccountDrawer({ isOpen, onClose }) {
         <aside
           className={`h-full w-full sm:w-[450px] bg-white text-black shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
             isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          } relative`}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className={`absolute top-8 right-8 z-50 p-2 rounded-full transition-all duration-300 ${
+              isLoggedIn 
+                ? "text-zinc-400 hover:text-white hover:bg-white/10" 
+                : "text-zinc-400 hover:text-black hover:bg-zinc-100"
+            }`}
+          >
+            <X className="w-5 h-5" />
+          </button>
+
           {!mounted ? (
             <div className="flex h-full items-center justify-center">
               <div className="w-8 h-8 border-2 border-zinc-200 border-t-black animate-spin rounded-full" />

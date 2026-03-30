@@ -22,19 +22,22 @@ export function Button({
   const baseStyles = cn(
     "group inline-flex items-center justify-center font-semibold tracking-[0.1em] uppercase transition-all duration-300 ease-out focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden rounded-none active:scale-[0.98]",
     !isPositioned && "relative",
-    isLoading && "opacity-70 pointer-events-none cursor-not-allowed"
+    isLoading && "opacity-70 pointer-events-none cursor-not-allowed",
   );
 
   // Pre-configured style variants
   const variants = {
     primary: "bg-black text-white hover:bg-zinc-800 border border-black",
-    outline: "border border-zinc-200 bg-transparent text-black hover:border-black hover:bg-black hover:text-white",
-    secondary: "bg-zinc-100 text-black hover:bg-zinc-200 border border-zinc-100",
+    outline:
+      "border border-zinc-200 bg-transparent text-black hover:border-black hover:bg-black hover:text-white",
+    secondary:
+      "bg-zinc-100 text-black hover:bg-zinc-200 border border-zinc-100",
     white: "bg-white text-black hover:bg-zinc-50 border border-white",
     ghost: "bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-black",
     link: "bg-transparent text-zinc-900 underline underline-offset-4 hover:text-black p-0 h-auto",
     danger: "bg-red-600 text-white hover:bg-red-700 border border-red-600",
-    warning: "bg-amber-500 text-black hover:bg-amber-600 border border-amber-500",
+    warning:
+      "bg-amber-500 text-black hover:bg-amber-600 border border-amber-500",
   };
 
   // Pre-configured sizing specifications
@@ -49,15 +52,15 @@ export function Button({
     baseStyles,
     variants[variant],
     sizes[size],
-    className
+    className,
   );
 
   const content = (
-    <span className="relative z-10 flex items-center justify-center gap-2">
+    <span className="relative z-10 flex items-center justify-center">
       <span className="flex items-center">{children}</span>
       {showHoverIcon && variant !== "link" && variant !== "icon" && (
         <span className="flex items-center w-0 opacity-0 -translate-x-2 group-hover:w-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out">
-          <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+          <Icon className="w-3.5 h-3.5 stroke-[2.5] shrink-0 ml-2" />
         </span>
       )}
     </span>

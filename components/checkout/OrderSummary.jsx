@@ -2,21 +2,25 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Tag } from "lucide-react";
 import { Button } from "../ui/Button";
 
 export default function OrderSummary({ items, subtotal, shipping, total }) {
   return (
-    <div className="bg-gray-50/50 border border-gray-100 p-8 lg:p-12 space-y-10">
-      <h2 className="text-[20px] font-bold uppercase tracking-widest border-b border-gray-100 pb-8">Order Summary</h2>
+    <div className="bg-gray-50/50 border border-gray-100 p-5 md:p-8 lg:p-12 space-y-8 lg:space-y-10">
+      <h2 className="text-[18px] lg:text-[20px] font-bold uppercase tracking-widest border-b border-gray-100 pb-6 lg:pb-8">
+        Order Summary
+      </h2>
 
       {/* Items List */}
       <div className="space-y-8">
         {items.map((item) => (
-          <div key={`${item._id || item.id}-${item.variant}`} className="flex gap-6">
-            <Link 
+          <div
+            key={`${item._id || item.id}-${item.variant}`}
+            className="flex gap-4 md:gap-6"
+          >
+            <Link
               href={`/product/${item._id || item.id}`}
-              className="relative w-24 h-24 bg-white border border-gray-100 shrink-0 group/img"
+              className="relative w-20 h-20 md:w-24 md:h-24 bg-white border border-gray-100 shrink-0 group/img"
             >
               <div className="w-full h-full overflow-hidden">
                 <Image
@@ -32,14 +36,14 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
             </Link>
             <div className="flex flex-col justify-center min-w-0">
               <div className="line-clamp-2 mb-2">
-                <Link 
+                <Link
                   href={`/product/${item._id || item.id}`}
                   className="text-sm font-bold text-black uppercase tracking-tight hover:underline underline-offset-4 decoration-black hover:text-zinc-600 transition-colors"
                 >
                   {item.title}
                 </Link>
               </div>
-              <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">
+              <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1 md:mb-2 line-clamp-1">
                 {item.variant}
               </p>
               <span className="text-sm font-bold text-black">
@@ -51,44 +55,38 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
       </div>
 
       {/* Coupon Field */}
-      <div className="pt-10 border-t border-gray-100">
-        <div className="flex gap-3">
+      <div className="pt-8 lg:pt-10 border-t border-gray-100">
+        <div className="flex gap-2 sm:gap-3">
           <input
             type="text"
             placeholder="Coupon Code"
-            className="flex-1 h-12 px-5 bg-white border border-gray-100 focus:border-black outline-none transition-all text-xs font-bold uppercase tracking-widest placeholder:text-gray-300"
+            className="flex-1 h-12 px-4 md:px-5 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[10px] md:text-xs font-bold uppercase tracking-widest placeholder:text-gray-300 min-w-0"
           />
-          <Button variant="secondary" className="h-12 px-6">Apply</Button>
+          <Button variant="secondary" className="h-12 px-4 sm:px-6 shrink-0 text-[10px] sm:text-[11px]">
+            Apply
+          </Button>
         </div>
       </div>
 
       {/* Price Breakdown */}
-      <div className="space-y-4 pt-10 border-t border-gray-100">
+      <div className="space-y-4 pt-8 lg:pt-10 border-t border-gray-100">
         <div className="flex justify-between items-center text-[12px] font-bold uppercase tracking-widest text-gray-400">
           <span>Subtotal</span>
           <span className="text-black">৳{subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between items-center text-[12px] font-bold uppercase tracking-widest text-gray-400">
           <span>Delivery Fee</span>
-          <span className="text-black italic">{shipping === 0 ? "Free" : `৳${shipping.toLocaleString()}`}</span>
+          <span className="text-black italic">
+            {shipping === 0 ? "Free" : `৳${shipping.toLocaleString()}`}
+          </span>
         </div>
-        <div className="flex justify-between items-center pt-6 border-t border-gray-100">
-          <span className="text-[15px] font-bold uppercase tracking-[0.3em]">Total</span>
-          <span className="text-[28px] font-bold text-black tracking-tighter">৳{total.toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* Trust Badges */}
-      <div className="pt-10 flex flex-col items-center gap-4 text-center">
-        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] leading-relaxed">
-          Guaranteed Safe & Secure Checkout
-        </p>
-        <div className="flex gap-4 opacity-30 grayscale">
-          {/* Mock mini icons for payment trust */}
-          <div className="w-10 h-6 bg-gray-200 rounded-sm" />
-          <div className="w-10 h-6 bg-gray-200 rounded-sm" />
-          <div className="w-10 h-6 bg-gray-200 rounded-sm" />
-          <div className="w-10 h-6 bg-gray-200 rounded-sm" />
+        <div className="flex justify-between items-center pt-4 lg:pt-6 border-t border-gray-100">
+          <span className="text-[14px] lg:text-[15px] font-bold uppercase tracking-[0.3em]">
+            Total
+          </span>
+          <span className="text-[24px] lg:text-[28px] font-bold text-black tracking-tighter">
+            ৳{total.toLocaleString()}
+          </span>
         </div>
       </div>
     </div>

@@ -3,6 +3,8 @@ import LoadingOverlay from "@/components/shared/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { useProducts } from "@/hooks/api/useProducts";
 import { useUser } from "@/hooks/api/useUser";
+import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/hooks/useToast";
 import { addRecentView } from "@/redux/slices/recentlyViewedSlice";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
@@ -16,6 +18,8 @@ import RelatedProducts from "./RelatedProducts";
 
 export default function ProductView({ productId }) {
   const { user } = useUser();
+  const { addItem } = useCart();
+  const { toast } = useToast();
   const router = useRouter();
   const pathname = usePathname();
   const { useProductDetail } = useProducts();
@@ -43,6 +47,8 @@ export default function ProductView({ productId }) {
   const cartRef = useRef(null);
 
   useEffect(() => {
+    if (!cartRef.current) return;
+    
     const cartObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
@@ -54,9 +60,9 @@ export default function ProductView({ productId }) {
       { threshold: 0 },
     );
 
-    if (cartRef.current) cartObserver.observe(cartRef.current);
+    cartObserver.observe(cartRef.current);
     return () => cartObserver.disconnect();
-  }, []);
+  }, [product]);
 
   if (isLoading) return <LoadingOverlay />;
   if (error || !product) {
@@ -71,19 +77,18 @@ export default function ProductView({ productId }) {
   }
 
   return (
-    <div className="w-full pt-16 md:pt-24 lg:pt-32">
-      <div className="max-w-[1400px] w-full mx-auto px-0 md:px-8 xl:px-12">
+    <div className="w-full pt-12 md:pt-24 lg:pt-32">
+      <div className="max-w-[1400px] w-full mx-auto px-4 md:px-8 xl:px-12">
         {/* Split Architecture Container */}
-        <div className="flex flex-col lg:flex-row gap-0 lg:gap-14 relative">
-          {/* Left Side: Elaborate Scrolling Image Gallery */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 relative">
+          {/* Left Side: Image Gallery */}
           <div className="w-full lg:w-1/2">
             <ProductGallery title={product.title} images={product.images} />
           </div>
 
-          {/* Right Side: Sticky Purchasing Information Block */}
+          {/* Right Side: Sticky Purchasing Block */}
           <div className="w-full lg:w-1/2 relative bg-white">
             <div className="lg:sticky lg:top-[120px]">
-              {/* cartRef passed down so ProductInfo can attach it to the cart buttons div */}
               <ProductInfo product={product} cartRef={cartRef} />
             </div>
           </div>
@@ -94,20 +99,22 @@ export default function ProductView({ productId }) {
         categoryId={product.category?._id || product.category}
         currentProductId={product._id}
       />
-      <ProductReviews productId={product._id} />
+      <div className="px-4 md:px-8">
+        <ProductReviews productId={product._id} />
+      </div>
 
       {/* Sticky Add to Cart Bar — controlled at ProductView level */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center px-4 pb-4 pt-2 pointer-events-none transition-all duration-300 ${
+        className={`fixed bottom-20 lg:bottom-0 left-0 right-0 z-50 flex items-center justify-center px-4 pb-4 pt-2 pointer-events-none transition-all duration-300 ${
           showStickyBar &&
           !["out-of-stock", "upcoming"].includes(product.stockStage)
             ? "translate-y-0 opacity-100"
-            : "translate-y-6 opacity-0"
+            : "translate-y-12 opacity-0"
         }`}
       >
-        <div className="pointer-events-auto w-full max-w-[560px] flex items-center gap-3 bg-white border border-gray-300 shadow-[0_8px_30px_rgba(0,0,0,0.14)] px-3 py-3">
+        <div className="pointer-events-auto w-full max-w-[560px] h-[64px] md:h-[72px] flex items-center gap-3 bg-white border border-gray-200 shadow-[0_12px_40px_rgba(0,0,0,0.12)] px-3">
           {/* Thumbnail */}
-          <div className="w-12 h-12 bg-gray-100 shrink-0 overflow-hidden">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 shrink-0 overflow-hidden flex items-center justify-center">
             {product.images?.[0] ? (
               <Image
                 src={product.images[0]}
@@ -117,50 +124,62 @@ export default function ProductView({ productId }) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                <ShoppingCart size={18} className="text-gray-400" />
-              </div>
+              <ShoppingCart size={18} className="text-gray-400" />
             )}
           </div>
 
           {/* Product Info */}
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-[12px] font-semibold text-black truncate leading-tight">
+          <div className="flex flex-col flex-1 min-w-0 justify-center">
+            <span className="text-[11px] md:text-[12px] font-bold text-black truncate leading-tight uppercase tracking-wide">
               {product.title}
             </span>
-            <span className="text-[11px] text-gray-500 mt-px truncate">
-              {product.variants?.[0]?.name}:{" "}
-              {product.variants?.[0]?.values?.[0] || "Standard"}
+            <span className="text-[10px] text-gray-500 mt-0.5 truncate uppercase tracking-widest font-medium">
+              {product.salePrice ? "Special Offer" : "Boutique Exclusive"}
             </span>
           </div>
 
           {/* Price */}
-          <div className="flex flex-col items-end shrink-0 mr-1">
-            <span className="text-[14px] font-semibold text-black">
+          <div className="flex items-center shrink-0 mx-2">
+            <span className="text-[13px] md:text-[14px] font-bold text-black">
               ৳{(product.salePrice || product.price).toLocaleString()}
             </span>
-            {product.salePrice && (
-              <span className="text-[10px] text-gray-400 line-through">
-                ৳{product.price.toLocaleString()}
-              </span>
-            )}
           </div>
 
           {/* CTA */}
           <Button
+            size="sm"
+            className="h-10 md:h-11 px-4 md:px-6 text-[10px] tracking-[0.15em] font-bold shrink-0 flex items-center justify-center"
+
             onClick={() => {
+              const hasVariants = product.variants && product.variants.length > 0;
+              
+              if (hasVariants) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                return;
+              }
+
               if (!user) {
                 const redirectPath = encodeURIComponent(pathname);
                 router.push(`/login?redirect=${redirectPath}`);
                 return;
               }
-              console.log("Added to cart (sticky)", { productId: product._id });
+              
+              // Standard add to cart logic (simplified for view)
+              addItem({
+                product: {
+                  id: product._id,
+                  title: product.title,
+                  price: product.price,
+                  salePrice: product.salePrice,
+                  image: product.images?.[0] || "",
+                },
+                variant: "Standard",
+                silent: true
+              });
+              toast.success("Added to your shopping bag");
             }}
           >
-            <div className="flex items-center gap-2">
-              <ShoppingCart size={14} />
-              ADD TO CART
-            </div>
+            {product.variants && product.variants.length > 0 ? "CHOOSE" : "ADD"}
           </Button>
         </div>
       </div>

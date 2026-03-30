@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { ChevronLeft, ChevronRight, Heart, Trash2 } from "lucide-react";
+import { useUser } from "@/hooks/api/useUser";
+import { Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useUser } from "@/hooks/api/useUser";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useCart } from "@/hooks/useCart";
@@ -33,9 +33,18 @@ export default function ProductCard({
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const images = imagesProp && imagesProp.length > 0 ? imagesProp : (hoverImage ? [image, hoverImage] : [image]);
+  const images =
+    imagesProp && imagesProp.length > 0
+      ? imagesProp
+      : hoverImage
+        ? [image, hoverImage]
+        : [image];
   const hasVariants = variants && variants.length > 0;
-  const buttonText = hasVariants ? "CHOOSE OPTIONS" : (stockStage === "pre-order" ? "PRE-ORDER" : "ADD TO CART");
+  const buttonText = hasVariants
+    ? "CHOOSE OPTIONS"
+    : stockStage === "pre-order"
+      ? "PRE-ORDER"
+      : "ADD TO CART";
   const hasMultipleImages = images.length > 1;
 
   const isSaved = isInWishlist(id);
@@ -107,7 +116,7 @@ export default function ProductCard({
 
           {/* Minimalist Progress Dots (Interactive) */}
           {hasMultipleImages && (
-            <div 
+            <div
               className={`absolute left-1/2 -translate-x-1/2 z-20 flex gap-1.5 px-3 py-1.5 rounded-full bg-black/10 backdrop-blur-[2px] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] ${
                 isHovered ? "bottom-14" : "bottom-3"
               }`}
@@ -121,8 +130,8 @@ export default function ProductCard({
                     setCurrentImageIndex(dotIdx);
                   }}
                   className={`h-1 transition-all duration-300 rounded-full ${
-                    dotIdx === currentImageIndex 
-                      ? "w-4 bg-white" 
+                    dotIdx === currentImageIndex
+                      ? "w-4 bg-white"
                       : "w-1 bg-white/40 hover:bg-white/60"
                   }`}
                   aria-label={`Go to image ${dotIdx + 1}`}
@@ -166,19 +175,19 @@ export default function ProductCard({
                 toggleWishlist({ id, title, price, salePrice, image });
               }}
             >
-              <Heart 
+              <Heart
                 className={`w-4 h-4 transition-all duration-300 stroke-[1.5] ${
-                  isSaved 
-                    ? "text-[#ff385c] fill-[#ff385c]" 
+                  isSaved
+                    ? "text-[#ff385c] fill-[#ff385c]"
                     : "text-white drop-shadow-md hover:text-[#ff385c] fill-none"
-                }`} 
+                }`}
               />
             </button>
           )}
         </div>
 
         {/* Integrated Quick Add Bar */}
-        {(!["out-of-stock", "upcoming"].includes(stockStage)) && (
+        {!["out-of-stock", "upcoming"].includes(stockStage) && (
           <button
             className={`absolute bottom-0 left-0 right-0 h-10 md:h-12 bg-black text-white text-[9px] md:text-[10px] font-bold tracking-[0.2em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-30 uppercase ${
               isHovered
@@ -213,8 +222,8 @@ export default function ProductCard({
 
       {/* Details Area (Editorial Layout) */}
       <div className="flex flex-col text-left relative z-10">
-        <Link href={`/product/${id}`} className="group/title">
-          <h3 className="text-[10px] md:text-[11px] font-medium text-black tracking-[0.12em] uppercase leading-[1.6] mb-1 line-clamp-2 transition-colors duration-300 group-hover/title:text-zinc-500">
+        <Link href={`/product/${id}`} className="group/title block">
+          <h3 className="text-[10px] md:text-[11px] font-medium text-black tracking-[0.12em] uppercase leading-[1.6] mb-1 line-clamp-2 transition-all duration-300 group-hover/title:text-black group-hover/title:underline underline-offset-[3px] decoration-1 hover:font-semibold">
             {title}
           </h3>
         </Link>
@@ -227,9 +236,11 @@ export default function ProductCard({
             ) : (
               <>
                 <span className="text-[10px] md:text-[11px] text-black font-semibold tracking-wider">
-                  {(salePrice && salePrice > 0) ? `৳${salePrice.toLocaleString()}` : formattedPrice}
+                  {salePrice && salePrice > 0
+                    ? `৳${salePrice.toLocaleString()}`
+                    : formattedPrice}
                 </span>
-                {(salePrice && salePrice > 0) && (
+                {salePrice && salePrice > 0 && (
                   <span className="text-[8px] md:text-[9px] text-zinc-400 line-through tracking-wider">
                     {formattedPrice}
                   </span>

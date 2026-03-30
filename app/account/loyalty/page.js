@@ -45,34 +45,34 @@ export default function LoyaltyPage() {
   };
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-10 md:space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Digital Membership Card */}
-      <div className={`relative overflow-hidden rounded-none p-10 md:p-14 text-white shadow-2xl bg-linear-to-br ${tierStyles[currentTier]} transition-all duration-700`}>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
-          <div className="space-y-6">
+      <div className={`relative overflow-hidden rounded-none p-6 sm:p-10 md:p-14 text-white shadow-2xl bg-linear-to-br ${tierStyles[currentTier]} transition-all duration-700`}>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-10">
+          <div className="space-y-4 md:space-y-6">
             <div className="flex items-center gap-3">
-              <Shield className="w-8 h-8 opacity-80" strokeWidth={1.5} />
-              <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-80">Prestige Registry</span>
+              <Shield className="w-6 h-6 md:w-8 md:h-8 opacity-80" strokeWidth={1.5} />
+              <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] md:tracking-[0.4em] opacity-80">Prestige Registry</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-montserrat font-bold tracking-tight uppercase">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-montserrat font-bold tracking-tight uppercase leading-none">
               {currentTier} Member
             </h2>
-            <div className="pt-4 flex items-center gap-8">
+            <div className="pt-2 md:pt-4 flex items-center gap-6 md:gap-8 flex-wrap">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Accumulated Hub</p>
-                <p className="text-2xl font-bold tracking-tighter">{userData.points || 0} PTS</p>
+                <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Accumulated Hub</p>
+                <p className="text-xl md:text-2xl font-bold tracking-tighter">{userData.points || 0} PTS</p>
               </div>
-              <div className="w-px h-10 bg-white/20" />
+              <div className="w-px h-8 md:h-10 bg-white/20" />
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Member Since</p>
-                <p className="text-2xl font-bold tracking-tighter">{new Date(userData.createdAt).getFullYear()}</p>
+                <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Member Since</p>
+                <p className="text-xl md:text-2xl font-bold tracking-tighter">{new Date(userData.createdAt).getFullYear()}</p>
               </div>
             </div>
           </div>
           
-          <div className="flex flex-col items-center md:items-end gap-2 shrink-0">
-             <div className="w-24 h-24 rounded-full border-2 border-white/20 flex items-center justify-center backdrop-blur-sm">
-                <Award className="w-10 h-10 opacity-80" strokeWidth={1} />
+          <div className="hidden sm:flex flex-col items-center md:items-end gap-2 shrink-0">
+             <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-white/20 flex items-center justify-center backdrop-blur-sm">
+                <Award className="w-8 h-8 md:w-10 md:h-10 opacity-80" strokeWidth={1} />
              </div>
              <p className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-40">Identity Verified</p>
           </div>
@@ -84,40 +84,40 @@ export default function LoyaltyPage() {
       </div>
 
       {/* Prestige Privileges */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-        <div className="lg:col-span-4 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
+        <div className="lg:col-span-4 space-y-4 md:space-y-6">
           <div className="flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-black" />
-            <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-black">Active Privileges</h3>
+            <Sparkles className="w-5 h-5 text-black shrink-0" />
+            <h3 className="text-[12px] md:text-[13px] font-bold uppercase tracking-[0.2em] text-black">Active Privileges</h3>
           </div>
-          <p className="text-[13px] text-gray-500 leading-relaxed font-medium">
+          <p className="text-[12px] md:text-[13px] text-gray-500 leading-relaxed font-medium">
             Your current prestige level grants you access to an exclusive sanctuary of boutique benefits designed to elevate your Xiroo experience.
           </p>
         </div>
 
-        <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
           {currentTierConfig?.benefits?.map((benefit, idx) => (
-            <div key={idx} className="p-6 border border-gray-100 bg-gray-50 flex items-center gap-4 group hover:bg-black hover:text-white transition-all duration-500">
-               <div className="w-2 h-2 rounded-full bg-zinc-300 group-hover:bg-zinc-700 transition-colors" />
-               <span className="text-[11px] font-bold uppercase tracking-widest">{benefit}</span>
+            <div key={idx} className="p-4 md:p-6 border border-gray-100 bg-gray-50 flex items-center gap-4 group hover:bg-black hover:text-white transition-all duration-500">
+               <div className="w-2 h-2 rounded-full bg-zinc-300 group-hover:bg-zinc-700 transition-colors shrink-0" />
+               <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest">{benefit}</span>
             </div>
           ))}
           {(!currentTierConfig?.benefits || currentTierConfig.benefits.length === 0) && (
-            <div className="col-span-full py-12 border border-dashed border-gray-200 text-center">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">No specific privileges gained yet.</p>
+            <div className="col-span-full py-10 md:py-12 border border-dashed border-gray-200 text-center">
+              <p className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">No specific privileges gained yet.</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Prestige Evolution (Timeline) */}
-      <div className="space-y-12">
-        <div className="flex items-center gap-3 pb-8 border-b border-gray-100">
-           <TrendingUp className="w-5 h-5 text-black" />
-           <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-black">Prestige Evolution</h3>
+      <div className="space-y-8 md:space-y-12">
+        <div className="flex items-center gap-3 pb-6 md:pb-8 border-b border-gray-100">
+           <TrendingUp className="w-5 h-5 text-black shrink-0" />
+           <h3 className="text-[12px] md:text-[13px] font-bold uppercase tracking-[0.2em] text-black">Prestige Evolution</h3>
         </div>
 
-        <div className="relative space-y-20 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-zinc-200 before:to-transparent">
+        <div className="relative space-y-10 md:space-y-20 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-zinc-200 before:to-transparent">
           {loyaltySettings.tierConfig.map((tier, idx) => {
             const isReached = userData.points >= tier.minPoints;
             const isCurrent = currentTier === tier.tier.toLowerCase();
@@ -128,17 +128,17 @@ export default function LoyaltyPage() {
                   {isReached ? <Zap size={14} /> : <div className="w-1.5 h-1.5 rounded-full bg-current" />}
                 </div>
 
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-8 border border-gray-100 bg-white transition-all duration-500 group-hover:bg-[#FAFAFA]">
-                  <div className="flex items-center justify-between mb-4">
-                     <time className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">{tier.minPoints}+ points</time>
+                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 sm:p-6 md:p-8 border border-gray-100 bg-white transition-all duration-500 group-hover:bg-[#FAFAFA]">
+                  <div className="flex items-center justify-between gap-2 mb-3 md:mb-4 flex-wrap">
+                     <time className="text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">{tier.minPoints}+ points</time>
                      {isCurrent && (
-                        <span className="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100">Current Standing</span>
+                        <span className="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100">Current</span>
                      )}
                   </div>
-                  <h4 className="text-xl font-montserrat font-bold text-black uppercase tracking-tight mb-4">{tier.tier}</h4>
-                  <div className="flex flex-wrap gap-2 mt-4">
+                  <h4 className="text-lg md:text-xl font-montserrat font-bold text-black uppercase tracking-tight mb-3 md:mb-4">{tier.tier}</h4>
+                  <div className="flex flex-wrap gap-1.5 md:gap-2">
                     {tier.benefits.map((benefit, bIdx) => (
-                      <span key={bIdx} className="text-[9px] font-bold tracking-widest px-2 py-1 bg-gray-50 text-gray-400 border border-gray-100 italic">{benefit}</span>
+                      <span key={bIdx} className="text-[8px] md:text-[9px] font-bold tracking-widest px-2 py-1 bg-gray-50 text-gray-400 border border-gray-100 italic">{benefit}</span>
                     ))}
                   </div>
                 </div>

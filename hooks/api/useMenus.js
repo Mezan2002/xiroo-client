@@ -19,6 +19,18 @@ export const useMenus = () => {
     });
   };
 
+  const useMenuBySlug = (slug) => {
+    return useQuery({
+      queryKey: ["menu", slug],
+      queryFn: async () => {
+        const response = await axiosInstance.get(`/menus/slug/${slug}`);
+        return response.data;
+      },
+      enabled: !!slug,
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
   const createMenu = useMutation({
     mutationFn: async (payload) => {
       const response = await axiosInstance.post("/menus", payload);
@@ -61,6 +73,7 @@ export const useMenus = () => {
 
   return {
     useAllMenus,
+    useMenuBySlug,
     createMenu,
     updateMenu,
     deleteMenu,
