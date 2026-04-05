@@ -1,8 +1,8 @@
 "use client";
 import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/hooks/api/useAuth";
-import { useUsers } from "@/hooks/api/useUsers";
 import { useInbox } from "@/hooks/api/useInbox";
+import { useUsers } from "@/hooks/api/useUsers";
 import { useToast } from "@/hooks/useToast";
 import {
   ArrowLeft,
@@ -11,10 +11,10 @@ import {
   Flag,
   Loader2,
   Paperclip,
+  RotateCcw,
   Send,
   Shield,
   UserCheck,
-  RotateCcw
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -50,7 +50,7 @@ export default function MessagingTerminal() {
     flagConversation,
     setStatus,
     setPriority,
-    markAsRead
+    markAsRead,
   } = useInbox();
 
   const { data: conversation, isLoading, refetch } = useConversation(id);
@@ -110,14 +110,17 @@ export default function MessagingTerminal() {
   const handleSend = (e) => {
     e?.preventDefault();
     if (!reply.trim()) return;
-    sendMessage.mutate({ content: reply, conversationId: id }, {
-      onSuccess: () => {
-        setReply("");
+    sendMessage.mutate(
+      { content: reply, conversationId: id },
+      {
+        onSuccess: () => {
+          setReply("");
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to transmit message.");
+        },
       },
-      onError: (err) => {
-        toast.error(err.message || "Failed to transmit message.");
-      }
-    });
+    );
   };
 
   if (isLoading) {
@@ -198,14 +201,16 @@ export default function MessagingTerminal() {
                   : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-zinc-200"
               }`}
             >
-                {setStatus.isPending ? (
+              {setStatus.isPending ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : isResolved ? (
                 <RotateCcw size={16} className="md:hidden" />
               ) : (
                 <CheckCircle2 size={16} className="md:hidden" />
               )}
-              <span className="hidden md:inline">{isResolved ? "Reopen Case" : "Resolve Case"}</span>
+              <span className="hidden md:inline">
+                {isResolved ? "Reopen Case" : "Resolve Case"}
+              </span>
             </button>
           </div>
         </header>
@@ -367,20 +372,22 @@ export default function MessagingTerminal() {
       </div>
 
       {/* ══ Sidebar / Drawer Overlay ═══════════════════════════════════════════════════ */}
-       {/* Mobile Backdrop */}
-       {isInfoOpen && (
-         <div 
-           className="lg:hidden fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm transition-all animate-in fade-in duration-300"
-           onClick={() => setIsInfoOpen(false)}
-         />
-       )}
- 
-       <aside className={`
+      {/* Mobile Backdrop */}
+      {isInfoOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm transition-all animate-in fade-in duration-300"
+          onClick={() => setIsInfoOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`
          fixed lg:relative inset-y-0 right-0 w-[300px] sm:w-[320px] bg-white z-[70] lg:z-0
          transform lg:transform-none transition-transform duration-500 ease-in-out border-l border-zinc-100
          flex flex-col overflow-y-auto custom-scrollbar shadow-2xl lg:shadow-none
          ${isInfoOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
-       `}>
+       `}
+      >
         {/* User Card */}
         <div className="p-8 text-center bg-zinc-50/50 border-b border-zinc-100">
           <div className="w-20 h-20 rounded-none bg-white border border-zinc-100 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-zinc-200/50 font-bold text-2xl text-zinc-900 uppercase">
@@ -394,15 +401,28 @@ export default function MessagingTerminal() {
           </p>
           <div className="mt-6 flex flex-col gap-2.5 px-4 w-full">
             <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
-              <span className="uppercase tracking-widest text-[9px]">Joined</span>
-              <span className="text-zinc-900">{customer?.createdAt ? new Date(customer.createdAt).toLocaleDateString([], { month: 'short', year: 'numeric' }) : 'Mar 2024'}</span>
+              <span className="uppercase tracking-widest text-[9px]">
+                Joined
+              </span>
+              <span className="text-zinc-900">
+                {customer?.createdAt
+                  ? new Date(customer.createdAt).toLocaleDateString([], {
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "Mar 2024"}
+              </span>
             </div>
             <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
-              <span className="uppercase tracking-widest text-[9px]">Total Orders</span>
+              <span className="uppercase tracking-widest text-[9px]">
+                Total Orders
+              </span>
               <span className="text-zinc-900 font-bold">12</span>
             </div>
-             <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
-              <span className="uppercase tracking-widest text-[9px]">Account</span>
+            <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
+              <span className="uppercase tracking-widest text-[9px]">
+                Account
+              </span>
               <span className="text-emerald-600 font-bold">Verified</span>
             </div>
           </div>
@@ -490,7 +510,10 @@ export default function MessagingTerminal() {
                       <button
                         key={admin._id}
                         onClick={() => {
-                          assignConversation.mutate({ id, assignedTo: admin._id });
+                          assignConversation.mutate({
+                            id,
+                            assignedTo: admin._id,
+                          });
                           setShowAssignMenu(false);
                         }}
                         className="w-full text-left px-5 py-2.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50 transition-colors flex items-center gap-3"
@@ -533,19 +556,40 @@ export default function MessagingTerminal() {
             </p>
             <div className="space-y-3">
               <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
-                <span className="uppercase tracking-widest text-[9px]">Status</span>
-                <span className={`flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] ${isResolved ? "text-emerald-600" : "text-amber-600"}`}>
-                  <span className={`w-1.5 h-1.5 rounded-none ${isResolved ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
+                <span className="uppercase tracking-widest text-[9px]">
+                  Status
+                </span>
+                <span
+                  className={`flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] ${isResolved ? "text-emerald-600" : "text-amber-600"}`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-none ${isResolved ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`}
+                  />
                   {isResolved ? "Resolved" : "Open"}
                 </span>
               </div>
               <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
-                <span className="uppercase tracking-widest text-[9px]">Created</span>
-                <span className="text-zinc-900">{conversation?.createdAt ? new Date(conversation.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
+                <span className="uppercase tracking-widest text-[9px]">
+                  Created
+                </span>
+                <span className="text-zinc-900">
+                  {conversation?.createdAt
+                    ? new Date(conversation.createdAt).toLocaleDateString([], {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "N/A"}
+                </span>
               </div>
               <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 py-1.5 border-b border-zinc-50">
-                <span className="uppercase tracking-widest text-[9px]">Channel</span>
-                <span className="text-zinc-900 font-bold uppercase tracking-tighter text-[10px]">Direct Support</span>
+                <span className="uppercase tracking-widest text-[9px]">
+                  Channel
+                </span>
+                <span className="text-zinc-900 font-bold uppercase tracking-tighter text-[10px]">
+                  Direct Support
+                </span>
               </div>
             </div>
           </div>
