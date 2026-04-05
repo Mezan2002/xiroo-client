@@ -229,23 +229,22 @@ export default function MessagingTerminal() {
           {conversation?.messages?.map((msg, idx) => {
             const isAdminMsg = msg.senderRole === "admin";
             const isMe =
-              isAdminMsg &&
               String(msg.sender?._id || msg.sender) ===
-                String(currentUser?._id);
+              String(currentUser?._id);
 
             return (
               <div
                 key={msg._id || idx}
-                className={`flex ${isAdminMsg ? "justify-end" : "justify-start"} animate-in fade-in duration-500 px-2 sm:px-0`}
+                className={`flex ${isMe ? "justify-end" : "justify-start"} animate-in fade-in duration-500 px-2 sm:px-0`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isAdminMsg ? "items-end" : "items-start"} gap-1.5`}
+                  className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isMe ? "items-end" : "items-start"} gap-1.5`}
                 >
                   <div
                     className={`px-5 py-3.5 rounded-none text-[14px] leading-relaxed tracking-tight ${
-                      isAdminMsg
+                      isMe
                         ? "bg-zinc-900 text-white rounded-none shadow-lg shadow-zinc-200"
-                        : "bg-zinc-200 text-zinc-800 border border-zinc-100/50 rounded-none"
+                        : "bg-zinc-100 text-zinc-800 border border-zinc-200/50 rounded-none"
                     }`}
                   >
                     {msg.content && (
