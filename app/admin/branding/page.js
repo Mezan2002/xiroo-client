@@ -39,7 +39,7 @@ export default function AdminBranding() {
   };
 
   return (
-    <div className="space-y-12 pb-24 animate-in fade-in duration-700">
+    <div className="space-y-8 md:space-y-12 pb-24 animate-in fade-in duration-700">
       <ModuleHeader 
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
@@ -54,11 +54,11 @@ export default function AdminBranding() {
         }}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
         {/* Left Column: Core Identity */}
-        <div className="lg:col-span-7 space-y-16">
+        <div className="lg:col-span-7 space-y-10 md:space-y-16">
           {/* Basic Information */}
-          <div className="space-y-10">
+          <div className="space-y-8 md:space-y-10">
             <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
               <Type size={16} className="text-zinc-300" />
               <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
@@ -74,7 +74,7 @@ export default function AdminBranding() {
                   name="name"
                   value={branding.name}
                   onChange={handleChange}
-                  className="w-full h-14 px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[13px] font-bold uppercase tracking-widest"
+                  className="w-full h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[12px] md:text-[13px] font-bold uppercase tracking-widest"
                 />
               </div>
               <div className="space-y-3">
@@ -84,7 +84,7 @@ export default function AdminBranding() {
                   name="slogan"
                   value={branding.slogan}
                   onChange={handleChange}
-                  className="w-full h-14 px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[13px] font-medium text-zinc-500"
+                  className="w-full h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[12px] md:text-[13px] font-medium text-zinc-500"
                 />
               </div>
             </div>
@@ -109,9 +109,9 @@ export default function AdminBranding() {
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Merchant Symbol (Favicon)</label>
-                <div className="aspect-square bg-[#FDFDFB] border border-gray-100 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black transition-all group max-w-[140px]">
+                <div className="aspect-square bg-[#FDFDFB] border border-gray-100 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black transition-all group max-w-[120px] md:max-w-[140px] mx-auto sm:mx-0">
                   <div className="w-8 h-8 bg-black text-white flex items-center justify-center font-bold text-sm">X</div>
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-300 group-hover:text-black text-center">Update Symbol</span>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-300 group-hover:text-black text-center px-1">Update Symbol</span>
                 </div>
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function AdminBranding() {
 
         {/* Right Column: Theme Engine */}
         <div className="lg:col-span-5">
-          <div className="bg-[#FDFDFB] border border-gray-100 p-10 space-y-12 h-fit sticky top-6">
+          <div className="bg-[#FDFDFB] border border-gray-100 p-6 md:p-10 space-y-8 md:space-y-12 h-fit lg:sticky lg:top-6">
             <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
               <Box size={16} className="text-zinc-400" />
               <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
@@ -131,7 +131,7 @@ export default function AdminBranding() {
             <div className="space-y-10">
               <div className="space-y-4">
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Signature Color</label>
-                <div className="flex items-center gap-4 h-14 px-6 bg-white border border-gray-100">
+                <div className="flex items-center gap-4 h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100">
                   <input 
                     type="color" 
                     name="primaryColor"
@@ -165,7 +165,7 @@ export default function AdminBranding() {
               </div>
 
               {/* High-Fidelity Preview */}
-              <div className="p-8 bg-white border border-gray-100 space-y-8 mt-12 overflow-hidden">
+              <div className="p-6 md:p-8 bg-white border border-gray-100 space-y-6 md:space-y-8 mt-8 md:mt-12 overflow-hidden">
                 <label className="text-[9px] font-bold text-zinc-300 uppercase tracking-[0.3em] block mb-4 italic underline decoration-gray-100 underline-offset-8">Live Style Verification</label>
                 
                 <div className="space-y-6">
@@ -193,7 +193,7 @@ export default function AdminBranding() {
                         borderRadius: `${branding.borderRadius}px`,
                         fontFamily: branding.fontFamily
                       }}
-                      className="w-full h-14 text-white text-[10px] font-bold tracking-[0.25em] uppercase shadow-lg shadow-black/5 active:scale-[0.98] transition-all"
+                      className="w-full h-12 md:h-14 text-white text-[9px] md:text-[10px] font-bold tracking-[0.25em] uppercase shadow-lg shadow-black/5 active:scale-[0.98] transition-all"
                     >
                       Purchase Item
                     </button>
@@ -202,7 +202,7 @@ export default function AdminBranding() {
                         borderRadius: `${branding.borderRadius}px`,
                         fontFamily: branding.fontFamily
                       }}
-                      className="w-full h-14 border border-zinc-200 text-black text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-zinc-50 transition-all"
+                      className="w-full h-12 md:h-14 border border-zinc-200 text-black text-[9px] md:text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-zinc-50 transition-all"
                     >
                       Add to Registry
                     </button>

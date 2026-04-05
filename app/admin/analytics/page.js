@@ -19,7 +19,7 @@ const STATS = [
 
 export default function AdminAnalytics() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-10 md:space-y-12 pb-24 animate-in fade-in duration-700">
       <ModuleHeader 
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
@@ -30,9 +30,9 @@ export default function AdminAnalytics() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {STATS.map((stat) => (
-          <div key={stat.label} className="bg-white border border-gray-100 p-8 space-y-4 hover:border-black transition-colors group">
+          <div key={stat.label} className="bg-white border border-gray-100 p-6 md:p-8 space-y-4 hover:border-black transition-colors group">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition-all">
                 <stat.icon size={20} strokeWidth={1.5} />
@@ -57,7 +57,7 @@ export default function AdminAnalytics() {
       </div>
 
       {/* Placeholder Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
         <div className="space-y-6">
           <h3 className="text-[12px] font-bold uppercase tracking-widest border-b border-gray-100 pb-4">
             Sales Over Time

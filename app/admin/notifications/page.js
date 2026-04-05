@@ -57,8 +57,8 @@ export default function AdminNotifications() {
         icon={Bell}
       />
 
-      <div className="space-y-6 px-1">
-        <div className="flex items-center justify-between border-b border-[#EDECE9] pb-4">
+      <div className="space-y-6 md:space-y-8 px-0 md:px-1">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#EDECE9] pb-4 gap-4 px-4 md:px-0">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
             {["All", "Orders", "Messages", "System", "Security"].map((f) => (
               <button
@@ -102,16 +102,16 @@ export default function AdminNotifications() {
                 <div
                   key={notif._id}
                   onClick={() => !notif.isRead && markAsRead(notif._id)}
-                  className={`flex items-start gap-6 p-6 transition-all group relative cursor-pointer ${
+                  className={`flex items-start gap-4 md:gap-6 p-4 md:p-6 transition-all group relative cursor-pointer ${
                     !notif.isRead
                       ? "bg-white"
                       : "bg-[#FBFBFA] hover:bg-white"
                   }`}
                 >
-                  <div className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-none shadow-lg transition-transform group-hover:scale-105 ${
+                  <div className={`shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-none shadow-lg transition-transform group-hover:scale-105 ${
                     !notif.isRead ? "bg-black text-white" : "bg-[#EDECE9] text-[#37352F40]"
                   }`}>
-                    <Icon size={18} strokeWidth={1.5} />
+                    <Icon className="w-4 h-4 md:w-[18px] md:h-[18px]" strokeWidth={1.5} />
                   </div>
 
                   <div className="flex-1 min-w-0 pt-1">

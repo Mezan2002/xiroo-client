@@ -206,8 +206,8 @@ export default function OrderDetailsPage() {
         title={`#${order.orderId}`}
         icon={ShoppingBag}
         actions={
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 pr-4 border-r border-zinc-100">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+            <div className="flex items-center gap-2 sm:pr-4 sm:border-r border-zinc-100">
               <Badge
                 variant={
                   order.status === "cancelled"
@@ -216,20 +216,21 @@ export default function OrderDetailsPage() {
                       ? "success"
                       : "info"
                 }
+                className="w-full sm:w-auto text-center"
               >
                 ORDER: {order.status}
               </Badge>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-full sm:w-40">
               <div className="flex items-center gap-2">
                 {isUpdatingStatus && (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2 text-zinc-400" />
+                  <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />
                 )}
                 <Select
                   options={statusOptions}
                   value={order.status}
                   onChange={handleStatusChange}
-                  className="w-40 h-10! text-[12px]! font-bold! rounded-none!"
+                  className="w-full h-10 text-[12px] font-bold rounded-none"
                   disabled={
                     isUpdatingStatus ||
                     ["delivered", "cancelled", "failed"].includes(order.status)
@@ -241,8 +242,8 @@ export default function OrderDetailsPage() {
         }
       />
 
-      <div className="grid grid-cols-12 gap-10">
-        <div className="col-span-12 lg:col-span-8 space-y-10">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10">
+        <div className="md:col-span-12 lg:col-span-8 space-y-8 md:space-y-10">
           <Card
             title="Items Registry"
             action={
@@ -255,16 +256,16 @@ export default function OrderDetailsPage() {
               <table className="w-full text-left">
                 <thead className="bg-zinc-50 border-b border-zinc-100">
                   <tr>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                    <th className="px-4 md:px-6 py-4 text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-widest whitespace-nowrap">
                       Product Description
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-center">
+                    <th className="px-4 md:px-6 py-4 text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-center whitespace-nowrap">
                       Qty
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">
+                    <th className="px-4 md:px-6 py-4 text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right whitespace-nowrap">
                       Unit Price
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">
+                    <th className="px-4 md:px-6 py-4 text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right whitespace-nowrap">
                       Subtotal
                     </th>
                   </tr>
@@ -290,11 +291,11 @@ export default function OrderDetailsPage() {
                               <ShoppingBag size={20} strokeWidth={1} />
                             )}
                           </div>
-                          <div className="flex flex-col gap-1.5">
-                            <span className="text-[14px] font-bold text-zinc-900 tracking-tight leading-tight line-clamp-1">
+                          <div className="flex flex-col gap-1 min-w-[120px]">
+                            <span className="text-[13px] md:text-[14px] font-bold text-zinc-900 tracking-tight leading-tight line-clamp-2">
                               {item.product?.title || "Unknown Product"}
                             </span>
-                            <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
+                            <span className="text-[9px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
                               ID:{" "}
                               {item.product?.sku ||
                                 item.product?._id?.slice(-8) ||
@@ -303,13 +304,13 @@ export default function OrderDetailsPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-6 text-center text-[13px] font-bold text-zinc-500 tracking-tight">
+                      <td className="px-4 md:px-6 py-4 md:py-6 text-center text-[12px] md:text-[13px] font-bold text-zinc-500 tracking-tight">
                         x{item.quantity}
                       </td>
-                      <td className="px-6 py-6 text-right text-[13px] font-bold text-zinc-500 tracking-tight">
+                      <td className="px-4 md:px-6 py-4 md:py-6 text-right text-[12px] md:text-[13px] font-bold text-zinc-500 tracking-tight whitespace-nowrap">
                         ৳{item.price.toLocaleString()}
                       </td>
-                      <td className="px-6 py-6 text-right text-[15px] font-black text-zinc-900 tracking-tight">
+                      <td className="px-4 md:px-6 py-4 md:py-6 text-right text-[14px] md:text-[15px] font-black text-zinc-900 tracking-tight whitespace-nowrap">
                         ৳{(item.price * item.quantity).toLocaleString()}
                       </td>
                     </tr>
@@ -340,7 +341,7 @@ export default function OrderDetailsPage() {
                   <span className="text-[14px] font-black text-zinc-900 uppercase tracking-widest">
                     Total Valuation
                   </span>
-                  <span className="text-3xl font-black text-black tracking-tighter">
+                  <span className="text-2xl md:text-3xl font-black text-black tracking-tighter">
                     ৳{order.totalPrice.toLocaleString()}
                   </span>
                 </div>
@@ -372,7 +373,7 @@ export default function OrderDetailsPage() {
           </Card>
         </div>
 
-        <div className="col-span-12 lg:col-span-4 space-y-10">
+        <div className="col-span-1 md:col-span-12 lg:col-span-4 space-y-8 md:space-y-10">
           <Card title="Customer Identity">
             <div className="space-y-8">
               <div className="flex items-center gap-5">

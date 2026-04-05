@@ -61,7 +61,7 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
         );
       case 'actions':
         return (
-          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             {onView && (
               <button 
                 onClick={() => onView(row)}
@@ -98,14 +98,15 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full -mx-4 sm:mx-0 overflow-x-auto">
+      <div className="min-w-[600px] sm:min-w-0">
       <table className="w-full text-left border-collapse border-t border-[#EDECE9]">
         <thead>
           <tr className="border-b border-[#EDECE9]">
             {columns.map((col) => (
               <th 
                 key={col.key} 
-                className={`px-3 py-3 text-[12px] font-medium text-[#37352F80] ${col.align === 'right' ? 'text-right' : ''}`}
+                className={`px-3 py-3 text-[12px] font-medium text-[#37352F80] whitespace-nowrap ${col.align === 'right' ? 'text-right' : ''}`}
               >
                 {col.label}
               </th>
@@ -142,6 +143,7 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -52,12 +52,12 @@ export default function AdminSettings() {
       />
 
       {/* Internal Navigation Tabs */}
-      <div className="flex items-center gap-8 border-b border-[#EDECE9]">
+      <div className="flex items-center gap-6 md:gap-8 border-b border-[#EDECE9] overflow-x-auto no-scrollbar scrollbar-hide">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-4 text-[11px] font-bold uppercase tracking-[0.3em] transition-all relative ${
+            className={`pb-4 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] md:tracking-[0.3em] transition-all relative whitespace-nowrap shrink-0 ${
               activeTab === tab ? "text-black" : "text-[#37352F40] hover:text-[#37352F80]"
             }`}
           >
@@ -70,13 +70,13 @@ export default function AdminSettings() {
       </div>
 
       {activeTab === "Operational" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Shipping Configurations */}
           <div className="lg:col-span-7 space-y-12">
             <div className="space-y-10">
               <div className="flex items-center gap-3 pb-4 border-b border-zinc-100">
                 <Truck size={16} className="text-zinc-300" />
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
+                <h3 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-black">
                   Logistics & Delivery
                 </h3>
               </div>
@@ -130,9 +130,9 @@ export default function AdminSettings() {
                       type="number" 
                       value={shipping.outsideCity}
                       onChange={(e) => setShipping({ ...shipping, outsideCity: e.target.value })}
-                      className="w-full h-14 px-6 bg-[#FDFDFB] border border-gray-100 focus:border-black outline-none transition-all text-[13px] font-bold tracking-widest pl-12 rounded-none"
+                      className="w-full h-12 md:h-14 px-4 md:px-6 bg-[#FDFDFB] border border-gray-100 focus:border-black outline-none transition-all text-[12px] md:text-[13px] font-bold tracking-widest pl-10 md:pl-12 rounded-none"
                     />
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-300 group-focus-within:text-black">৳</span>
+                    <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-300 group-focus-within:text-black">৳</span>
                   </div>
                 </div>
               </div>
@@ -162,22 +162,22 @@ export default function AdminSettings() {
           <div className="lg:col-span-5 space-y-10">
             <div className="flex items-center gap-3 pb-4 border-b border-zinc-100">
               <CreditCard size={16} className="text-zinc-300" />
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
+              <h3 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-black">
                 Transaction Terminals
               </h3>
             </div>
 
             <div className="space-y-4">
               <div className="p-8 bg-[#FDFDFB] border border-gray-100 space-y-8 group transition-all hover:border-black rounded-none">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-black flex items-center justify-center font-bold text-[11px] text-white tracking-widest">COD</div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 md:gap-5">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-black flex items-center justify-center font-bold text-[10px] md:text-[11px] text-white tracking-widest">COD</div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-[12px] font-bold uppercase tracking-widest text-black">Cash Registry</span>
-                      <span className="text-[9px] font-bold text-green-500 uppercase tracking-[0.2em]">Merchant Verified</span>
+                      <span className="text-[11px] md:text-[12px] font-bold uppercase tracking-widest text-black">Cash Registry</span>
+                      <span className="text-[8px] md:text-[9px] font-bold text-green-500 uppercase tracking-[0.2em]">Merchant Verified</span>
                     </div>
                   </div>
-                  <button className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-300 hover:text-red-500 transition-colors">Deactivate</button>
+                  <button className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-300 hover:text-red-500 transition-colors">Deactivate</button>
                 </div>
               </div>
 
@@ -210,23 +210,23 @@ export default function AdminSettings() {
                 <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">API Intelligence Registry</h3>
               </div>
               
-              <div className="space-y-8 bg-white border border-[#EDECE9] p-10 shadow-sm shadow-black/5">
+              <div className="space-y-6 md:space-y-8 bg-white border border-[#EDECE9] p-6 md:p-10 shadow-sm shadow-black/5">
                 {[
                   { label: "SaaS Access Token", value: "sk_xiroo_production_982347dkf9823h89d" },
                   { label: "Webhook Signing Secret", value: "whsec_8923h89dh89d8923d8923" }
                 ].map((key, idx) => (
                   <div key={idx} className="space-y-3">
                     <label className="text-[10px] font-bold text-[#37352F40] uppercase tracking-[0.3em]">{key.label}</label>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <input
                         type="password"
                         readOnly
                         value={key.value}
-                        className="flex-1 h-12 px-5 bg-[#F7F7F5] border border-[#EDECE9] font-mono text-[11px] text-[#37352F] outline-none rounded-none"
+                        className="flex-1 h-12 px-4 md:px-5 bg-[#F7F7F5] border border-[#EDECE9] font-mono text-[10px] md:text-[11px] text-[#37352F] outline-none rounded-none overflow-hidden text-ellipsis"
                       />
                       <Button
                         variant="outline"
-                        className="h-12 border-[#EDECE9] gap-2 px-6 text-[10px] font-bold tracking-widest uppercase rounded-none hover:border-black transition-all"
+                        className="h-12 border-[#EDECE9] gap-2 px-6 text-[10px] font-bold tracking-widest uppercase rounded-none hover:border-black transition-all w-full sm:w-auto"
                       >
                         <Copy size={14} /> Copy
                       </Button>
@@ -244,17 +244,17 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-4">
-                <div className="p-8 bg-white border border-[#EDECE9] flex items-center justify-between group shadow-sm shadow-black/5">
-                   <div className="space-y-1">
-                      <div className="text-[12px] font-bold uppercase tracking-widest text-[#37352F]">Production Order Event</div>
-                      <div className="text-[10px] text-[#37352F40] font-mono">https://api.xiroo.com/webhooks/orders</div>
+                <div className="p-6 md:p-8 bg-white border border-[#EDECE9] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group shadow-sm shadow-black/5">
+                   <div className="space-y-1 w-full overflow-hidden">
+                      <div className="text-[11px] md:text-[12px] font-bold uppercase tracking-widest text-[#37352F]">Production Order Event</div>
+                      <div className="text-[9px] md:text-[10px] text-[#37352F40] font-mono truncate">https://api.xiroo.com/webhooks/orders</div>
                    </div>
-                   <div className="flex items-center gap-6">
+                   <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                         <span className="text-[10px] font-bold uppercase tracking-widest text-green-600">Active</span>
                       </div>
-                      <Button variant="ghost" className="text-[10px] font-bold uppercase tracking-widest text-[#37352F40] hover:text-black">Configure</Button>
+                      <Button variant="ghost" className="text-[10px] font-bold uppercase tracking-widest text-[#37352F40] hover:text-black p-0 h-auto">Configure</Button>
                    </div>
                 </div>
 

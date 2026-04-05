@@ -23,7 +23,7 @@ const Label = ({ children }) => (
 );
 
 const SectionHeader = ({ label, title, action }) => (
-  <div className="flex items-center justify-between border-b border-zinc-200 pb-8 mb-12 font-montserrat">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-200 pb-6 md:pb-8 mb-8 md:mb-12 font-montserrat gap-4">
     <div className="space-y-2">
       <h2 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.3em]">
         {label}
@@ -311,25 +311,25 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
     }));
 
   return (
-    <div className="space-y-32">
+    <div className="space-y-16 md:space-y-32 pb-24">
       {/* Identity Section */}
       <section>
-        <div className="flex items-center justify-between border-b border-zinc-200 pb-8 mb-12 font-montserrat">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between border-b border-zinc-200 pb-6 md:pb-8 mb-8 md:mb-12 font-montserrat gap-6">
           <div className="space-y-2">
             <h2 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.3em]">
               Block 01
             </h2>
-            <p className="text-2xl font-light text-black tracking-tight">
+            <p className="text-xl md:text-2xl font-light text-black tracking-tight">
               Product Narrative
             </p>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-8 px-8 py-2 bg-zinc-50 border border-zinc-100">
-              <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Inventory Registry</span>
-                <span className="text-[11px] font-black uppercase tracking-tighter text-black">Target Stage</span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
+            <div className="flex items-center gap-4 md:gap-8 px-4 md:px-8 py-2 bg-zinc-50 border border-zinc-100 flex-1 sm:flex-none">
+              <div className="flex flex-col gap-1 min-w-fit">
+                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Inventory Registry</span>
+                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tighter text-black">Target Stage</span>
               </div>
-              <div className="w-48">
+              <div className="w-full sm:w-40 md:w-48">
                 <Select
                   options={[
                     { value: "in-stock", label: "In Stock" },
@@ -343,7 +343,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                 />
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-zinc-50 px-6 py-3 border border-zinc-100">
+            <div className="flex items-center justify-between sm:justify-start gap-3 bg-zinc-50 px-6 py-3 border border-zinc-100 flex-1 sm:flex-none">
               <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                 Featured Product
               </span>
@@ -351,7 +351,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                 onClick={() =>
                   setProduct((p) => ({ ...p, isFeatured: !p.isFeatured }))
                 }
-                className={`w-10 h-5 rounded-full transition-all duration-500 relative ${product.isFeatured ? "bg-black" : "bg-zinc-200"}`}
+                className={`w-10 h-5 rounded-full transition-all duration-500 relative shrink-0 ${product.isFeatured ? "bg-black" : "bg-zinc-200"}`}
               >
                 <div
                   className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all duration-500 ${product.isFeatured ? "left-6" : "left-1"}`}
@@ -370,7 +370,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
               onChange={(e) =>
                 setProduct({ ...product, title: e.target.value })
               }
-              className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-3xl font-light placeholder:text-zinc-200 text-black py-4"
+              className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-xl md:text-3xl font-light placeholder:text-zinc-200 text-black py-4"
               placeholder="Name of Product"
             />
           </div>
@@ -391,7 +391,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
       {/* Classification Section */}
       <section>
         <SectionHeader label="Block 02" title="Registry Classification" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20">
           <div className="space-y-6">
             <Label>Main Category Registry</Label>
             <Select
@@ -445,14 +445,14 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
 
         {/* Suggested Attributes */}
         {suggestedAttributes.length > 0 && (
-          <div className="mb-12 space-y-4">
+          <div className="mb-12 space-y-4 overflow-hidden">
             <Label>Suggested Registry Attributes (Based on Category)</Label>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 md:gap-3">
               {suggestedAttributes.map((attr) => (
                 <button
                   key={attr._id}
                   onClick={() => addVariant(attr.name, attr.values)}
-                  className="px-6 py-3 bg-white border border-[#EDECE9] text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:border-black hover:text-black transition-all flex items-center gap-3 group"
+                  className="px-4 md:px-6 py-2 md:py-3 bg-white border border-[#EDECE9] text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:border-black hover:text-black transition-all flex items-center gap-2 md:gap-3 group"
                 >
                   <Plus
                     size={12}
@@ -465,8 +465,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
           </div>
         )}
         {product.variants.length === 0 ? (
-          <div className="bg-zinc-50 border border-zinc-200 p-20 text-center">
-            <p className="text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
+          <div className="bg-zinc-50 border border-zinc-200 p-10 md:p-20 text-center">
+            <p className="text-[11px] md:text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
               No configuration variants active.
             </p>
           </div>
@@ -475,7 +475,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
             {product.variants.map((v) => (
               <div
                 key={v.id}
-                className="p-12 bg-white border border-zinc-200 space-y-8 group transition-all hover:bg-zinc-50/50"
+                className="p-6 md:p-12 bg-white border border-zinc-200 space-y-6 md:space-y-8 group transition-all hover:bg-zinc-50/50"
               >
                 <div className="flex items-center justify-between">
                   <input
@@ -494,7 +494,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                   {v.values.map((val, idx) => (
                     <span
                       key={idx}
-                      className="px-6 py-3 bg-white border-2 border-zinc-900 text-[11px] font-bold tracking-widest uppercase flex items-center gap-4 text-black shadow-lg shadow-black/5"
+                      className="px-4 md:px-6 py-2 md:py-3 bg-white border border-zinc-900 text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-3 md:gap-4 text-black shadow-lg shadow-black/5"
                     >
                       {val}
                       <button onClick={() => removeVariantValue(v.id, idx)}>
@@ -536,7 +536,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
             </button>
           }
         />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           <ImageUploader
             multiple={true}
             onUploadSuccess={(url) =>
@@ -622,8 +622,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
           }
         />
         {product.specifications.length === 0 ? (
-          <div className="bg-zinc-50 border border-zinc-200 p-20 text-center">
-            <p className="text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
+          <div className="bg-zinc-50 border border-zinc-200 p-10 md:p-20 text-center">
+            <p className="text-[11px] md:text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
               Define metric constants for engineering verification.
             </p>
           </div>
@@ -632,7 +632,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
             {product.specifications.map((group) => (
               <div
                 key={group.id}
-                className="space-y-12 border-l-4 border-zinc-900 pl-12 pt-2"
+                className="space-y-8 md:space-y-12 border-l-2 md:border-l-4 border-zinc-900 pl-6 md:pl-12 pt-2"
               >
                 <div className="flex items-center justify-between">
                   <input
@@ -657,7 +657,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-20 gap-y-6 md:gap-y-10">
                   {group.items.map((item) => (
                     <div
                       key={item.id}
@@ -719,11 +719,11 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
           }
         />
         {product.bundles.length === 0 ? (
-          <div className="bg-black text-white p-20 text-center space-y-6">
-            <p className="text-[12px] font-bold uppercase tracking-[0.4em] opacity-40">
+          <div className="bg-black text-white p-10 md:p-20 text-center space-y-6">
+            <p className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.4em] opacity-40">
               Tiered Strategy Inactive
             </p>
-            <p className="text-[13px] font-light italic opacity-70 max-w-sm mx-auto tracking-wide leading-relaxed">
+            <p className="text-[12px] md:text-[13px] font-light italic opacity-70 max-w-sm mx-auto tracking-wide leading-relaxed">
               Configure bulk acquisition incentives (e.g. Duo-Pack, Family-Pack)
               to optimize conversion.
             </p>
@@ -733,12 +733,12 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
             {product.bundles.map((b) => (
               <div
                 key={b.id}
-                className="p-12 border-2 border-zinc-200 bg-white space-y-12 group hover:border-black transition-all"
+                className="p-6 md:p-12 border-2 border-zinc-200 bg-white space-y-8 md:space-y-12 group hover:border-black transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex gap-8 items-center">
                     <input
-                      className="text-[16px] font-bold uppercase tracking-widest outline-none bg-transparent text-black"
+                      className="text-[14px] md:text-[16px] font-bold uppercase tracking-widest outline-none bg-transparent text-black w-full"
                       value={b.title}
                       onChange={(e) =>
                         updateBundle(b.id, "title", e.target.value)
@@ -759,7 +759,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                     <Trash2 size={20} />
                   </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-12">
                   <div className="space-y-4">
                     <Label>Offer Status Badge</Label>
                     <input

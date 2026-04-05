@@ -65,7 +65,7 @@ export default function AdminLoyalty() {
   if (!settings) return null;
 
   return (
-    <div className="space-y-16 pb-24 animate-in fade-in duration-700">
+    <div className="space-y-10 md:space-y-16 pb-24 animate-in fade-in duration-700">
       <ModuleHeader
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
@@ -76,19 +76,19 @@ export default function AdminLoyalty() {
         icon={ShieldCheck}
       />
 
-      <div className="max-w-7xl space-y-16">
+      <div className="max-w-7xl space-y-12 md:space-y-16">
         {/* Point Accrual Strategy */}
         <section className="space-y-10">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <div className="w-1.5 h-1.5 bg-black" />
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
+              <h3 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-black">
                 Point Accrual Strategy
               </h3>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
             <div className="space-y-4">
               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
                 Points Per 100 BDT Spent
@@ -103,9 +103,9 @@ export default function AdminLoyalty() {
                       pointsPerHundred: Number(e.target.value),
                     })
                   }
-                  className="w-full h-14 px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[14px] font-bold tracking-tight"
+                  className="w-full h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[13px] md:text-[14px] font-bold tracking-tight"
                 />
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
+                <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-[9px] md:text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
                   PTS / 100 ৳
                 </div>
               </div>
@@ -125,9 +125,9 @@ export default function AdminLoyalty() {
                       pointsPerOrder: Number(e.target.value),
                     })
                   }
-                  className="w-full h-14 px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[14px] font-bold tracking-tight"
+                  className="w-full h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[13px] md:text-[14px] font-bold tracking-tight"
                 />
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
+                <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-[9px] md:text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
                   PTS / Order
                 </div>
               </div>
@@ -138,9 +138,9 @@ export default function AdminLoyalty() {
         {/* Prestige Hierarchy */}
         <section className="space-y-10">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <div className="w-1.5 h-1.5 bg-black" />
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">
+              <h3 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-black">
                 Prestige Hierarchy
               </h3>
             </div>
@@ -156,7 +156,7 @@ export default function AdminLoyalty() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
                   {/* Shared Label Baseline */}
                   <div className="lg:col-span-3 space-y-4">
                     <label className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest block h-4">
@@ -173,7 +173,7 @@ export default function AdminLoyalty() {
                             Number(e.target.value),
                           )
                         }
-                        className="w-full h-14 px-6 bg-[#F9F9F9] border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-[14px] font-bold"
+                        className="w-full h-12 md:h-14 px-4 md:px-6 bg-[#F9F9F9] border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-[13px] md:text-[14px] font-bold"
                       />
                     </div>
                   </div>
@@ -204,11 +204,11 @@ export default function AdminLoyalty() {
                             onChange={(e) =>
                               updateBenefit(idx, bIdx, e.target.value)
                             }
-                            className="flex-1 h-14 px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[12px] font-medium"
+                            className="flex-1 h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[11px] md:text-[12px] font-medium"
                           />
                           <button
                             onClick={() => removeBenefit(idx, bIdx)}
-                            className="p-2 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition-all"
+                            className="p-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 text-red-300 hover:text-red-500 transition-all"
                           >
                             <Trash2 size={12} />
                           </button>
@@ -230,10 +230,10 @@ export default function AdminLoyalty() {
         </section>
 
         {/* Global Controls */}
-        <div className="pt-16 border-t border-gray-100 flex items-center justify-between">
+        <div className="pt-10 md:pt-16 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-4 text-zinc-400 max-w-md">
-            <Info size={14} />
-            <p className="text-[10px] font-medium uppercase tracking-widest italic">
+            <Info size={14} className="shrink-0" />
+            <p className="text-[9px] md:text-[10px] font-medium uppercase tracking-widest italic">
               Registry changes take effect immediately across all synchronized
               identity records.
             </p>
@@ -241,7 +241,7 @@ export default function AdminLoyalty() {
           <button
             onClick={handleUpdate}
             disabled={updateLoyaltySettings.isPending}
-            className="h-14 px-12 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-800 transition-all disabled:opacity-50 active:scale-[0.98] flex items-center gap-3"
+            className="w-full md:w-auto h-12 md:h-14 px-8 md:px-12 bg-black text-white text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-800 transition-all disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-3"
           >
             {updateLoyaltySettings.isPending ? (
               "Calibrating..."
@@ -252,7 +252,6 @@ export default function AdminLoyalty() {
               </>
             )}
           </button>
-
         </div>
       </div>
     </div>

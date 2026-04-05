@@ -63,6 +63,7 @@ export default function MessagingTerminal() {
   const [reply, setReply] = useState("");
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const [showAssignMenu, setShowAssignMenu] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   const scrollRef = useRef(null);
   const textareaRef = useRef(null);
@@ -141,11 +142,11 @@ export default function MessagingTerminal() {
   const ps = PRIORITY_STYLES[priority] || PRIORITY_STYLES.medium;
 
   return (
-    <div className="fixed inset-0 top-0 left-64 flex overflow-hidden bg-white font-montserrat antialiased z-50">
+    <div className="fixed inset-0 top-0 left-0 lg:left-64 flex overflow-hidden bg-white font-montserrat antialiased z-50">
       {/* ══ Main Column ═══════════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-zinc-100">
+      <div className="flex-1 flex flex-col min-w-0 border-r border-zinc-100 h-full">
         {/* Header */}
-        <header className="h-[72px] shrink-0 px-8 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-zinc-100">
+        <header className="h-[64px] md:h-[72px] shrink-0 px-4 md:px-8 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-zinc-100">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
@@ -153,12 +154,12 @@ export default function MessagingTerminal() {
             >
               <ArrowLeft size={20} />
             </button>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-none bg-zinc-900 text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-none bg-zinc-900 text-white flex items-center justify-center font-bold text-xs md:text-sm shadow-sm uppercase shrink-0">
                 {customer.firstName?.[0] || "?"}
               </div>
               <div>
-                <h1 className="text-[15px] font-semibold text-zinc-900 leading-tight">
+                <h1 className="text-[13px] md:text-[15px] font-semibold text-zinc-900 leading-tight truncate max-w-[120px] sm:max-w-none">
                   {customer.firstName} {customer.lastName}
                 </h1>
                 <div className="flex items-center gap-1.5 mt-0.5">
@@ -171,11 +172,18 @@ export default function MessagingTerminal() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-widest px-3 py-1 border border-zinc-200 rounded-none">
+          <div className="flex items-center gap-2 md:gap-4">
+            <span className="hidden sm:inline-block text-[11px] font-medium text-zinc-500 uppercase tracking-widest px-3 py-1 border border-zinc-200 rounded-none">
               Case #{conversation?._id?.slice(-6).toUpperCase()}
             </span>
-            <div className="w-px h-6 bg-zinc-200 mx-2" />
+            <div className="hidden sm:block w-px h-6 bg-zinc-200 mx-2" />
+            <button
+              onClick={() => setIsInfoOpen(!isInfoOpen)}
+              className="lg:hidden p-2 text-zinc-400 hover:bg-zinc-50 transition-colors"
+              title="Toggle Info"
+            >
+              <Shield size={20} />
+            </button>
             <button
               onClick={() =>
                 setStatus.mutate({
@@ -190,13 +198,14 @@ export default function MessagingTerminal() {
                   : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-zinc-200"
               }`}
             >
-              {setStatus.isPending ? (
+                {setStatus.isPending ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : isResolved ? (
-                "Reopen Case"
+                <RotateCcw size={16} className="md:hidden" />
               ) : (
-                "Resolve Case"
+                <CheckCircle2 size={16} className="md:hidden" />
               )}
+              <span className="hidden md:inline">{isResolved ? "Reopen Case" : "Resolve Case"}</span>
             </button>
           </div>
         </header>
@@ -204,7 +213,7 @@ export default function MessagingTerminal() {
         {/* Messaging Area */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto px-10 py-10 space-y-8 bg-white custom-scrollbar"
+          className="flex-1 overflow-y-auto px-4 md:px-10 py-6 md:py-10 space-y-6 md:space-y-8 bg-white custom-scrollbar"
         >
           <div className="flex justify-center mb-4">
             <span className="text-[11px] font-medium text-zinc-600 bg-zinc-50 px-3 py-1 rounded-none border border-zinc-200">
@@ -227,10 +236,10 @@ export default function MessagingTerminal() {
             return (
               <div
                 key={msg._id || idx}
-                className={`flex ${isAdminMsg ? "justify-end" : "justify-start"} animate-in fade-in duration-500`}
+                className={`flex ${isAdminMsg ? "justify-end" : "justify-start"} animate-in fade-in duration-500 px-2 sm:px-0`}
               >
                 <div
-                  className={`max-w-[75%] flex flex-col ${isAdminMsg ? "items-end" : "items-start"} gap-1.5`}
+                  className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isAdminMsg ? "items-end" : "items-start"} gap-1.5`}
                 >
                   <div
                     className={`px-5 py-3.5 rounded-none text-[14px] leading-relaxed tracking-tight ${
@@ -316,13 +325,13 @@ export default function MessagingTerminal() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-3 rounded-none text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-all mb-0.5"
+                className="p-2 md:p-3 rounded-none text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-all mb-0.5 shrink-0"
               >
-                <Paperclip size={22} />
+                <Paperclip size={20} className="md:size-[22px]" />
               </button>
               <input ref={fileInputRef} type="file" hidden multiple />
 
-              <div className="flex-1 bg-zinc-50 border border-zinc-100 rounded-none focus-within:bg-white focus-within:border-zinc-300 focus-within:shadow-xl focus-within:shadow-zinc-100/50 transition-all px-4 py-1">
+              <div className="flex-1 bg-zinc-50 border border-zinc-100 rounded-none focus-within:bg-white focus-within:border-zinc-300 focus-within:shadow-xl focus-within:shadow-zinc-100/50 transition-all px-2 md:px-4 py-1">
                 <textarea
                   ref={textareaRef}
                   rows={1}
@@ -343,14 +352,14 @@ export default function MessagingTerminal() {
               <button
                 type="submit"
                 disabled={!reply.trim() || sendMessage.isPending}
-                className="h-14 w-14 flex items-center justify-center rounded-none transition-all shadow-xl shadow-zinc-200/50 mb-0.5 shrink-0
+                className="h-12 w-12 md:h-14 md:w-14 flex items-center justify-center rounded-none transition-all shadow-xl shadow-zinc-200/50 mb-0.5 shrink-0
                   enabled:bg-zinc-900 enabled:text-white enabled:hover:bg-zinc-700 enabled:hover:scale-105 active:scale-95
                   disabled:bg-zinc-100 disabled:text-zinc-300"
               >
                 {sendMessage.isPending ? (
-                  <Loader2 size={20} className="animate-spin" />
+                  <Loader2 className="w-[18px] h-[18px] md:w-5 md:h-5 animate-spin" />
                 ) : (
-                  <Send size={20} className="ml-0.5" />
+                  <Send className="w-[18px] h-[18px] md:w-5 md:h-5 ml-0.5" />
                 )}
               </button>
             </form>
@@ -358,8 +367,21 @@ export default function MessagingTerminal() {
         </footer>
       </div>
 
-      {/* ══ Sidebar ═══════════════════════════════════════════════════════ */}
-      <aside className="w-[320px] shrink-0 flex flex-col bg-white overflow-y-auto custom-scrollbar border-l border-zinc-100">
+      {/* ══ Sidebar / Drawer Overlay ═══════════════════════════════════════════════════ */}
+       {/* Mobile Backdrop */}
+       {isInfoOpen && (
+         <div 
+           className="lg:hidden fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm transition-all animate-in fade-in duration-300"
+           onClick={() => setIsInfoOpen(false)}
+         />
+       )}
+ 
+       <aside className={`
+         fixed lg:relative inset-y-0 right-0 w-[300px] sm:w-[320px] bg-white z-[70] lg:z-0
+         transform lg:transform-none transition-transform duration-500 ease-in-out border-l border-zinc-100
+         flex flex-col overflow-y-auto custom-scrollbar shadow-2xl lg:shadow-none
+         ${isInfoOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+       `}>
         {/* User Card */}
         <div className="p-8 text-center bg-zinc-50/50 border-b border-zinc-100">
           <div className="w-20 h-20 rounded-none bg-white border border-zinc-100 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-zinc-200/50 font-bold text-2xl text-zinc-900 uppercase">

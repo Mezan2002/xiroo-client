@@ -11,7 +11,8 @@ import {
   Clock, 
   Database,
   Shield,
-  CornerUpLeft
+  CornerUpLeft,
+  X
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -37,37 +38,47 @@ export default function NotificationDetail() {
   const router = useRouter();
   const { id } = useParams();
 
+  const [isInfoOpen, setIsInfoOpen] = React.useState(false);
+  
   return (
-    <div className="fixed inset-0 top-0 left-64 bg-white flex overflow-hidden font-montserrat antialiased select-none z-50">
+    <div className="fixed inset-0 top-0 left-0 lg:left-64 bg-white flex overflow-hidden font-montserrat antialiased select-none z-50">
       {/* Main Diagnostic Hub */}
       <div className="flex-1 flex flex-col bg-[#F7F7F5] relative border-r border-[#EDECE9] overflow-y-auto custom-scrollbar">
         {/* Boutique Header */}
         <div className="bg-white border-b border-[#EDECE9] p-8 space-y-4 shrink-0">
-          <button 
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#37352F80] hover:text-black transition-colors group"
-          >
-            <CornerUpLeft size={14} className="transition-transform group-hover:-translate-x-1" />
-            Back to Pulse
-          </button>
+          <div className="flex items-center justify-between">
+            <button 
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#37352F80] hover:text-black transition-colors group"
+            >
+              <CornerUpLeft size={14} className="transition-transform group-hover:-translate-x-1" />
+              Back to Pulse
+            </button>
+            <button 
+              onClick={() => setIsInfoOpen(true)}
+              className="lg:hidden p-2 text-[#37352F80] hover:text-black transition-colors"
+            >
+              <Activity size={18} />
+            </button>
+          </div>
           <div className="flex items-end justify-between">
             <div className="space-y-1">
-              <h1 className="text-[26px] font-bold text-black tracking-tight leading-none uppercase">
+              <h1 className="text-[20px] md:text-[26px] font-bold text-black tracking-tight leading-none uppercase">
                 Diagnostic Analysis
               </h1>
-              <p className="text-[11px] text-[#37352F] font-bold tracking-wide opacity-80">
+              <p className="text-[10px] md:text-[11px] text-[#37352F] font-bold tracking-wide opacity-80">
                 Intelligence ID: <span className="text-black">XRO-NOTIF-00{id || "1"}</span>
               </p>
             </div>
-            <div className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-none shadow-xl shadow-black/10">
-              <Bell size={20} strokeWidth={1.5} />
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-black text-white flex items-center justify-center rounded-none shadow-xl shadow-black/10">
+              <Bell className="w-[18px] h-[18px] md:w-5 md:h-5" strokeWidth={1.5} />
             </div>
           </div>
         </div>
 
         {/* Content Stream */}
-        <div className="p-10 space-y-10 max-w-5xl mx-auto w-full">
-          <div className="bg-white border border-[#EDECE9] rounded-none p-10 space-y-16 relative overflow-hidden shadow-sm shadow-black/5">
+        <div className="p-4 md:p-10 space-y-8 md:space-y-10 max-w-5xl mx-auto w-full">
+          <div className="bg-white border border-[#EDECE9] rounded-none p-6 md:p-10 space-y-10 md:space-y-16 relative overflow-hidden shadow-sm shadow-black/5">
              {/* Aesthetic Accent */}
              <div className="absolute top-0 right-0 p-6 opacity-[0.02]">
                 <Shield size={140} />
@@ -85,43 +96,43 @@ export default function NotificationDetail() {
                      <span className="w-1 h-1 bg-[#EDECE9] rounded-full" />
                      <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#37352F80]">{MOCK_NOTIFICATION.time}</span>
                    </div>
-                   <h2 className="text-[22px] font-bold text-black tracking-tight leading-tight">{MOCK_NOTIFICATION.title}</h2>
+                   <h2 className="text-[18px] md:text-[22px] font-bold text-black tracking-tight leading-tight">{MOCK_NOTIFICATION.title}</h2>
                  </div>
                </div>
-               <p className="text-[14px] leading-relaxed text-[#37352F] font-bold max-w-3xl border-l-[3px] border-black pl-8 ml-2 opacity-90">
+               <p className="text-[13px] md:text-[14px] leading-relaxed text-[#37352F] font-bold max-w-3xl border-l-[3px] border-black pl-5 md:pl-8 ml-2 opacity-90">
                  {MOCK_NOTIFICATION.message}
                </p>
              </div>
 
              {/* Diagnostic Grid */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-[#EDECE9] pt-12 relative z-10">
-                <div className="space-y-3">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 border-t border-[#EDECE9] pt-8 md:pt-12 relative z-10">
+                <div className="space-y-2 md:space-y-3">
                   <div className="flex items-center gap-3 text-[#37352F80]">
                     <Database size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Source Engine</span>
+                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em]">Source Engine</span>
                   </div>
-                  <p className="text-[16px] font-bold text-black leading-none">{MOCK_NOTIFICATION.source}</p>
+                  <p className="text-[14px] md:text-[16px] font-bold text-black leading-none">{MOCK_NOTIFICATION.source}</p>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   <div className="flex items-center gap-3 text-[#37352F80]">
                     <Activity size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Operational Impact</span>
+                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em]">Operational Impact</span>
                   </div>
-                  <p className="text-[15px] font-bold text-black leading-relaxed">{MOCK_NOTIFICATION.impact}</p>
+                  <p className="text-[13px] md:text-[15px] font-bold text-black leading-relaxed">{MOCK_NOTIFICATION.impact}</p>
                 </div>
              </div>
 
              {/* Technical Registry Data */}
-             <div className="bg-[#F7F7F5] border-y border-[#EDECE9] -mx-10 p-10 relative z-10">
-                <div className="flex items-center justify-between mb-8 pb-3 border-b border-[#EDECE9]">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-black">Payload Diagnostic Registry</span>
+             <div className="bg-[#F7F7F5] border-y border-[#EDECE9] -mx-6 md:-mx-10 p-6 md:p-10 relative z-10">
+                <div className="flex items-center justify-between mb-6 md:mb-8 pb-3 border-b border-[#EDECE9]">
+                  <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.4em] text-black">Payload Diagnostic Registry</span>
                   <Database size={14} className="text-[#37352F40]" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                    {Object.entries(MOCK_NOTIFICATION.data).map(([key, value]) => (
-                     <div key={key} className="space-y-2.5">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-[#37352F80]">{key.replace('_', ' ')}</span>
-                       <div className="p-2.5 bg-white border border-[#EDECE9] font-mono text-[12px] font-bold text-black shadow-sm">
+                     <div key={key} className="space-y-2">
+                       <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-[#37352F80]">{key.replace('_', ' ')}</span>
+                       <div className="p-2 md:p-2.5 bg-white border border-[#EDECE9] font-mono text-[11px] md:text-[12px] font-bold text-black shadow-sm">
                          {String(value)}
                        </div>
                      </div>
@@ -133,25 +144,47 @@ export default function NotificationDetail() {
              <div className="pt-2 relative z-10">
                 <Button 
                    onClick={() => router.push(`/admin/products/${MOCK_NOTIFICATION.data.sku}`)}
-                   className="bg-black text-white px-10 h-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em] flex items-center gap-4 hover:shadow-2xl shadow-black/10 transition-all active:scale-95"
+                   className="bg-black text-white px-6 md:px-10 h-12 rounded-none text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] flex items-center gap-4 hover:shadow-2xl shadow-black/10 transition-all active:scale-95 w-full md:w-auto justify-center"
                 >
-                   Inspect Primary Item Registry <ArrowRight size={16} />
+                   Inspect Registry <ArrowRight size={16} />
                 </Button>
              </div>
           </div>
         </div>
       </div>
 
+      {/* Mobile Drawer Backdrop */}
+      {isInfoOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 lg:hidden animate-in fade-in transition-opacity"
+          onClick={() => setIsInfoOpen(false)}
+        />
+      )}
+
       {/* Right Sidebar: Operational Diagnostics */}
-      <div className="w-[340px] border-l border-[#EDECE9] flex flex-col bg-white overflow-y-auto custom-scrollbar">
+      <div className={`
+        fixed lg:sticky top-0 right-0 lg:right-auto z-50 lg:z-auto
+        w-[320px] md:w-[340px] h-screen
+        border-l border-[#EDECE9] flex flex-col bg-white overflow-y-auto custom-scrollbar
+        transition-transform duration-300 ease-in-out
+        ${isInfoOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+      `}>
+        {/* Mobile Close Button */}
+        <button 
+          onClick={() => setIsInfoOpen(false)}
+          className="lg:hidden absolute top-4 right-4 p-2 text-[#37352F40] hover:text-black transition-colors"
+        >
+          <X size={18} />
+        </button>
+
         {/* Core Identity / Source */}
-        <div className="p-10 text-center space-y-6 border-b border-[#EDECE9] bg-[#F7F7F5]/40">
-           <div className="w-16 h-16 bg-white border border-[#EDECE9] flex items-center justify-center mx-auto shadow-2xl shadow-black/5 shrink-0">
-              <Shield size={24} strokeWidth={1.5} />
+        <div className="p-8 md:p-10 text-center space-y-4 md:space-y-6 border-b border-[#EDECE9] bg-[#F7F7F5]/40">
+           <div className="w-14 h-14 md:w-16 md:h-16 bg-white border border-[#EDECE9] flex items-center justify-center mx-auto shadow-2xl shadow-black/5 shrink-0">
+              <Shield className="w-[22px] h-[22px] md:w-6 md:h-6" strokeWidth={1.5} />
            </div>
            <div className="space-y-1.5">
-              <h3 className="text-[16px] font-bold text-black tracking-tight leading-none uppercase">Xiroo Core</h3>
-              <p className="text-[10px] text-[#37352F80] font-bold uppercase tracking-widest leading-none">Security Origin 01</p>
+              <h3 className="text-[14px] md:text-[16px] font-bold text-black tracking-tight leading-none uppercase">Xiroo Core</h3>
+              <p className="text-[9px] md:text-[10px] text-[#37352F80] font-bold uppercase tracking-widest leading-none">Security Origin 01</p>
            </div>
         </div>
 

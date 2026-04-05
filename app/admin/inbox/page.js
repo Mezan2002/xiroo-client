@@ -77,8 +77,8 @@ export default function AdminInbox() {
       />
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-[#EDECE9] pb-4">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between border-b border-[#EDECE9] pb-4 gap-4">
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 sm:pb-0 whitespace-nowrap">
             {[
               { id: "All", label: "All Records" },
               { id: "active", label: "Active" },
@@ -88,7 +88,7 @@ export default function AdminInbox() {
               <button
                 key={f.id}
                 onClick={() => setFilter(f.id)}
-                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] transition-all ${
+                className={`px-4 py-1.5 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] transition-all ${
                   filter === f.id
                     ? "bg-black text-white"
                     : "text-[#37352FA6] hover:bg-[#F7F7F5]"
@@ -100,7 +100,7 @@ export default function AdminInbox() {
           </div>
           <Button
             variant="ghost"
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#37352F60] hover:text-black transition-colors"
+            className="hidden sm:flex text-[10px] font-bold uppercase tracking-[0.2em] text-[#37352F60] hover:text-black transition-colors shrink-0"
           >
             Clear Notifications
           </Button>
@@ -179,7 +179,7 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
   return (
     <div
       onClick={onOpen}
-      className={`flex items-center gap-6 p-6 transition-all group relative cursor-pointer ${
+      className={`flex items-center gap-4 sm:gap-6 p-4 sm:p-6 transition-all group relative cursor-pointer ${
         isResolved
           ? "bg-green-50 hover:bg-green-100/60"
           : isUnread
@@ -189,7 +189,7 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
     >
       {/* Avatar */}
       <div className="relative shrink-0">
-        <div className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-none font-bold text-[13px] shadow-lg uppercase">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black text-white flex items-center justify-center rounded-none font-bold text-[11px] sm:text-[13px] shadow-lg uppercase">
           {customer.firstName?.[0] || customer.lastName?.[0] || "C"}
         </div>
         {isUnread ? (
@@ -248,9 +248,9 @@ function ConversationCard({ conv, onOpen, onRefetch }) {
         </div>
       </div>
 
-      {/* Action Buttons — always visible on hover */}
+      {/* Action Buttons */}
       <div
-        className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-3 group-hover:translate-x-0"
+        className="flex items-center gap-0.5 sm:gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all sm:translate-x-3 sm:group-hover:translate-x-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* View Details */}

@@ -75,15 +75,15 @@ export default function CategoryDetailsSidebar({
       />
 
       {/* Sidebar */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 border-l border-[#EDECE9] animate-in slide-in-from-right duration-300 font-montserrat antialiased">
+      <div className="fixed inset-y-0 right-0 w-full lg:max-w-md bg-white shadow-2xl z-50 border-l border-[#EDECE9] animate-in slide-in-from-right duration-300 font-montserrat antialiased">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-[#EDECE9] bg-[#F7F7F5]">
+          <div className="flex items-center justify-between p-5 md:p-6 border-b border-[#EDECE9] bg-[#F7F7F5]">
             <div className="flex flex-col">
               <h2 className="text-[10px] font-bold text-[#91918E] uppercase tracking-[0.2em] mb-1">
                 Registry Management
               </h2>
-              <p className="text-[14px] font-bold text-black uppercase tracking-widest">
+              <p className="text-[13px] md:text-[14px] font-bold text-black uppercase tracking-widest">
                 Detailed Protocol
               </p>
             </div>
@@ -96,7 +96,7 @@ export default function CategoryDetailsSidebar({
           </div>
 
           {/* Body */}
-          <form className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+          <form className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 md:space-y-8 custom-scrollbar">
             {/* Image Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -131,12 +131,12 @@ export default function CategoryDetailsSidebar({
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-3 py-10">
+                  <div className="flex flex-col items-center gap-3 py-8 md:py-10">
                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#EDECE9]">
                       <ImageIcon size={18} className="text-[#37352F40]" />
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-[10px] font-bold text-[#37352F] uppercase tracking-widest">Upload Key Visual</span>
+                      <span className="text-[10px] font-bold text-[#37352F] uppercase tracking-widest text-center">Upload Key Visual</span>
                       <span className="text-[9px] text-[#91918E] font-medium tracking-wide">PNG, WEBP, or JPEG strictly.</span>
                     </div>
                   </div>
@@ -154,7 +154,7 @@ export default function CategoryDetailsSidebar({
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full bg-white border border-[#EDECE9] px-4 py-3 text-[14px] font-medium text-black outline-none focus:border-black/20 transition-all placeholder:text-[#37352F20]"
+                  className="w-full bg-white border border-[#EDECE9] px-4 py-3 text-[13px] md:text-[14px] font-medium text-black outline-none focus:border-black/20 transition-all placeholder:text-[#37352F20]"
                   placeholder="e.g. Minimalist Home"
                 />
               </div>
@@ -181,7 +181,7 @@ export default function CategoryDetailsSidebar({
                   value={formData.description}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full bg-white border border-[#EDECE9] px-4 py-3 text-[13px] font-medium leading-relaxed text-black outline-none focus:border-black/20 transition-all resize-none placeholder:text-[#37352F20]"
+                  className="w-full bg-white border border-[#EDECE9] px-4 py-3 text-[12px] md:text-[13px] font-medium leading-relaxed text-black outline-none focus:border-black/20 transition-all resize-none placeholder:text-[#37352F20]"
                   placeholder="Specify the scope and attributes of this category..."
                 />
               </div>
@@ -199,13 +199,13 @@ export default function CategoryDetailsSidebar({
                         key={attr._id}
                         onClick={() => toggleAttribute(attr._id)}
                         className={`
-                          flex items-center justify-between p-4 cursor-pointer transition-all border
+                          flex items-center justify-between p-3 md:p-4 cursor-pointer transition-all border
                           ${isSelected ? 'bg-black border-black shadow-lg shadow-black/5' : 'bg-white border-[#EDECE9] hover:border-[#37352F20]'}
                         `}
                       >
                         <div className="flex items-center gap-3">
                           <Hash size={12} className={isSelected ? 'text-white/40' : 'text-zinc-300'} />
-                          <span className={`text-[11px] font-bold uppercase tracking-widest ${isSelected ? 'text-white' : 'text-zinc-600'}`}>
+                          <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest ${isSelected ? 'text-white' : 'text-zinc-600'}`}>
                             {attr.name}
                           </span>
                         </div>
@@ -250,11 +250,11 @@ export default function CategoryDetailsSidebar({
           </form>
 
           {/* Footer */}
-          <div className="p-6 border-t border-[#EDECE9] bg-[#F7F7F5] flex items-center justify-end gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
+          <div className="p-5 md:p-6 border-t border-[#EDECE9] bg-[#F7F7F5] flex items-center justify-end gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] pt-safe">
             <Button 
               variant="ghost" 
               onClick={onClose} 
-              className="h-11 px-6 text-[10px] font-bold uppercase tracking-[0.2em] border-transparent"
+              className="h-10 md:h-11 px-4 md:px-6 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] border-transparent"
               showHoverIcon={false}
             >
               Discard
@@ -262,10 +262,10 @@ export default function CategoryDetailsSidebar({
             <Button 
               disabled={isLoading}
               onClick={handleSubmit}
-              className="h-11 px-10 text-[10px] font-bold uppercase tracking-[0.2em] bg-black text-white hover:bg-zinc-800 transition-all"
+              className="h-10 md:h-11 px-6 md:px-10 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] bg-black text-white hover:bg-zinc-800 transition-all font-montserrat"
               icon={Save}
             >
-              {isLoading ? "Synchronizing..." : "Initialize Registry"}
+              {isLoading ? "Syncing..." : "Initialize"}
             </Button>
           </div>
         </div>
