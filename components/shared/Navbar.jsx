@@ -8,6 +8,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import { UserAvatar } from "./UserAvatar";
+import { useProducts } from "@/hooks/api/useProducts";
+import { useUser } from "@/hooks/api/useUser";
+import { useCart } from "@/hooks/useCart";
+import axiosInstance from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
 
 const CartSidebar = dynamic(
   () => import("./CartSidebar").then((mod) => mod.CartSidebar),
@@ -22,13 +27,17 @@ const UserAccountDrawer = dynamic(
   { ssr: false },
 );
 
-// Dynamic Navigation Architecture Hooked to Admin Modules
+const INITIAL_NAV_ITEMS = [
+  { id: "men", label: "MENSWEAR", categories: [], products: [] },
+  { id: "women", label: "WOMENSWEAR", categories: [], products: [] },
+  { id: "sale", label: "SEASONAL SALE", categories: [], products: [] },
+];
 
-import { useProducts } from "@/hooks/api/useProducts";
-import { useUser } from "@/hooks/api/useUser";
-import { useCart } from "@/hooks/useCart";
-import axiosInstance from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
+const INITIAL_MENUS_DATA = {
+  men: { categories: [], products: [] },
+  women: { categories: [], products: [] },
+  sale: { categories: [], products: [] },
+};
 
 export function Navbar() {
   const pathname = usePathname();
@@ -50,55 +59,78 @@ export function Navbar() {
       const response = await axiosInstance.get("/menus");
       return response.data || response;
     },
-    staleTime: 60 * 60 * 1000, // 1 hour stale time for stable menus
-    gcTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
-    placeholderData: (prev) => prev, // Keep previous data during background updates
+    staleTime: 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 
   const { useAllProducts } = useProducts({
-    staleTime: 30 * 60 * 1000, // 30 minutes for products in navbar
+    staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     placeholderData: (prev) => prev,
   });
   const { data: productsResponse } = useAllProducts({ limit: 50 });
 
-  // Optimized Data Transformation Protocol
+  // 1. Initial State Resolution Protocol (Hydration + Persistent Cache)
   const { navItems, menusData } = useMemo(() => {
-    if (!menuResponse) return { navItems: [], menusData: {} };
+    // Step A: Prefer live/cached data from React Query
+    if (menuResponse) {
+      const allProducts = productsResponse?.data || productsResponse || [];
+      const menusArray = Array.isArray(menuResponse)
+        ? menuResponse
+        : menuResponse.data || [];
 
-    const allProducts = productsResponse?.data || productsResponse || [];
-    const menusArray = Array.isArray(menuResponse)
-      ? menuResponse
-      : menuResponse.data || [];
+      const items = menusArray.map((menu) => {
+        const categories = menu.categories || [];
+        const catIds = categories.map((c) => c._id || c.id || c);
 
-    const items = menusArray.map((menu) => {
-      const categories = menu.categories || [];
-      const catIds = categories.map((c) => c._id || c.id || c);
+        const relevantProducts = allProducts
+          .filter((p) =>
+            catIds.includes(p.category?._id || p.category?.id || p.category),
+          )
+          .slice(0, 2);
 
-      // Find relevant products for this menu's categories
-      const relevantProducts = allProducts
-        .filter((p) =>
-          catIds.includes(p.category?._id || p.category?.id || p.category),
-        )
-        .slice(0, 2);
+        return {
+          id: menu.slug,
+          label: menu.name.toUpperCase(),
+          categories: categories,
+          products: relevantProducts,
+        };
+      });
 
-      return {
-        id: menu.slug,
-        label: menu.name.toUpperCase(),
-        categories: categories,
-        products: relevantProducts,
-      };
-    });
+      const data = {};
+      items.forEach((item) => {
+        data[item.id] = {
+          categories: item.categories,
+          products: item.products,
+        };
+      });
 
-    const data = {};
-    items.forEach((item) => {
-      data[item.id] = {
-        categories: item.categories,
-        products: item.products,
-      };
-    });
+      // Persist to LOCAL STORAGE Silently for Instant Loading on Refresh
+      if (typeof window !== "undefined" && items.length > 0) {
+        localStorage.setItem("xiroo_cached_nav", JSON.stringify({ items, data }));
+      }
 
-    return { navItems: items, menusData: data };
+      return { navItems: items, menusData: data };
+    }
+
+    // Step B: Fallback to INSTANT Local Storage Cache (Zero Network Phase)
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("xiroo_cached_nav");
+      if (cached) {
+        try {
+          return {
+            navItems: JSON.parse(cached).items,
+            menusData: JSON.parse(cached).data,
+          };
+        } catch (e) {
+          console.warn("Retrying nav resolution...");
+        }
+      }
+    }
+
+    // Step C: True Static Fallback (First Visit Protocol)
+    return { navItems: INITIAL_NAV_ITEMS, menusData: INITIAL_MENUS_DATA };
   }, [menuResponse, productsResponse]);
 
   useEffect(() => {
