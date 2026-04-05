@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
+import { useProducts } from "@/hooks/api/useProducts";
+import { useUser } from "@/hooks/api/useUser";
+import { useCart } from "@/hooks/useCart";
+import axiosInstance from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
 import { LayoutGrid, Menu, Search, ShoppingBag, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -8,11 +13,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import { UserAvatar } from "./UserAvatar";
-import { useProducts } from "@/hooks/api/useProducts";
-import { useUser } from "@/hooks/api/useUser";
-import { useCart } from "@/hooks/useCart";
-import axiosInstance from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
 
 const CartSidebar = dynamic(
   () => import("./CartSidebar").then((mod) => mod.CartSidebar),
@@ -26,18 +26,7 @@ const UserAccountDrawer = dynamic(
   () => import("./UserAccountDrawer").then((mod) => mod.UserAccountDrawer),
   { ssr: false },
 );
-
-const INITIAL_NAV_ITEMS = [
-  { id: "men", label: "MENSWEAR", categories: [], products: [] },
-  { id: "women", label: "WOMENSWEAR", categories: [], products: [] },
-  { id: "sale", label: "SEASONAL SALE", categories: [], products: [] },
-];
-
-const INITIAL_MENUS_DATA = {
-  men: { categories: [], products: [] },
-  women: { categories: [], products: [] },
-  sale: { categories: [], products: [] },
-};
+const NavLinks = dynamic(() => import("./NavLinks"), { ssr: false });
 
 export function Navbar() {
   const pathname = usePathname();
@@ -49,10 +38,31 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Synchronous Cache Initializer — Reads localStorage BEFORE first render
+  // so menus appear instantly without any pop-in delay
+  const [navItems, setNavItems] = useState(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const cached = localStorage.getItem("xiroo_cached_nav");
+      if (cached) return JSON.parse(cached).items || [];
+    } catch (e) {}
+    return [];
+  });
+
+  const [menusData, setMenusData] = useState(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const cached = localStorage.getItem("xiroo_cached_nav");
+      if (cached) return JSON.parse(cached).data || {};
+    } catch (e) {}
+    return {};
+  });
+
   const { user: currentUser } = useUser();
   const { itemCount } = useCart();
   const isLoggedIn = !!currentUser;
 
+  // React Query Fetcher (Silent Background Sync)
   const { data: menuResponse } = useQuery({
     queryKey: ["menus"],
     queryFn: async () => {
@@ -71,9 +81,13 @@ export function Navbar() {
   });
   const { data: productsResponse } = useAllProducts({ limit: 50 });
 
-  // 1. Initial State Resolution Protocol (Hydration + Persistent Cache)
-  const { navItems, menusData } = useMemo(() => {
-    // Step A: Prefer live/cached data from React Query
+  // Mount flag (for user-specific UI like cart count, avatar)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 2. Dynamic Update Protocol (When Query data arrives)
+  useEffect(() => {
     if (menuResponse) {
       const allProducts = productsResponse?.data || productsResponse || [];
       const menusArray = Array.isArray(menuResponse)
@@ -106,36 +120,14 @@ export function Navbar() {
         };
       });
 
-      // Persist to LOCAL STORAGE Silently for Instant Loading on Refresh
+      // Update Local States and Persistent Cache
+      setNavItems(items);
+      setMenusData(data);
       if (typeof window !== "undefined" && items.length > 0) {
         localStorage.setItem("xiroo_cached_nav", JSON.stringify({ items, data }));
       }
-
-      return { navItems: items, menusData: data };
     }
-
-    // Step B: Fallback to INSTANT Local Storage Cache (Zero Network Phase)
-    if (typeof window !== "undefined") {
-      const cached = localStorage.getItem("xiroo_cached_nav");
-      if (cached) {
-        try {
-          return {
-            navItems: JSON.parse(cached).items,
-            menusData: JSON.parse(cached).data,
-          };
-        } catch (e) {
-          console.warn("Retrying nav resolution...");
-        }
-      }
-    }
-
-    // Step C: True Static Fallback (First Visit Protocol)
-    return { navItems: INITIAL_NAV_ITEMS, menusData: INITIAL_MENUS_DATA };
   }, [menuResponse, productsResponse]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -254,22 +246,13 @@ export function Navbar() {
             className="hidden lg:flex items-center gap-8 w-[350px] h-full"
             onMouseLeave={() => setActiveMenu(null)}
           >
-            {navItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center h-full cursor-pointer"
-                onMouseEnter={() => setActiveMenu(item.id)}
-              >
-                <Link
-                  href={`/${item.id}`}
-                  className={`text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max ${
-                    activeMenu === item.id ? "opacity-70" : "hover:opacity-70"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </div>
-            ))}
+            {/* NavLinks is SSR:false — never rendered on the server,
+                so the cached-from-localStorage items never cause a hydration mismatch */}
+            <NavLinks
+              navItems={navItems}
+              activeMenu={activeMenu}
+              setActiveMenu={setActiveMenu}
+            />
 
             {/* Mega Menu Dropdown */}
             <div
@@ -437,7 +420,7 @@ export function Navbar() {
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
-        navItems={navItems}
+        navItems={mounted ? navItems : []}
       />
     </>
   );
