@@ -1,16 +1,21 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Navbar } from "./Navbar";
-import Footer from "./Footer";
-import ChatBubble from "./ChatBubble";
 import BottomNavbar from "./BottomNavbar";
+import Footer from "./Footer";
+import { Navbar } from "./Navbar";
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
-  
+
   // Define routes that should NOT have the global header/footer
-  const authRoutes = ["/login", "/register", "/forgot-password", "/verify-email", "/reset-password"];
+  const authRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/verify-email",
+    "/reset-password",
+  ];
   const isAuthRoute = authRoutes.includes(pathname);
   const isAdminRoute = pathname.startsWith("/admin");
 
@@ -23,7 +28,7 @@ export default function ConditionalLayout({ children }) {
       <Navbar />
       <main className="grow pb-24 lg:pb-0">{children}</main>
       <Footer />
-      <ChatBubble />
+      {/* <ChatBubble /> */}
       <BottomNavbar />
     </div>
   );
