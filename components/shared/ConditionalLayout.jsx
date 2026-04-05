@@ -30,6 +30,7 @@ export default function ConditionalLayout({ children }) {
       <Footer />
       {/* <ChatBubble /> */}
       <BottomNavbar />
+      {/* <InitialModal /> */}
     </div>
   );
 }
