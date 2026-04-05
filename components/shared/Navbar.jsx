@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import { UserAvatar } from "./UserAvatar";
 
@@ -39,8 +39,6 @@ export function Navbar() {
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [navItems, setNavItems] = useState([]);
-  const [menusData, setMenusData] = useState({});
 
   const { user: currentUser } = useUser();
   const { itemCount } = useCart();
@@ -52,49 +50,60 @@ export function Navbar() {
       const response = await axiosInstance.get("/menus");
       return response.data || response;
     },
-    staleTime: 10 * 60 * 1000,
+    staleTime: 60 * 60 * 1000, // 1 hour stale time for stable menus
+    gcTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+    placeholderData: (prev) => prev, // Keep previous data during background updates
   });
 
-  const { useAllProducts } = useProducts();
+  const { useAllProducts } = useProducts({
+    staleTime: 30 * 60 * 1000, // 30 minutes for products in navbar
+    gcTime: 60 * 60 * 1000,
+    placeholderData: (prev) => prev,
+  });
   const { data: productsResponse } = useAllProducts({ limit: 50 });
+
+  // Optimized Data Transformation Protocol
+  const { navItems, menusData } = useMemo(() => {
+    if (!menuResponse) return { navItems: [], menusData: {} };
+
+    const allProducts = productsResponse?.data || productsResponse || [];
+    const menusArray = Array.isArray(menuResponse)
+      ? menuResponse
+      : menuResponse.data || [];
+
+    const items = menusArray.map((menu) => {
+      const categories = menu.categories || [];
+      const catIds = categories.map((c) => c._id || c.id || c);
+
+      // Find relevant products for this menu's categories
+      const relevantProducts = allProducts
+        .filter((p) =>
+          catIds.includes(p.category?._id || p.category?.id || p.category),
+        )
+        .slice(0, 2);
+
+      return {
+        id: menu.slug,
+        label: menu.name.toUpperCase(),
+        categories: categories,
+        products: relevantProducts,
+      };
+    });
+
+    const data = {};
+    items.forEach((item) => {
+      data[item.id] = {
+        categories: item.categories,
+        products: item.products,
+      };
+    });
+
+    return { navItems: items, menusData: data };
+  }, [menuResponse, productsResponse]);
 
   useEffect(() => {
     setMounted(true);
-    if (menuResponse) {
-      const allProducts = productsResponse?.data || productsResponse || [];
-      const menusArray = Array.isArray(menuResponse)
-        ? menuResponse
-        : menuResponse.data || [];
-      const items = menusArray.map((menu) => {
-        const categories = menu.categories || [];
-        const catIds = categories.map((c) => c._id || c.id || c);
-
-        // Find relevant products for this menu's categories
-        const relevantProducts = allProducts
-          .filter((p) =>
-            catIds.includes(p.category?._id || p.category?.id || p.category),
-          )
-          .slice(0, 2); // Show top 2 for boutique aesthetic
-
-        return {
-          id: menu.slug,
-          label: menu.name.toUpperCase(),
-          categories: categories,
-          products: relevantProducts,
-        };
-      });
-      setNavItems(items);
-
-      const data = {};
-      items.forEach((item) => {
-        data[item.id] = {
-          categories: item.categories,
-          products: item.products,
-        };
-      });
-      setMenusData(data);
-    }
-  }, [menuResponse, productsResponse]);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
