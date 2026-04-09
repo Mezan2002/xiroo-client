@@ -14,14 +14,35 @@ import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
 import { Button } from "../ui/Button";
 import { useEffect, useState } from "react";
+import { useDiscounts } from "@/hooks/api/useDiscounts";
+import { useToast } from "@/hooks/useToast";
 
 const FREE_SHIPPING_THRESHOLD = 2000;
 
 export function CartSidebar({ isOpen, onClose }) {
-  const { items, subtotal, updateQuantity, removeItem } = useCart();
+  const { items, subtotal, discount, discountAmount, total, updateQuantity, removeItem, applyDiscount, removeDiscount } = useCart();
   const [activeDrawer, setActiveDrawer] = useState(null); // 'note' or 'coupon'
   const [note, setNote] = useState("");
   const [coupon, setCoupon] = useState("");
+  const { validateDiscount } = useDiscounts();
+  const { toast } = useToast();
+
+  const handleApplyCoupon = () => {
+    if (!coupon) return;
+    validateDiscount.mutate(
+      { code: coupon, currentOrderValue: subtotal || 0 },
+      {
+        onSuccess: (res) => {
+          applyDiscount(res.data);
+          setActiveDrawer(null);
+          setCoupon("");
+        },
+        onError: (err) => {
+          toast.error(err?.response?.data?.message || err.message || "Invalid Coupon");
+        }
+      }
+    );
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -270,12 +291,33 @@ export function CartSidebar({ isOpen, onClose }) {
                   </Button>
                 </div>
 
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-2">
                   <span className="text-[14px] text-gray-500 tracking-tight">
+                    Subtotal
+                  </span>
+                  <span className="text-[16px] font-medium text-black">
+                    ৳{Number(subtotal || 0).toFixed(0)}
+                  </span>
+                </div>
+                {discount && (
+                  <div className="flex justify-between items-center mb-2">
+                     <span className="text-[14px] text-green-600 tracking-tight flex items-center gap-2">
+                       Discount ({discount.code})
+                       <Button variant="ghost" size="icon" showHoverIcon={false} className="h-4 w-4 p-0 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-none ml-2" onClick={removeDiscount}>
+                         <X className="w-3 h-3" />
+                       </Button>
+                     </span>
+                     <span className="text-[16px] font-medium text-green-600">
+                       -৳{Number(discountAmount || 0).toFixed(0)}
+                     </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center mb-4 mt-2 pt-2 border-t border-gray-100">
+                  <span className="text-[14px] font-bold tracking-tight text-black">
                     Estimated total
                   </span>
                   <span className="text-[22px] font-semibold text-black">
-                    ৳{Number(subtotal || 0).toFixed(0)}
+                    ৳{Number(total || subtotal || 0).toFixed(0)}
                   </span>
                 </div>
 
@@ -342,8 +384,8 @@ export function CartSidebar({ isOpen, onClose }) {
                       placeholder="Enter coupon code"
                       className="flex-1 p-4.5 text-[14px] bg-gray-50 border border-gray-200 focus:border-black focus:bg-white outline-none transition-all placeholder:text-gray-300 uppercase tracking-widest"
                     />
-                    <Button variant="primary" className="px-8">
-                      Apply
+                    <Button variant="primary" className="px-8" onClick={handleApplyCoupon} disabled={validateDiscount.isPending}>
+                      {validateDiscount.isPending ? "Applying..." : "Apply"}
                     </Button>
                   </div>
                   <p className="text-[12px] text-gray-500 font-medium">

@@ -40,6 +40,7 @@ export default function DiscountForm({
   initialData = {}, 
   onSubmit, 
   onCancel,
+  isLoading = false,
   title = "Coupon Configuration"
 }) {
   const [formData, setFormData] = useState({
@@ -246,9 +247,10 @@ export default function DiscountForm({
         </Button>
         <Button 
           onClick={() => onSubmit(formData)}
+          disabled={isLoading}
           className="h-14 px-12 bg-black text-white text-[11px] font-bold uppercase tracking-widest rounded-none hover:bg-zinc-800 transition-all shadow-xl shadow-black/10"
         >
-          Save Promotional Logic
+          {isLoading ? "Saving..." : "Save Promotional Logic"}
         </Button>
       </div>
     </div>

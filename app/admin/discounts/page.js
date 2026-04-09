@@ -5,12 +5,8 @@ import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Plus, Percent } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-const MOCK_DISCOUNTS = [
-  { id: 1, code: "XIROO20", type: "Percentage", value: "20%", usage: "142", expiry: "Apr 30, 2024", status: "Active" },
-  { id: 2, code: "WELCOME500", type: "Fixed Amount", value: "৳500", usage: "89", expiry: "Dec 31, 2024", status: "Active" },
-  { id: 3, code: "FLASH_SALE", type: "Automatic", value: "15%", usage: "0", expiry: "Expired", status: "Draft" },
-];
+import { useDiscounts } from "@/hooks/api/useDiscounts";
+import { useToast } from "@/hooks/useToast";
 
 const COLUMNS = [
   { key: "code", label: "Coupon Code", type: "text", mono: true },
@@ -24,9 +20,27 @@ const COLUMNS = [
 
 export default function AdminDiscounts() {
   const router = useRouter();
-  const [discounts, setDiscounts] = useState(MOCK_DISCOUNTS);
+  const { toast } = useToast();
+  const { useDiscountsQuery, deleteDiscount } = useDiscounts();
+  const { data: response, isLoading } = useDiscountsQuery();
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedDiscount, setSelectedDiscount] = useState(null);
+
+  const discounts = (response?.data || []).map((d) => ({
+    ...d,
+    id: d._id,
+    code: d.code,
+    type: d.type === "percentage" ? "Percentage" : "Fixed Amount",
+    value: d.type === "percentage" ? `${d.value}%` : `৳${d.value}`,
+    usage: `${d.usageCount}${d.usageLimit ? ` / ${d.usageLimit}` : ""}`,
+    expiry: new Date(d.endDate).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+    status: d.isActive && new Date(d.endDate) > new Date() ? "Active" : "Draft",
+  }));
 
   const handleDelete = (row) => {
     setSelectedDiscount(row);
@@ -34,39 +48,47 @@ export default function AdminDiscounts() {
   };
 
   const confirmDelete = () => {
-    setDiscounts(prev => prev.filter(d => d.id !== selectedDiscount.id));
+    deleteDiscount.mutate(selectedDiscount._id || selectedDiscount.id, {
+      onSuccess: () => {
+        toast.success("Discount deleted successfully.");
+      },
+      onError: (err) => {
+        toast.error(err?.response?.data?.message || "Failed to delete discount.");
+      },
+    });
     setIsDeleteModalOpen(false);
     setSelectedDiscount(null);
   };
 
   const handleEdit = (row) => {
-    router.push(`/admin/discounts/${row.id}/edit`);
+    router.push(`/admin/discounts/${row._id || row.id}/edit`);
   };
 
   return (
     <div className="space-y-6">
-      <ModuleHeader 
+      <ModuleHeader
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
-          { label: "Discounts", active: true }
+          { label: "Discounts", active: true },
         ]}
-        title="Discounts" 
+        title="Discounts"
         icon={Percent}
         primaryAction={{
           label: "Create Coupon",
           icon: Plus,
-          onClick: () => router.push("/admin/discounts/new")
+          onClick: () => router.push("/admin/discounts/new"),
         }}
       />
-      
-      <DataTable 
+
+      <DataTable
         columns={COLUMNS}
         data={discounts}
+        isLoading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}

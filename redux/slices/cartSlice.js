@@ -4,6 +4,9 @@ const initialState = {
   items: [],
   subtotal: 0,
   itemCount: 0,
+  discount: null,
+  discountAmount: 0,
+  total: 0,
 };
 
 const cartSlice = createSlice({
@@ -12,9 +15,8 @@ const cartSlice = createSlice({
   reducers: {
     setCart: (state, action) => {
       state.items = action.payload;
-      const metrics = calculateMetrics(state.items);
-      state.subtotal = metrics.subtotal;
-      state.itemCount = metrics.itemCount;
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
     },
     addToCart: (state, action) => {
       const { product, variant } = action.payload;
@@ -39,9 +41,8 @@ const cartSlice = createSlice({
         });
       }
       
-      const metrics = calculateMetrics(state.items);
-      state.subtotal = metrics.subtotal;
-      state.itemCount = metrics.itemCount;
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
     },
     updateQuantity: (state, action) => {
       const { id, variant, delta } = action.payload;
@@ -50,9 +51,8 @@ const cartSlice = createSlice({
         item.quantity = Math.max(1, item.quantity + delta);
       }
       
-      const metrics = calculateMetrics(state.items);
-      state.subtotal = metrics.subtotal;
-      state.itemCount = metrics.itemCount;
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
     },
     removeFromCart: (state, action) => {
       const { id, variant } = action.payload;
@@ -60,27 +60,52 @@ const cartSlice = createSlice({
         (i) => !((i._id === id || i.id === id) && i.variant === variant)
       );
       
-      const metrics = calculateMetrics(state.items);
-      state.subtotal = metrics.subtotal;
-      state.itemCount = metrics.itemCount;
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
     },
     clearCart: (state) => {
       state.items = [];
       state.subtotal = 0;
       state.itemCount = 0;
+      state.discount = null;
+      state.discountAmount = 0;
+      state.total = 0;
+    },
+    applyDiscount: (state, action) => {
+      state.discount = action.payload;
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
+    },
+    removeDiscount: (state) => {
+      state.discount = null;
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
     },
   },
 });
 
-const calculateMetrics = (items) => {
+const calculateMetrics = (items, discount = null) => {
   const subtotal = items.reduce((sum, item) => {
     const activePrice = item.salePrice && item.salePrice > 0 ? item.salePrice : item.price;
     const numericPrice = parseFloat(activePrice?.toString().replace(/[^0-9.]/g, "") || 0);
     return sum + numericPrice * item.quantity;
   }, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  return { subtotal, itemCount };
+
+  let discountAmount = 0;
+  if (discount) {
+    if (discount.type === "percentage") {
+      discountAmount = subtotal * (discount.value / 100);
+    } else if (discount.type === "fixed") {
+      discountAmount = discount.value;
+    }
+  }
+  
+  discountAmount = Math.min(discountAmount, subtotal);
+  const total = subtotal - discountAmount;
+
+  return { subtotal, itemCount, discountAmount, total };
 };
 
-export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart } = cartSlice.actions;
+export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart, applyDiscount, removeDiscount } = cartSlice.actions;
 export default cartSlice.reducer;

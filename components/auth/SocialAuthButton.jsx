@@ -8,8 +8,9 @@ export default function SocialAuthButton({ text = "GOOGLE IDENTITY", onClick }) 
     <Button
       type="button"
       variant="outline"
+      size="lg"
       onClick={onClick}
-      className="w-full rounded-none py-5 flex items-center justify-center gap-3 border-gray-200 hover:border-black hover:text-black transition-all group"
+      className="w-full rounded-none flex items-center justify-center gap-3 border-gray-200 hover:border-black hover:text-black transition-all group"
     >
       <div className="flex items-center gap-2">
         <Image

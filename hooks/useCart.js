@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, updateQuantity, removeFromCart, clearCart } from "@/redux/slices/cartSlice";
+import { addToCart, updateQuantity, removeFromCart, clearCart, applyDiscount, removeDiscount } from "@/redux/slices/cartSlice";
 import { addToast } from "@/redux/slices/toastSlice";
 
 /** 
@@ -8,7 +8,7 @@ import { addToast } from "@/redux/slices/toastSlice";
  */
 export const useCart = () => {
   const dispatch = useDispatch();
-  const { items, subtotal, itemCount } = useSelector((state) => state.cart);
+  const { items, subtotal, itemCount, discount, discountAmount, total } = useSelector((state) => state.cart);
 
   const addItem = ({ product, variant = "Standard", silent = false }) => {
     dispatch(addToCart({ product, variant }));
@@ -30,13 +30,28 @@ export const useCart = () => {
     dispatch(clearCart());
   };
 
+  const applyDiscountCode = (discountData) => {
+    dispatch(applyDiscount(discountData));
+    dispatch(addToast({ message: "Discount applied successfully.", type: "success" }));
+  };
+
+  const removeDiscountCode = () => {
+    dispatch(removeDiscount());
+    dispatch(addToast({ message: "Discount removed.", type: "info" }));
+  };
+
   return {
     items,
     subtotal,
     itemCount,
+    discount,
+    discountAmount,
+    total,
     addItem,
     updateQuantity: updateItemQuantity,
     removeItem: removeItemItem,
     clearCart: resetCart,
+    applyDiscount: applyDiscountCode,
+    removeDiscount: removeDiscountCode,
   };
 };
