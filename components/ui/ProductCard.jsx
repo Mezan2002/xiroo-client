@@ -34,12 +34,13 @@ export default function ProductCard({
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const images =
+  const images = (
     imagesProp && imagesProp.length > 0
       ? imagesProp
       : hoverImage
         ? [image, hoverImage]
-        : [image];
+        : [image]
+  ).filter(Boolean);
   const hasVariants = variants && variants.length > 0;
   const buttonText = hasVariants
     ? "CHOOSE OPTIONS"
@@ -57,9 +58,15 @@ export default function ProductCard({
   const badgeText = (() => {
     if (badge) return badge;
     if (stockStage !== "in-stock") return stockStage.replace("-", " ");
-    
-    const numPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.-]+/g,"")) : price;
-    const numSalePrice = typeof salePrice === 'string' ? parseFloat(salePrice.replace(/[^0-9.-]+/g,"")) : salePrice;
+
+    const numPrice =
+      typeof price === "string"
+        ? parseFloat(price.replace(/[^0-9.-]+/g, ""))
+        : price;
+    const numSalePrice =
+      typeof salePrice === "string"
+        ? parseFloat(salePrice.replace(/[^0-9.-]+/g, ""))
+        : salePrice;
 
     if (numSalePrice && numSalePrice > 0 && numPrice > numSalePrice) {
       const discount = Math.round(((numPrice - numSalePrice) / numPrice) * 100);
@@ -93,8 +100,8 @@ export default function ProductCard({
       <div className="relative w-full mb-4 overflow-hidden bg-white border border-zinc-100 group-hover:border-zinc-200 transition-colors duration-500">
         {/* Status Badge (Dynamic Logic) */}
         {!showRemove && badgeText && (
-          <div className="absolute top-0 left-0 z-30 px-2 py-1 bg-white border-r border-b border-zinc-100">
-            <p className="text-[8px] font-bold tracking-[0.2em] text-black uppercase">
+          <div className="absolute top-0 left-0 z-30 px-2 py-1 bg-black">
+            <p className="text-[8px] font-bold tracking-[0.2em] text-white uppercase">
               {badgeText}
             </p>
           </div>

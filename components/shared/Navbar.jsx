@@ -190,7 +190,8 @@ export function Navbar() {
                   alt="Xiroo Shop Logo"
                   width={90}
                   height={90}
-                  style={{ height: "auto", width: "90px" }}
+                  priority
+                  style={{ height: "auto" }}
                   className={`transition-all duration-300 ${
                     isSolid ? "delay-0" : "brightness-0 invert delay-500"
                   }`}
@@ -330,7 +331,8 @@ export function Navbar() {
                 alt="Xiroo Shop Logo"
                 width={130}
                 height={130}
-                style={{ height: "auto", width: "130px" }}
+                priority
+                style={{ height: "auto" }}
                 className={`transition-all duration-300 ${
                   isSolid ? "delay-0" : "brightness-0 invert delay-500"
                 }`}
