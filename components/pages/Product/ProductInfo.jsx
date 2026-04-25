@@ -151,10 +151,24 @@ export default function ProductInfo({ product, cartRef }) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
+  // --- Price Logic with Variants ---
+  const variantPriceOverride = Object.entries(selectedVariants).reduce(
+    (max, [vName, vVal]) => {
+      const variant = product.variants.find((v) => v.name === vName);
+      const valObj = variant?.values.find((v) => (v.value || v) === vVal);
+      if (valObj?.price && valObj.price > max) return valObj.price;
+      return max;
+    },
+    0,
+  );
+
+  const displayPrice =
+    variantPriceOverride > 0 ? variantPriceOverride : currentActivePrice;
+
   const selectedBundle = activeBundles.find((b) => b.id === selectedBundleId);
   const unitPrice = selectedBundle
     ? selectedBundle.unitPrice
-    : product.salePrice || product.price;
+    : displayPrice;
   const totalPrice = (selectedBundle?.price || unitPrice) * quantity;
 
   return (
@@ -169,9 +183,9 @@ export default function ProductInfo({ product, cartRef }) {
           <>
             <div className="flex items-center justify-center gap-3 mb-1">
               <span className="text-[17px] md:text-[20px] font-bold text-black tracking-tight">
-                ৳{currentActivePrice.toLocaleString()}
+                ৳{displayPrice.toLocaleString()}
               </span>
-              {isSaleActive && (
+              {isSaleActive && variantPriceOverride === 0 && (
                 <span className="text-[13px] md:text-[14px] text-gray-400 line-through">
                   ৳{product.price.toLocaleString()}
                 </span>
@@ -210,7 +224,9 @@ export default function ProductInfo({ product, cartRef }) {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {variant.values.map((val) => {
+                  {variant.values.map((vObj) => {
+                    const val = typeof vObj === "string" ? vObj : vObj.value;
+                    const vPrice = typeof vObj === "string" ? null : vObj.price;
                     const isSelected = selectedVariants[variant.name] === val;
                     return (
                       <button
@@ -221,13 +237,18 @@ export default function ProductInfo({ product, cartRef }) {
                             [variant.name]: val,
                           }))
                         }
-                        className={`min-w-[50px] px-4 py-2.5 text-[10px] font-bold tracking-widest transition-all border uppercase ${
+                        className={`min-w-[50px] px-4 py-2.5 text-[10px] font-bold tracking-widest transition-all border uppercase flex flex-col items-center gap-0.5 ${
                           isSelected
                             ? "bg-black text-white border-black shadow-lg"
                             : "bg-white text-gray-500 border-gray-200 hover:border-black"
                         }`}
                       >
-                        {val}
+                        <span>{val}</span>
+                        {vPrice > 0 && (
+                          <span className={`text-[8px] ${isSelected ? "text-white/60" : "text-zinc-400"}`}>
+                            ৳{vPrice}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -421,21 +442,15 @@ export default function ProductInfo({ product, cartRef }) {
                 const variantString = Object.entries(selectedVariants)
                   .map(([k, v]) => `${k}: ${v}`)
                   .join(", ");
+                
                 const cartProduct = {
                   id: product._id,
                   title: product.title,
-                  price:
-                    hasBundles && selectedBundleId > 1
-                      ? selectedBundle.price
-                      : product.price,
-                  salePrice:
-                    hasBundles && selectedBundleId > 1
-                      ? undefined
-                      : isSaleActive
-                        ? product.salePrice
-                        : undefined,
+                  price: displayPrice,
+                  salePrice: variantPriceOverride > 0 ? 0 : (isSaleActive ? product.salePrice : undefined),
                   image: product.images?.[0] || "",
                 };
+
                 addItem({
                   product: cartProduct,
                   variant: variantString || "Standard",

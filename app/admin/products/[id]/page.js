@@ -54,7 +54,7 @@ export default function EditProductPage() {
       ) : (
         <ProductForm 
           ref={formRef}
-          initialData={productData}
+          initialData={productData?.data}
           onSubmit={handleSave}
           isPending={updateProductMutation.isPending}
         />
