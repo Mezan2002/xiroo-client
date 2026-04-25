@@ -166,9 +166,7 @@ export default function ProductInfo({ product, cartRef }) {
     variantPriceOverride > 0 ? variantPriceOverride : currentActivePrice;
 
   const selectedBundle = activeBundles.find((b) => b.id === selectedBundleId);
-  const unitPrice = selectedBundle
-    ? selectedBundle.unitPrice
-    : displayPrice;
+  const unitPrice = selectedBundle ? selectedBundle.unitPrice : displayPrice;
   const totalPrice = (selectedBundle?.price || unitPrice) * quantity;
 
   return (
@@ -237,7 +235,7 @@ export default function ProductInfo({ product, cartRef }) {
                             [variant.name]: val,
                           }))
                         }
-                        className={`min-w-[50px] px-4 py-2.5 text-[10px] font-bold tracking-widest transition-all border uppercase flex flex-col items-center gap-0.5 ${
+                        className={`min-w-[100px] h-12 px-4 text-[10px] font-bold tracking-widest transition-all border uppercase flex flex-col items-center justify-center gap-0.5 ${
                           isSelected
                             ? "bg-black text-white border-black shadow-lg"
                             : "bg-white text-gray-500 border-gray-200 hover:border-black"
@@ -245,7 +243,9 @@ export default function ProductInfo({ product, cartRef }) {
                       >
                         <span>{val}</span>
                         {vPrice > 0 && (
-                          <span className={`text-[8px] ${isSelected ? "text-white/60" : "text-zinc-400"}`}>
+                          <span
+                            className={`text-[8px] ${isSelected ? "text-white/60" : "text-zinc-400"}`}
+                          >
                             ৳{vPrice}
                           </span>
                         )}
@@ -442,12 +442,17 @@ export default function ProductInfo({ product, cartRef }) {
                 const variantString = Object.entries(selectedVariants)
                   .map(([k, v]) => `${k}: ${v}`)
                   .join(", ");
-                
+
                 const cartProduct = {
                   id: product._id,
                   title: product.title,
                   price: displayPrice,
-                  salePrice: variantPriceOverride > 0 ? 0 : (isSaleActive ? product.salePrice : undefined),
+                  salePrice:
+                    variantPriceOverride > 0
+                      ? 0
+                      : isSaleActive
+                        ? product.salePrice
+                        : undefined,
                   image: product.images?.[0] || "",
                 };
 

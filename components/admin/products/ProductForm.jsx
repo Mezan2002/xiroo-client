@@ -1,10 +1,12 @@
-/* eslint-disable react-hooks/immutability */
 "use client";
 import TiptapEditor from "@/components/admin/shared/TiptapEditor";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
-import { Circle, Plus, Star, Trash2, X } from "lucide-react";
+import { useAttributes } from "@/hooks/api/useAttributes";
+import { useCategories } from "@/hooks/api/useCategories";
+import { useToast } from "@/hooks/useToast";
+import { Plus, Star, Trash2, X } from "lucide-react";
 import {
   forwardRef,
   useEffect,
@@ -12,9 +14,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useToast } from "@/hooks/useToast";
-import { useCategories } from "@/hooks/api/useCategories";
-import { useAttributes } from "@/hooks/api/useAttributes";
 
 const Label = ({ children }) => (
   <label className="text-[10px] font-bold text-zinc-900 uppercase block mb-3 font-montserrat tracking-[0.2em]">
@@ -38,7 +37,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
   const { toast } = useToast();
   const { useCategoryTree } = useCategories();
   const { data: categories = [] } = useCategoryTree();
-  
+
   const { useAttributeRegistry } = useAttributes();
   const { data: attributes = [] } = useAttributeRegistry();
 
@@ -94,7 +93,11 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
         variants:
           initialData.variants?.map((v, i) => ({
             ...v,
-            id: v.id || `v-${Date.now()}-${i}`,
+            id: v._id || v.id || `v-${i}`,
+            values:
+              v.values?.map((val) =>
+                typeof val === "string" ? { value: val, price: "" } : val,
+              ) || [],
           })) || [],
         specifications:
           initialData.specifications?.map((g, i) => ({
@@ -120,7 +123,6 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
       validateAndSave();
     },
   }));
-
 
   const selectedCategoryData = useMemo(() => {
     const cid = product.subCategory || product.category;
@@ -201,7 +203,16 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
   const addVariant = (name = "Option", values = []) =>
     setProduct((p) => ({
       ...p,
-      variants: [...p.variants, { id: Date.now(), name, values }],
+      variants: [
+        ...p.variants,
+        {
+          id: Date.now(),
+          name,
+          values: values.map((val) =>
+            typeof val === "string" ? { value: val, price: "" } : val,
+          ),
+        },
+      ],
     }));
   const removeVariant = (vid) =>
     setProduct((p) => ({
@@ -233,7 +244,10 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
               ...v,
               values: v.values.map((val, i) =>
                 i === idx
-                  ? { ...(typeof val === "string" ? { value: val } : val), price }
+                  ? {
+                      ...(typeof val === "string" ? { value: val } : val),
+                      price,
+                    }
                   : val,
               ),
             }
@@ -354,8 +368,12 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
           {/* Inventory Registry */}
           <div className="flex items-center gap-6 px-6 py-4 bg-zinc-50 border border-zinc-100 group hover:bg-white hover:border-black transition-all duration-300">
             <div className="flex flex-col gap-1 min-w-fit">
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-zinc-500">Inventory Registry</span>
-              <span className="text-[10px] font-black uppercase tracking-tighter text-black">Target Stage</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-zinc-500">
+                Inventory Registry
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-tighter text-black">
+                Target Stage
+              </span>
             </div>
             <div className="flex-1">
               <Select
@@ -375,8 +393,12 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
           {/* Featured Toggle */}
           <div className="flex items-center justify-between px-6 py-4 bg-zinc-50 border border-zinc-100 group hover:bg-white hover:border-black transition-all duration-300">
             <div className="flex flex-col gap-1">
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-zinc-500">Global Visibility</span>
-              <span className="text-[10px] font-black uppercase tracking-tighter text-black">Featured Product</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-zinc-500">
+                Global Visibility
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-tighter text-black">
+                Featured Product
+              </span>
             </div>
             <button
               onClick={() =>
@@ -393,14 +415,23 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
           {/* Manual Badge */}
           <div className="flex items-center gap-6 px-6 py-4 bg-zinc-50 border border-zinc-100 group hover:bg-white hover:border-black transition-all duration-300 sm:col-span-2 lg:col-span-1">
             <div className="flex flex-col gap-1 min-w-fit">
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-zinc-500">Manual Badge</span>
-              <span className="text-[10px] font-black uppercase tracking-tighter text-black">Display Label</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-zinc-500">
+                Manual Badge
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-tighter text-black">
+                Display Label
+              </span>
             </div>
             <div className="flex-1">
               <input
                 type="text"
                 value={product.badge}
-                onChange={(e) => setProduct({ ...product, badge: e.target.value.toUpperCase() })}
+                onChange={(e) =>
+                  setProduct({
+                    ...product,
+                    badge: e.target.value.toUpperCase(),
+                  })
+                }
                 className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-[11px] font-bold uppercase tracking-widest text-black py-1 placeholder:text-zinc-300"
                 placeholder="E.G. HOT, NEW"
                 list="badge-suggestions"
@@ -533,16 +564,27 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
               >
                 <div className="flex items-center justify-between">
                   <input
-                    className="bg-transparent font-bold text-[12px] uppercase tracking-widest text-zinc-900 focus:text-black outline-none border-b border-transparent focus:border-black/10"
+                    className="bg-transparent font-bold text-[12px] uppercase tracking-widest text-zinc-900 focus:text-black outline-none border-b border-transparent focus:border-black/10 w-4/12"
                     value={v.name}
                     onChange={(e) => updateVariantName(v.id, e.target.value)}
                   />
-                  <button
-                    onClick={() => removeVariant(v.id)}
-                    className="text-zinc-200 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex gap-8">
+                    <button
+                      onClick={() => {
+                        const val = prompt("Enter new value:");
+                        if (val) addVariantValue(v.id, val);
+                      }}
+                      className="text-zinc-300 hover:text-black transition-colors"
+                    >
+                      <Plus size={16} />
+                    </button>
+                    <button
+                      onClick={() => removeVariant(v.id)}
+                      className="text-zinc-200 hover:text-red-500 transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-4">
                   {v.values.map((val, idx) => (
@@ -551,16 +593,20 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                       className="px-4 md:px-6 py-2 md:py-3 bg-white border border-zinc-900 text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-3 md:gap-4 text-black shadow-lg shadow-black/5"
                     >
                       <div className="flex flex-col items-start gap-1">
-                        <span className="leading-none">{typeof val === "string" ? val : val.value}</span>
+                        <span className="leading-none">
+                          {typeof val === "string" ? val : val.value}
+                        </span>
                         <div className="flex items-center gap-1 border-b border-zinc-100 pb-0.5">
-                           <span className="text-[8px] text-zinc-400">৳</span>
-                           <input
+                          <span className="text-[8px] text-zinc-400">৳</span>
+                          <input
                             type="number"
                             placeholder="Price"
                             value={typeof val === "string" ? "" : val.price}
-                            onChange={(e) => updateVariantValuePrice(v.id, idx, e.target.value)}
+                            onChange={(e) =>
+                              updateVariantValuePrice(v.id, idx, e.target.value)
+                            }
                             className="bg-transparent border-none outline-none text-[9px] w-12 text-zinc-500 font-bold placeholder:text-zinc-200"
-                           />
+                          />
                         </div>
                       </div>
                       <button onClick={() => removeVariantValue(v.id, idx)}>
@@ -723,7 +769,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-20 gap-y-6 md:gap-y-10">
+                <div className="grid grid-cols-1 gap-x-8 md:gap-x-20 gap-y-6 md:gap-y-10">
                   {group.items.map((item) => (
                     <div
                       key={item.id}
@@ -917,7 +963,9 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                   <input
                     type="date"
                     value={product.saleStartDate}
-                    onChange={(e) => setProduct({ ...product, saleStartDate: e.target.value })}
+                    onChange={(e) =>
+                      setProduct({ ...product, saleStartDate: e.target.value })
+                    }
                     className="w-full bg-white border border-zinc-200 h-12 px-5 text-[11px] font-bold uppercase tracking-widest outline-none focus:border-black transition-all"
                   />
                 </div>
@@ -926,13 +974,16 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                   <input
                     type="date"
                     value={product.saleEndDate}
-                    onChange={(e) => setProduct({ ...product, saleEndDate: e.target.value })}
+                    onChange={(e) =>
+                      setProduct({ ...product, saleEndDate: e.target.value })
+                    }
                     className="w-full bg-white border border-zinc-200 h-12 px-5 text-[11px] font-bold uppercase tracking-widest outline-none focus:border-black transition-all"
                   />
                 </div>
               </div>
               <p className="text-[10px] text-zinc-400 font-medium italic text-center">
-                Leave both dates empty to create a perpetual offer without time constraints.
+                Leave both dates empty to create a perpetual offer without time
+                constraints.
               </p>
             </div>
 

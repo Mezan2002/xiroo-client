@@ -39,7 +39,7 @@ export default function AdminShell({ children }) {
   if (!mounted || isLoading) {
     return (
       <div className="h-screen flex items-center justify-center italic text-gray-400">
-        Checking Identity...!
+        Loading...!
       </div>
     );
   }
