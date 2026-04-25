@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronsLeftRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -56,17 +56,8 @@ export default function ProductComparison() {
           style={{ left: `calc(${sliderPosition}% - 1px)` }}
         >
           {/* Circular Drag Handle */}
-          <div className="w-[42px] h-[42px] bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex items-center justify-center">
-            <ChevronLeft
-              size={16}
-              strokeWidth={1.5}
-              className="text-gray-500 mr-[-2px]"
-            />
-            <ChevronRight
-              size={16}
-              strokeWidth={1.5}
-              className="text-gray-500 ml-[-2px]"
-            />
+          <div className="size-8 p-2 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex items-center justify-center">
+            <ChevronsLeftRight size={20} className="text-gray-500" />
           </div>
         </div>
 
