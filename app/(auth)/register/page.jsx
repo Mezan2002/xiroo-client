@@ -2,13 +2,13 @@
 
 import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
-import { useLayout } from "@/hooks/useLayout";
 import { useAuth } from "@/hooks/api/useAuth";
+import { useLayout } from "@/hooks/useLayout";
 import { useToast } from "@/hooks/useToast";
 import { Eye, EyeOff, Lock, Mail, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 function RegisterForm() {
   const { updateAuthLayout } = useLayout();
@@ -40,7 +40,6 @@ function RegisterForm() {
     });
   }, [updateAuthLayout]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -51,7 +50,9 @@ function RegisterForm() {
 
     registerMutation.mutate(formData, {
       onSuccess: () => {
-        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&mode=otp`);
+        router.push(
+          `/verify-email?email=${encodeURIComponent(formData.email)}&mode=otp`,
+        );
       },
       onError: (err) => {
         toast.error(err.message || "--- Onboarding Failure ---");
@@ -78,11 +79,15 @@ function RegisterForm() {
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-2 group">
-            <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.firstName ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
+            <label
+              className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.firstName ? "text-zinc-800" : "text-gray-400 group-focus-within:text-zinc-800"}`}
+            >
               First Name
             </label>
             <div className="relative">
-              <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.firstName ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
+              <div
+                className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.firstName ? "text-zinc-800" : "text-gray-300 group-focus-within:text-zinc-800"}`}
+              >
                 <UserIcon className="w-3.5 h-3.5 stroke-[1.5]" />
               </div>
               <input
@@ -90,14 +95,16 @@ function RegisterForm() {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[14px] transition-all placeholder:text-gray-300 ${formData.firstName ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
+                className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[14px] transition-all placeholder:text-gray-300 ${formData.firstName ? "border-zinc-800" : "border-gray-200 focus:border-zinc-800"}`}
                 placeholder="John"
                 required
               />
             </div>
           </div>
           <div className="space-y-2 group">
-            <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.lastName ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
+            <label
+              className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.lastName ? "text-zinc-800" : "text-gray-400 group-focus-within:text-zinc-800"}`}
+            >
               Last Name
             </label>
             <input
@@ -105,7 +112,7 @@ function RegisterForm() {
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className={`w-full px-0 py-4 bg-transparent border-b outline-none text-[14px] transition-all placeholder:text-gray-300 ${formData.lastName ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
+              className={`w-full px-0 py-4 bg-transparent border-b outline-none text-[14px] transition-all placeholder:text-gray-300 ${formData.lastName ? "border-zinc-800" : "border-gray-200 focus:border-zinc-800"}`}
               placeholder="Doe"
               required
             />
@@ -113,11 +120,15 @@ function RegisterForm() {
         </div>
 
         <div className="space-y-2 group">
-          <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.email ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
+          <label
+            className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.email ? "text-zinc-800" : "text-gray-400 group-focus-within:text-zinc-800"}`}
+          >
             Email Identity
           </label>
           <div className="relative">
-            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.email ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
+            <div
+              className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.email ? "text-zinc-800" : "text-gray-300 group-focus-within:text-zinc-800"}`}
+            >
               <Mail className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
@@ -125,7 +136,7 @@ function RegisterForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${formData.email ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
+              className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${formData.email ? "border-zinc-800" : "border-gray-200 focus:border-zinc-800"}`}
               placeholder="fashion@xiroo.com"
               required
             />
@@ -133,11 +144,15 @@ function RegisterForm() {
         </div>
 
         <div className="space-y-2 group">
-          <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.password ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
+          <label
+            className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors ${formData.password ? "text-zinc-800" : "text-gray-400 group-focus-within:text-zinc-800"}`}
+          >
             Security Secret
           </label>
           <div className="relative">
-            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.password ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
+            <div
+              className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.password ? "text-zinc-800" : "text-gray-300 group-focus-within:text-zinc-800"}`}
+            >
               <Lock className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
@@ -145,7 +160,7 @@ function RegisterForm() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${formData.password ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
+              className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-300 placeholder:text-gray-300 ${formData.password ? "border-zinc-800" : "border-gray-200 focus:border-zinc-800"}`}
               placeholder="Create Password"
               required
             />
@@ -211,7 +226,10 @@ function RegisterForm() {
           </div>
         </div>
 
-        <SocialAuthButton text="GOOGLE IDENTITY" onClick={handleGoogleLogin} />
+        <SocialAuthButton
+          text="REGISTER WITH GOOGLE"
+          onClick={handleGoogleLogin}
+        />
 
         <div className="pt-8 text-center border-t border-gray-50 mt-8">
           <p className="text-[12px] font-medium text-gray-400">
@@ -231,7 +249,13 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-400 text-sm">Initializing Registry...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-center py-20 text-gray-400 text-sm">
+          Initializing Registry...
+        </div>
+      }
+    >
       <RegisterForm />
     </Suspense>
   );

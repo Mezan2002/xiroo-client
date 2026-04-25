@@ -307,6 +307,7 @@ export function Navbar() {
                           images={product.images}
                           hoverImage={product.images?.[1]}
                           variants={product.variants}
+                          badge={product.badge}
                         />
                       </div>
                     ))

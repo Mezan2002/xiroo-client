@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useUser } from "@/hooks/api/useUser";
+import { Bell, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminSidebar from "./AdminSidebar";
 import SearchModal from "./SearchModal";
-import { Menu, Bell, X } from "lucide-react";
 
 export default function AdminShell({ children }) {
   const { user, isLoading } = useUser();
@@ -39,7 +39,7 @@ export default function AdminShell({ children }) {
   if (!mounted || isLoading) {
     return (
       <div className="h-screen flex items-center justify-center italic text-gray-400">
-        Synchronizing Identity...
+        Checking Identity...!
       </div>
     );
   }
@@ -84,11 +84,15 @@ export default function AdminShell({ children }) {
             <div className="w-6 h-6 bg-black text-white flex items-center justify-center font-bold text-[11px]">
               X
             </div>
-            <span className="text-[13px] font-bold text-[#37352F]">Xiroo Admin</span>
+            <span className="text-[13px] font-bold text-[#37352F]">
+              Xiroo Admin
+            </span>
           </div>
 
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent("open-admin-search"))}
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("open-admin-search"))
+            }
             className="p-2 -mr-2 text-[#37352F80] hover:text-[#37352F] transition-colors"
             aria-label="Search"
           >

@@ -107,6 +107,7 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
               <th 
                 key={col.key} 
                 className={`px-3 py-3 text-[12px] font-medium text-[#37352F80] whitespace-nowrap ${col.align === 'right' ? 'text-right' : ''}`}
+                style={col.width ? { width: col.width, minWidth: col.width } : {}}
               >
                 {col.label}
               </th>
@@ -118,7 +119,11 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
             Array.from({ length: 5 }).map((_, i) => (
               <tr key={i} className="animate-pulse">
                 {columns.map((col, j) => (
-                  <td key={j} className="px-3 py-4">
+                  <td 
+                    key={j} 
+                    className="px-3 py-4"
+                    style={col.width ? { width: col.width, minWidth: col.width } : {}}
+                  >
                     <div className="h-4 bg-gray-50 rounded w-full" />
                   </td>
                 ))}
@@ -128,7 +133,11 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
             data.map((row, idx) => (
               <tr key={row.id || idx} className="group hover:bg-[#F7F7F5] transition-colors">
                 {columns.map((col) => (
-                  <td key={col.key} className={`px-3 py-4 ${col.align === 'right' ? 'text-right' : ''}`}>
+                  <td 
+                    key={col.key} 
+                    className={`px-3 py-4 ${col.align === 'right' ? 'text-right' : ''}`}
+                    style={col.width ? { width: col.width, minWidth: col.width, maxWidth: col.width } : {}}
+                  >
                     {renderCell(col, row)}
                   </td>
                 ))}

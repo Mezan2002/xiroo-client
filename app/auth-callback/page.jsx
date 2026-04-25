@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { setToken } from "@/lib/auth";
-import axiosInstance from "@/lib/axios";
 import { useUser } from "@/hooks/api/useUser";
-import { RefreshCw } from "lucide-react";
-import { useDispatch } from "react-redux";
+import axiosInstance from "@/lib/axios";
 import { setCredentials } from "@/redux/slices/authSlice";
+import { RefreshCw } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -21,7 +20,7 @@ function AuthCallbackContent() {
     if (token) {
       // 1. Session Registry Persistence (Redux + LocalStorage)
       dispatch(setCredentials({ token }));
-      
+
       // 2. High-Performance Identity Synchronization
       // We wait for the profile refresh to complete before moving the user
       // to the home page, ensuring a seamless "identified" state.
@@ -32,10 +31,10 @@ function AuthCallbackContent() {
           await axiosInstance.get("/users/me", {
             headers: { Authorization: token },
           });
-          
+
           // Re-trigger global query refetch to hydrate UI
           await refreshUser();
-          
+
           router.push("/");
         } catch (error) {
           console.error("Identity Sync Protocol Breach:", error);
@@ -58,10 +57,10 @@ function AuthCallbackContent() {
           <div className="w-8 h-8 bg-zinc-800 rounded-none scale-75 animate-pulse"></div>
         </div>
       </div>
-      
+
       <div className="text-center space-y-2">
         <h2 className="text-[14px] font-montserrat font-bold uppercase tracking-[0.3em] text-zinc-800">
-          Synchronizing Identity
+          Checking Identity...!
         </h2>
         <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest animate-pulse">
           Establishing secure protocol connection...
@@ -73,11 +72,13 @@ function AuthCallbackContent() {
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 animate-spin text-zinc-100" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <RefreshCw className="w-8 h-8 animate-spin text-zinc-100" />
+        </div>
+      }
+    >
       <AuthCallbackContent />
     </Suspense>
   );

@@ -221,7 +221,7 @@ export default function ProductInfo({ product, cartRef }) {
                             [variant.name]: val,
                           }))
                         }
-                        className={`min-w-[50px] px-4 py-2.5 text-[10px] font-bold tracking-widest transition-all border ${
+                        className={`min-w-[50px] px-4 py-2.5 text-[10px] font-bold tracking-widest transition-all border uppercase ${
                           isSelected
                             ? "bg-black text-white border-black shadow-lg"
                             : "bg-white text-gray-500 border-gray-200 hover:border-black"
@@ -350,11 +350,11 @@ export default function ProductInfo({ product, cartRef }) {
                   className="w-[14px] h-[14px] lg:w-[16px] lg:h-[16px] text-white"
                   strokeWidth={2.5}
                 />
-                <span className="text-[10px] lg:text-[12px] font-bold tracking-[0.2em] uppercase">
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase">
                   Place order IN {timeLeft}
                 </span>
               </div>
-              <div className="text-[9px] lg:text-[11px] font-bold tracking-[0.2em] uppercase text-gray-500">
+              <div className="text-[9px] font-semibold tracking-[0.2em] uppercase text-gray-500">
                 Arriving{" "}
                 <span className="text-white ml-1.5 lg:ml-2">
                   {dates.delivered}

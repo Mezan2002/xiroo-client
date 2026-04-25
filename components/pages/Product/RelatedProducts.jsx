@@ -40,6 +40,7 @@ export default function RelatedProducts({ categoryId, currentProductId }) {
             hoverImage={item.images?.[1]}
             variants={item.variants}
             stockStage={item.stockStage}
+            badge={item.badge}
           />
         ))}
       </div>

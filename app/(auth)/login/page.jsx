@@ -2,18 +2,17 @@
 
 import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import { Button } from "@/components/ui/Button";
-import { useLayout } from "@/hooks/useLayout";
 import { useAuth } from "@/hooks/api/useAuth";
 import { useUser } from "@/hooks/api/useUser";
+import { useLayout } from "@/hooks/useLayout";
 import { useToast } from "@/hooks/useToast";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 function LoginForm() {
   const { updateAuthLayout } = useLayout();
-
 
   const searchParams = useSearchParams();
   const { user, isAuthenticated } = useUser();
@@ -21,7 +20,7 @@ function LoginForm() {
 
   const { toast } = useToast();
   const router = useRouter();
-  
+
   // High-Performance Redirect for Authenticated Protocol
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -50,7 +49,6 @@ function LoginForm() {
     });
   }, [updateAuthLayout]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -67,7 +65,9 @@ function LoginForm() {
       onError: (err) => {
         if (err.code === "VERIFICATION_REQUIRED") {
           toast.info("Security Verification Pending. Please Check Your Email.");
-          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&mode=otp`);
+          router.push(
+            `/verify-email?email=${encodeURIComponent(formData.email)}&mode=otp`,
+          );
         } else {
           toast.error(err.message || "--- Identification Failure ---");
         }
@@ -93,11 +93,15 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="space-y-2 group">
-          <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${formData.email ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
+          <label
+            className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${formData.email ? "text-zinc-800" : "text-gray-400 group-focus-within:text-zinc-800"}`}
+          >
             Email
           </label>
           <div className="relative">
-            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.email ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
+            <div
+              className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.email ? "text-zinc-800" : "text-gray-300 group-focus-within:text-zinc-800"}`}
+            >
               <Mail className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
@@ -105,7 +109,7 @@ function LoginForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${formData.email ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
+              className={`w-full pl-8 pr-4 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${formData.email ? "border-zinc-800" : "border-gray-200 focus:border-zinc-800"}`}
               placeholder="your@email.com"
               required
             />
@@ -114,7 +118,9 @@ function LoginForm() {
 
         <div className="space-y-2 group">
           <div className="flex justify-between items-center">
-            <label className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${formData.password ? 'text-zinc-800' : 'text-gray-400 group-focus-within:text-zinc-800'}`}>
+            <label
+              className={`text-[9px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${formData.password ? "text-zinc-800" : "text-gray-400 group-focus-within:text-zinc-800"}`}
+            >
               Password
             </label>
             <Link
@@ -125,7 +131,9 @@ function LoginForm() {
             </Link>
           </div>
           <div className="relative">
-            <div className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.password ? 'text-zinc-800' : 'text-gray-300 group-focus-within:text-zinc-800'}`}>
+            <div
+              className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors ${formData.password ? "text-zinc-800" : "text-gray-300 group-focus-within:text-zinc-800"}`}
+            >
               <Lock className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
@@ -133,7 +141,7 @@ function LoginForm() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${formData.password ? 'border-zinc-800' : 'border-gray-200 focus:border-zinc-800'}`}
+              className={`w-full pl-8 pr-12 py-4 bg-transparent border-b outline-none text-[15px] font-medium transition-all duration-500 placeholder:text-gray-300 ${formData.password ? "border-zinc-800" : "border-gray-200 focus:border-zinc-800"}`}
               placeholder="••••••••"
               required
             />
@@ -177,7 +185,10 @@ function LoginForm() {
           </div>
         </div>
 
-        <SocialAuthButton onClick={handleGoogleLogin} />
+        <SocialAuthButton
+          text="LOGIN WITH GOOGLE"
+          onClick={handleGoogleLogin}
+        />
 
         <div className="pt-10 text-center">
           <p className="text-[12px] font-medium text-gray-400">
@@ -197,7 +208,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-400 text-sm">Authenticating...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-center py-20 text-gray-400 text-sm">
+          Authenticating...
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

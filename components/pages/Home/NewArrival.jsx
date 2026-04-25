@@ -53,6 +53,7 @@ export default function NewArrival() {
             image={product.images?.[0]}
             variants={product.variants}
             stockStage={product.stockStage}
+            badge={product.badge}
             priority={idx === 0}
           />
         ))}

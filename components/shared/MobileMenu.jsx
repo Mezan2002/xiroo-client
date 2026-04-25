@@ -115,6 +115,7 @@ export default function MobileMenu({ isOpen, onClose, navItems }) {
                         images={product.images}
                         variants={product.variants}
                         stockStage={product.stockStage}
+                        badge={product.badge}
                       />
                     </div>
                   ))}

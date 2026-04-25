@@ -24,6 +24,7 @@ export default function ProductCard({
   onRemove = null,
   priority = false,
   stockStage = "in-stock",
+  badge,
 }) {
   const { user } = useUser();
   const { addItem } = useCart();
@@ -53,6 +54,20 @@ export default function ProductCard({
   const formattedPrice =
     typeof price === "string" ? price.replace("$", "৳") : `৳${price}`;
 
+  const badgeText = (() => {
+    if (badge) return badge;
+    if (stockStage !== "in-stock") return stockStage.replace("-", " ");
+    
+    const numPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.-]+/g,"")) : price;
+    const numSalePrice = typeof salePrice === 'string' ? parseFloat(salePrice.replace(/[^0-9.-]+/g,"")) : salePrice;
+
+    if (numSalePrice && numSalePrice > 0 && numPrice > numSalePrice) {
+      const discount = Math.round(((numPrice - numSalePrice) / numPrice) * 100);
+      return `SALE ${discount}% OFF`;
+    }
+    return null;
+  })();
+
   const nextImage = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -76,11 +91,11 @@ export default function ProductCard({
     >
       {/* Image Block wrapper */}
       <div className="relative w-full mb-4 overflow-hidden bg-white border border-zinc-100 group-hover:border-zinc-200 transition-colors duration-500">
-        {/* Status Badge (Minimal Editorial) */}
-        {!showRemove && (
+        {/* Status Badge (Dynamic Logic) */}
+        {!showRemove && badgeText && (
           <div className="absolute top-0 left-0 z-30 px-2 py-1 bg-white border-r border-b border-zinc-100">
             <p className="text-[8px] font-bold tracking-[0.2em] text-black uppercase">
-              {stockStage !== "in-stock" ? stockStage.replace("-", " ") : "NEW"}
+              {badgeText}
             </p>
           </div>
         )}

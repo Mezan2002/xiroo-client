@@ -231,6 +231,7 @@ export default function CategoryView({ category }) {
                   variants={product.variants}
                   priority={idx < 4}
                   stockStage={product.stockStage}
+                  badge={product.badge}
                 />
               ))}
             </div>

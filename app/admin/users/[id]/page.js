@@ -1,14 +1,12 @@
 "use client";
-import React from "react";
-import { useParams, useRouter } from "next/navigation";
+import DataTable from "@/components/admin/shared/DataTable";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import UserForm from "@/components/admin/users/UserForm";
-import DataTable from "@/components/admin/shared/DataTable";
-import { Shield, Clock, User, ShoppingBag } from "lucide-react";
-import { useToast } from "@/hooks/useToast";
-import { useUsers } from "@/hooks/api/useUsers";
 import { useLoyalty } from "@/hooks/api/useLoyalty";
-
+import { useUsers } from "@/hooks/api/useUsers";
+import { useToast } from "@/hooks/useToast";
+import { Clock, Shield, User } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 
 const ORDER_COLUMNS = [
   { key: "id", label: "Registry ID", type: "text" },
@@ -22,43 +20,52 @@ export default function UserDetail() {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const { useUserDetail, updateUser } = useUsers();
   const { useLoyaltySettings } = useLoyalty();
-  
+
   const { data: userData, isLoading: isUserLoading } = useUserDetail(id);
-  const { data: loyaltySettings, isLoading: isLoyaltyLoading } = useLoyaltySettings();
+  const { data: loyaltySettings, isLoading: isLoyaltyLoading } =
+    useLoyaltySettings();
 
   const isPageLoading = isUserLoading || isLoyaltyLoading;
 
   const currentTierConfig = loyaltySettings?.tierConfig?.find(
-    t => t.tier.toLowerCase() === (userData?.tier || "bronze").toLowerCase()
+    (t) => t.tier.toLowerCase() === (userData?.tier || "bronze").toLowerCase(),
   );
 
   const handleSubmit = async (data) => {
-    updateUser.mutate({ id, data }, {
-      onSuccess: () => {
-        toast.success("User Registry Synchronized Successfully.");
-        router.push("/admin/users");
+    updateUser.mutate(
+      { id, data },
+      {
+        onSuccess: () => {
+          toast.success("User Registry Synchronized Successfully.");
+          router.push("/admin/users");
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to modify user registry.");
+        },
       },
-      onError: (err) => {
-        toast.error(err.message || "Failed to modify user registry.");
-      }
-    });
+    );
   };
 
-  if (isPageLoading) return <div className="h-screen flex items-center justify-center italic text-gray-400">Synchronizing Identity...</div>;
+  if (isPageLoading)
+    return (
+      <div className="h-screen flex items-center justify-center italic text-gray-400">
+        Checking Identity...!
+      </div>
+    );
   if (!userData) return null;
 
   return (
     <div className="space-y-16 pb-24 animate-in fade-in duration-700">
-      <ModuleHeader 
+      <ModuleHeader
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Users", href: "/admin/users" },
-          { label: "Identity Refinement", active: true }
+          { label: "Identity Refinement", active: true },
         ]}
-        title="Identity Analysis" 
+        title="Identity Analysis"
         icon={User}
       />
 
@@ -67,17 +74,27 @@ export default function UserDetail() {
           {/* Intelligence Grid - 4 Columns */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="p-8 bg-[#FDFDFB] border border-gray-100 space-y-4">
-              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Loyalty Engagement</p>
+              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                Loyalty Engagement
+              </p>
               <div className="flex items-end gap-2">
-                <p className="text-[32px] font-bold tracking-tighter text-black leading-none">{userData.points || 0}</p>
-                <p className="text-[10px] font-bold text-emerald-500 uppercase pb-1 tracking-widest">Points</p>
+                <p className="text-[32px] font-bold tracking-tighter text-black leading-none">
+                  {userData.points || 0}
+                </p>
+                <p className="text-[10px] font-bold text-emerald-500 uppercase pb-1 tracking-widest">
+                  Points
+                </p>
               </div>
             </div>
 
             <div className="p-8 bg-white border border-gray-100 space-y-4">
-              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Membership Tier</p>
+              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                Membership Tier
+              </p>
               <div className="flex items-center gap-3">
-                <p className="text-[18px] font-bold tracking-tight text-black uppercase">{userData.tier || "Bronze"}</p>
+                <p className="text-[18px] font-bold tracking-tight text-black uppercase">
+                  {userData.tier || "Bronze"}
+                </p>
                 {(() => {
                   const tier = (userData.tier || "bronze").toLowerCase();
                   const tierStyles = {
@@ -88,25 +105,37 @@ export default function UserDetail() {
                     diamond: "bg-[#B9F2FF20] border-[#70D1F1] text-[#0A4D68]",
                   };
                   return (
-                    <span className={`text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 border ${tierStyles[tier] || tierStyles.bronze}`}>
+                    <span
+                      className={`text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 border ${tierStyles[tier] || tierStyles.bronze}`}
+                    >
                       Verified
                     </span>
                   );
                 })()}
               </div>
             </div>
-            
+
             <div className="p-8 bg-white border border-gray-100 space-y-2">
-              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Core Access</p>
-              <p className="text-[18px] font-bold tracking-tight text-black uppercase">{userData.role}</p>
+              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                Core Access
+              </p>
+              <p className="text-[18px] font-bold tracking-tight text-black uppercase">
+                {userData.role}
+              </p>
             </div>
 
             <div className="p-8 bg-black space-y-4">
-              <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Administrative Context</p>
+              <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">
+                Administrative Context
+              </p>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[14px] font-bold text-white uppercase mb-1">{userData.authType || 'Direct'}</p>
-                  <p className="text-[9px] text-zinc-500 font-medium">Authentication Vector</p>
+                  <p className="text-[14px] font-bold text-white uppercase mb-1">
+                    {userData.authType || "Direct"}
+                  </p>
+                  <p className="text-[9px] text-zinc-500 font-medium">
+                    Authentication Vector
+                  </p>
                 </div>
                 <Shield size={16} className="text-zinc-500" />
               </div>
@@ -118,13 +147,17 @@ export default function UserDetail() {
             <div className="p-8 bg-[#FAFAFA] border border-gray-100 flex flex-wrap items-center gap-x-8 gap-y-4">
               <div className="flex items-center gap-3 shrink-0">
                 <div className="w-1 h-4 bg-black" />
-                <p className="text-[10px] font-bold text-black uppercase tracking-[0.2em]">Prestige Privileges</p>
+                <p className="text-[10px] font-bold text-black uppercase tracking-[0.2em]">
+                  Prestige Privileges
+                </p>
               </div>
               <div className="flex flex-wrap items-center gap-4">
                 {currentTierConfig.benefits.map((benefit, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <div className="w-1 h-1 rounded-full bg-zinc-300" />
-                    <span className="text-[11px] font-medium text-zinc-600 lowercase italic">{benefit}</span>
+                    <span className="text-[11px] font-medium text-zinc-600 lowercase italic">
+                      {benefit}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -141,7 +174,7 @@ export default function UserDetail() {
                 Registry Profile
               </h3>
             </div>
-            <UserForm 
+            <UserForm
               initialData={userData}
               onSubmit={handleSubmit}
               isLoading={isLoading}
@@ -156,7 +189,7 @@ export default function UserDetail() {
               </h3>
             </div>
             <div className="border border-gray-100 bg-white p-1">
-              <DataTable 
+              <DataTable
                 columns={ORDER_COLUMNS}
                 data={[]} // Future: Integrate real order history
                 loading={false}

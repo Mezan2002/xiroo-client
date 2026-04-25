@@ -49,24 +49,26 @@ export default function AdminInventory() {
       label: "Product", 
       type: "image", 
       titleKey: "title",
+      width: "300px",
       render: (row) => (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 overflow-hidden">
           <div className="w-10 h-10 bg-[#F7F7F5] relative shrink-0 rounded-sm overflow-hidden border border-[#EDECE9]">
             {row.images?.[0] && (
               <img src={row.images[0]} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
             )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-[13px] font-medium text-[#37352F] line-clamp-1">{row.title}</span>
-            <span className="text-[11px] text-[#37352F80]">{row.category?.name || "Unclassified"}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[13px] font-medium text-[#37352F] line-clamp-1 truncate" title={row.title}>{row.title}</span>
+            <span className="text-[11px] text-[#37352F80] truncate">{row.category?.name || "Unclassified"}</span>
           </div>
         </div>
       )
     },
-    { key: "sku", label: "SKU", type: "text", mono: true },
+    { key: "sku", label: "SKU", type: "text", mono: true, width: "140px" },
     { 
       key: "isActive", 
       label: "Status", 
+      width: "120px",
       render: (row) => (
         <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm ${
           row.inventory > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
@@ -78,11 +80,19 @@ export default function AdminInventory() {
     { 
       key: "price", 
       label: "Price", 
+      width: "100px",
       render: (row) => <span className="text-[13px] font-medium">৳{row.price?.toLocaleString()}</span>
+    },
+    { 
+      key: "salePrice", 
+      label: "Sale Price", 
+      width: "100px",
+      render: (row) => <span className="text-[13px] font-medium text-emerald-600">৳{(row.salePrice || 0).toLocaleString()}</span>
     },
     { 
       key: "inventory", 
       label: "Registry Count", 
+      width: "140px",
       render: (row) => (
         <div className="flex flex-col">
           <span className="text-[13px] font-mono">{row.inventory} Units</span>

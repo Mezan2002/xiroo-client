@@ -3,7 +3,10 @@
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 
-export default function SocialAuthButton({ text = "GOOGLE IDENTITY", onClick }) {
+export default function SocialAuthButton({
+  text = "AUTHENTICATE WITH GOOGLE",
+  onClick,
+}) {
   return (
     <Button
       type="button"

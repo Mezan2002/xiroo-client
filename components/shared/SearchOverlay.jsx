@@ -156,6 +156,7 @@ export function SearchOverlay({ isOpen, onClose }) {
                           image={product.images?.[0]}
                           images={product.images}
                           variants={product.variants}
+                          badge={product.badge}
                         />
                       </div>
                     ))}
@@ -208,6 +209,7 @@ export function SearchOverlay({ isOpen, onClose }) {
                             image={product.images?.[0]}
                             images={product.images}
                             variants={product.variants}
+                            badge={product.badge}
                           />
                         </div>
                       ))}
@@ -248,9 +250,8 @@ export function SearchOverlay({ isOpen, onClose }) {
                             title={product.title}
                             price={product.price}
                             salePrice={product.salePrice}
-                            image={product.images?.[0]}
-                            images={product.images}
                             variants={product.variants}
+                            badge={product.badge}
                           />
                         </div>
                       ))}

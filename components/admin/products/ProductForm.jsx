@@ -60,6 +60,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
     images: [],
     stockStage: "in-stock",
     isFeatured: false,
+    badge: "",
   });
 
   const formatDate = (date) => {
@@ -89,6 +90,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
         images: initialData.images || [],
         stockStage: initialData.stockStage || "in-stock",
         isFeatured: initialData.isFeatured || false,
+        badge: initialData.badge || "",
         variants:
           initialData.variants?.map((v, i) => ({
             ...v,
@@ -173,6 +175,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
       subCategory: product.subCategory || undefined,
       stockStage: product.stockStage || "in-stock",
       isFeatured: product.isFeatured || false,
+      badge: product.badge || undefined,
       variants: product.variants.map((v) => ({
         name: v.name,
         values: v.values,
@@ -357,6 +360,28 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
                   className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all duration-500 ${product.isFeatured ? "left-6" : "left-1"}`}
                 />
               </button>
+            </div>
+            <div className="flex items-center gap-4 md:gap-8 px-4 md:px-8 py-2 bg-zinc-50 border border-zinc-100 flex-1 sm:flex-none">
+              <div className="flex flex-col gap-1 min-w-fit">
+                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Manual Badge</span>
+                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tighter text-black">Display Label</span>
+              </div>
+              <div className="w-full sm:w-40 md:w-48">
+                <input
+                  type="text"
+                  value={product.badge}
+                  onChange={(e) => setProduct({ ...product, badge: e.target.value.toUpperCase() })}
+                  className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-[11px] font-bold uppercase tracking-widest text-black py-1 placeholder:text-zinc-300"
+                  placeholder="e.g. HOT, NEW"
+                  list="badge-suggestions"
+                />
+                <datalist id="badge-suggestions">
+                  <option value="NEW" />
+                  <option value="HOT" />
+                  <option value="LIMITED" />
+                  <option value="BEST SELLER" />
+                </datalist>
+              </div>
             </div>
           </div>
         </div>
