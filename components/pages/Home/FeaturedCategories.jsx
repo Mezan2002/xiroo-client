@@ -1,9 +1,9 @@
 "use client";
 
+import { useCategories } from "@/hooks/api/useCategories";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useMemo } from "react";
-import { useCategories } from "@/hooks/api/useCategories";
+import { useMemo, useState } from "react";
 
 // Fallback images for categories without a custom image
 const FALLBACK_IMAGES = [
@@ -35,7 +35,7 @@ export default function FeaturedCategories() {
 
   if (isLoading) {
     return (
-      <section className="w-full py-24 lg:py-32 px-6 lg:px-12 max-w-[1600px] mx-auto">
+      <section className="w-full py-24 lg:py-32 px-6 lg:px-12">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-24 animate-pulse">
           <div className="w-full lg:w-7/12 flex flex-col gap-6 lg:gap-8">
             {[1, 2, 3, 4].map((i) => (
@@ -53,7 +53,7 @@ export default function FeaturedCategories() {
   if (categories.length === 0) return null;
 
   return (
-    <section className="w-full py-24 lg:py-32 px-6 lg:px-12 max-w-[1600px] mx-auto">
+    <section className="w-full py-24 lg:py-32 px-6 lg:px-12">
       <div className="flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-24">
         {/* Left Side: Category List */}
         <div className="w-full lg:w-7/12 flex flex-col gap-6 lg:gap-8">

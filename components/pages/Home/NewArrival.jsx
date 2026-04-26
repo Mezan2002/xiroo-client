@@ -10,7 +10,7 @@ export default function NewArrival() {
 
   if (isLoading) {
     return (
-      <section className="w-full py-20 lg:py-32 px-6 lg:px-12 max-w-[1600px] mx-auto border-t border-gray-100">
+      <section className="w-full py-20 lg:py-32 px-6 lg:px-12 border-t border-gray-100">
         <div className="flex justify-center mb-12 lg:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-[40px] font-mono tracking-[0.15em] lg:tracking-[0.2em] font-medium text-black uppercase">
             NEW ARRIVAL
@@ -32,7 +32,7 @@ export default function NewArrival() {
   if (products.length === 0) return null;
 
   return (
-    <section className="w-full py-20 lg:py-32 px-6 lg:px-12 max-w-[1600px] mx-auto border-t border-gray-100">
+    <section className="w-full py-20 lg:py-32 px-6 lg:px-12 border-t border-gray-100">
       {/* Section Header */}
       <div className="flex justify-center mb-12 lg:mb-16">
         <h2 className="text-3xl md:text-4xl lg:text-[40px] font-mono tracking-[0.15em] lg:tracking-[0.2em] font-medium text-black uppercase">
