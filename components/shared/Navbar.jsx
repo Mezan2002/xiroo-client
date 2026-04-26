@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import { UserAvatar } from "./UserAvatar";
 
@@ -124,7 +124,10 @@ export function Navbar() {
       setNavItems(items);
       setMenusData(data);
       if (typeof window !== "undefined" && items.length > 0) {
-        localStorage.setItem("xiroo_cached_nav", JSON.stringify({ items, data }));
+        localStorage.setItem(
+          "xiroo_cached_nav",
+          JSON.stringify({ items, data }),
+        );
       }
     }
   }, [menuResponse, productsResponse]);
@@ -374,7 +377,7 @@ export function Navbar() {
             >
               <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
               {mounted && itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white ring-2 ring-white">
+                <span className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-black text-[7px] font-medium text-white ring-1 ring-white">
                   {itemCount}
                 </span>
               )}

@@ -459,12 +459,14 @@ export default function ProductInfo({ product, cartRef }) {
                 addItem({
                   product: cartProduct,
                   variant: variantString || "Standard",
+                  quantity,
                   silent: true,
                 });
                 toast.success("Added to your shopping bag");
               }}
             >
-              ADD TO BAG
+              ADD TO CART — ৳{(displayPrice * quantity).toLocaleString()}
+              {quantity > 1 ? ` (${quantity} ITEMS)` : ""}
             </Button>
             <Button
               variant="outline"

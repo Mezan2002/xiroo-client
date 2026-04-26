@@ -211,7 +211,7 @@ export default function ProductCard({
         {/* Integrated Quick Add Bar */}
         {!["out-of-stock", "upcoming"].includes(stockStage) && (
           <button
-            className={`absolute bottom-0 left-0 right-0 h-10 md:h-12 bg-black text-white text-[9px] md:text-[10px] font-bold tracking-[0.2em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-30 uppercase ${
+            className={`absolute bottom-0 left-0 right-0 h-10 bg-black text-white text-[9px] md:text-[10px] font-bold tracking-[0.2em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] z-30 uppercase ${
               isHovered
                 ? "translate-y-0 opacity-100"
                 : "translate-y-full opacity-0"

@@ -2,6 +2,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hydrate } from "@/redux/slices/authSlice";
+import { setCart } from "@/redux/slices/cartSlice";
+import { setWishlist } from "@/redux/slices/wishlistSlice";
+import { setRecentlyViewed } from "@/redux/slices/recentlyViewedSlice";
 import { useSocket } from "@/context/SocketContext"; // Socket stays in context for now as a singleton
 import { addNotification } from "@/redux/slices/notificationSlice";
 import { addToast } from "@/redux/slices/toastSlice";
@@ -21,7 +24,24 @@ export default function AppInitializer({ children }) {
 
   // 1. Technical Hydration: Restore Session from Storage
   useEffect(() => {
+    // Auth Hydration
     dispatch(hydrate());
+
+    // Registry Hydration (Client-only)
+    if (typeof window !== "undefined") {
+      try {
+        const cartData = localStorage.getItem("xiroo_cart_registry");
+        if (cartData) dispatch(setCart(JSON.parse(cartData)));
+
+        const wishlistData = localStorage.getItem("xiroo_wishlist_registry");
+        if (wishlistData) dispatch(setWishlist(JSON.parse(wishlistData)));
+
+        const recentData = localStorage.getItem("xiroo_recently_viewed");
+        if (recentData) dispatch(setRecentlyViewed(JSON.parse(recentData)));
+      } catch (error) {
+        console.error("Critical Hydration Failure:", error);
+      }
+    }
   }, [dispatch]);
 
   // 2. Real-time Synchronization: Socket-to-Redux Bridge

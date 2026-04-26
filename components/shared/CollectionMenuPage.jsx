@@ -5,6 +5,7 @@ import { useMenus } from "@/hooks/api/useMenus";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default function CollectionMenuPage({ slug, title }) {
   const { useMenuBySlug } = useMenus();
@@ -22,19 +23,7 @@ export default function CollectionMenuPage({ slug, title }) {
   }
 
   if (isError || !menu) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen pt-32 px-6">
-        <h1 className="text-2xl font-light uppercase tracking-[0.2em] text-zinc-400">
-          Section Not Found
-        </h1>
-        <Link
-          href="/"
-          className="mt-8 text-[11px] font-bold uppercase tracking-widest border-b border-black pb-1"
-        >
-          Return Home
-        </Link>
-      </div>
-    );
+    notFound();
   }
 
   return (

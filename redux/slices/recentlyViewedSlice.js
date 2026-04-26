@@ -20,11 +20,14 @@ const recentlyViewedSlice = createSlice({
       // Prepend the new item at the top
       state.items = [incoming, ...filtered].slice(0, MAX_RECENT_ITEMS);
     },
+    setRecentlyViewed: (state, action) => {
+      state.items = action.payload;
+    },
     clearRecentViews: (state) => {
       state.items = [];
     },
   },
 });
 
-export const { addRecentView, clearRecentViews } = recentlyViewedSlice.actions;
+export const { addRecentView, setRecentlyViewed, clearRecentViews } = recentlyViewedSlice.actions;
 export default recentlyViewedSlice.reducer;

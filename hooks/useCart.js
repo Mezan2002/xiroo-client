@@ -10,8 +10,8 @@ export const useCart = () => {
   const dispatch = useDispatch();
   const { items, subtotal, itemCount, discount, discountAmount, total } = useSelector((state) => state.cart);
 
-  const addItem = ({ product, variant = "Standard", silent = false }) => {
-    dispatch(addToCart({ product, variant }));
+  const addItem = ({ product, variant = "Standard", quantity = 1, silent = false }) => {
+    dispatch(addToCart({ product, variant, quantity }));
     if (!silent) {
       dispatch(addToast({ message: "Product added to cart.", type: "success" }));
     }

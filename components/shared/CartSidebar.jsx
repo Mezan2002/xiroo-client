@@ -1,5 +1,8 @@
 "use client";
 
+import { useDiscounts } from "@/hooks/api/useDiscounts";
+import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/hooks/useToast";
 import {
   Minus,
   Plus,
@@ -11,16 +14,23 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/hooks/useCart";
-import { Button } from "../ui/Button";
 import { useEffect, useState } from "react";
-import { useDiscounts } from "@/hooks/api/useDiscounts";
-import { useToast } from "@/hooks/useToast";
+import { Button } from "../ui/Button";
 
 const FREE_SHIPPING_THRESHOLD = 2000;
 
 export function CartSidebar({ isOpen, onClose }) {
-  const { items, subtotal, discount, discountAmount, total, updateQuantity, removeItem, applyDiscount, removeDiscount } = useCart();
+  const {
+    items,
+    subtotal,
+    discount,
+    discountAmount,
+    total,
+    updateQuantity,
+    removeItem,
+    applyDiscount,
+    removeDiscount,
+  } = useCart();
   const [activeDrawer, setActiveDrawer] = useState(null); // 'note' or 'coupon'
   const [note, setNote] = useState("");
   const [coupon, setCoupon] = useState("");
@@ -38,9 +48,11 @@ export function CartSidebar({ isOpen, onClose }) {
           setCoupon("");
         },
         onError: (err) => {
-          toast.error(err?.response?.data?.message || err.message || "Invalid Coupon");
-        }
-      }
+          toast.error(
+            err?.response?.data?.message || err.message || "Invalid Coupon",
+          );
+        },
+      },
     );
   };
 
@@ -83,7 +95,7 @@ export function CartSidebar({ isOpen, onClose }) {
         >
           <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
               <div className="flex items-center gap-3">
                 <h2 className="text-[24px] font-medium text-black">Cart</h2>
                 <span className="flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full text-[12px] font-medium text-gray-400">
@@ -150,9 +162,12 @@ export function CartSidebar({ isOpen, onClose }) {
               {items.length > 0 ? (
                 <div className="flex flex-col gap-10">
                   {items.map((item) => (
-                    <div key={`${item._id || item.id}-${item.variant}`} className="flex gap-4">
+                    <div
+                      key={`${item._id || item.id}-${item.variant}`}
+                      className="flex gap-4"
+                    >
                       {/* Thumbnail */}
-                      <Link 
+                      <Link
                         href={`/product/${item._id || item.id}`}
                         onClick={onClose}
                         className="relative w-24 h-24 bg-gray-50 overflow-hidden shrink-0 border border-gray-100 group/img"
@@ -169,7 +184,7 @@ export function CartSidebar({ isOpen, onClose }) {
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-4 mb-1">
                           <div className="line-clamp-2">
-                            <Link 
+                            <Link
                               href={`/product/${item._id || item.id}`}
                               onClick={onClose}
                               className="text-[14px] font-medium text-black leading-tight hover:underline underline-offset-4"
@@ -178,7 +193,15 @@ export function CartSidebar({ isOpen, onClose }) {
                             </Link>
                           </div>
                           <span className="text-[14px] font-medium text-black whitespace-nowrap">
-                            ৳{parseFloat(((item.salePrice && item.salePrice > 0) ? item.salePrice : item.price)?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
+                            ৳
+                            {parseFloat(
+                              (item.salePrice && item.salePrice > 0
+                                ? item.salePrice
+                                : item.price
+                              )
+                                ?.toString()
+                                .replace(/[^0-9.]/g, "") || 0,
+                            ).toFixed(0)}
                           </span>
                         </div>
                         <p className="text-[13px] text-gray-400 mb-1">
@@ -186,11 +209,24 @@ export function CartSidebar({ isOpen, onClose }) {
                         </p>
                         <div className="flex items-center gap-2 mb-5">
                           <p className="text-[13px] text-black font-semibold">
-                            ৳{parseFloat(((item.salePrice && item.salePrice > 0) ? item.salePrice : item.price)?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
+                            ৳
+                            {parseFloat(
+                              (item.salePrice && item.salePrice > 0
+                                ? item.salePrice
+                                : item.price
+                              )
+                                ?.toString()
+                                .replace(/[^0-9.]/g, "") || 0,
+                            ).toFixed(0)}
                           </p>
-                          {(item.salePrice && item.salePrice > 0) && (
+                          {item.salePrice > 0 && (
                             <p className="text-[11px] text-gray-400 line-through">
-                              ৳{parseFloat(item.price?.toString().replace(/[^0-9.]/g, "") || 0).toFixed(0)}
+                              ৳
+                              {parseFloat(
+                                item.price
+                                  ?.toString()
+                                  .replace(/[^0-9.]/g, "") || 0,
+                              ).toFixed(0)}
                             </p>
                           )}
                         </div>
@@ -202,7 +238,13 @@ export function CartSidebar({ isOpen, onClose }) {
                               variant="ghost"
                               size="icon"
                               showHoverIcon={false}
-                               onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: -1 })}
+                              onClick={() =>
+                                updateQuantity({
+                                  id: item._id || item.id,
+                                  variant: item.variant,
+                                  delta: -1,
+                                })
+                              }
                               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                               aria-label="Decrease quantity"
                             >
@@ -215,7 +257,13 @@ export function CartSidebar({ isOpen, onClose }) {
                               variant="ghost"
                               size="icon"
                               showHoverIcon={false}
-                               onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: 1 })}
+                              onClick={() =>
+                                updateQuantity({
+                                  id: item._id || item.id,
+                                  variant: item.variant,
+                                  delta: 1,
+                                })
+                              }
                               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                               aria-label="Increase quantity"
                             >
@@ -227,7 +275,12 @@ export function CartSidebar({ isOpen, onClose }) {
                             variant="ghost"
                             size="icon"
                             showHoverIcon={false}
-                             onClick={() => removeItem({ id: item._id || item.id, variant: item.variant })}
+                            onClick={() =>
+                              removeItem({
+                                id: item._id || item.id,
+                                variant: item.variant,
+                              })
+                            }
                             className="p-2 text-gray-400 hover:text-black transition-colors"
                             aria-label="Remove item"
                           >
@@ -264,14 +317,14 @@ export function CartSidebar({ isOpen, onClose }) {
 
             {/* Simple Footer */}
             {items.length > 0 && (
-              <div className="px-6 py-8 border-t border-gray-100 bg-white relative z-20">
+              <div className="px-6 py-4 border-t border-gray-100 bg-white relative z-20">
                 {/* Interaction Row (Note / Coupon) - More Visible Design */}
                 <div className="flex items-center gap-0 mb-4 border border-gray-200 rounded-sm overflow-hidden">
                   <Button
                     variant="ghost"
                     showHoverIcon={false}
                     onClick={() => setActiveDrawer("note")}
-                    className="flex-1 flex items-center justify-center py-3 hover:bg-gray-50 transition-colors border-r border-gray-200 group bg-white rounded-none h-auto"
+                    className="flex-1 flex items-center justify-center py-3 hover:bg-gray-50 transition-colors border-r border-gray-200 group bg-white rounded-none h-10!"
                   >
                     <StickyNote className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors stroke-[1.5] mr-2" />
                     <span className="text-xs font-medium text-black/60 group-hover:text-black">
@@ -282,7 +335,7 @@ export function CartSidebar({ isOpen, onClose }) {
                     variant="ghost"
                     showHoverIcon={false}
                     onClick={() => setActiveDrawer("coupon")}
-                    className="flex-1 flex items-center justify-center py-3 hover:bg-gray-50 transition-colors group bg-white rounded-none h-auto"
+                    className="flex-1 flex items-center justify-center py-3 hover:bg-gray-50 transition-colors group bg-white rounded-none h-10!"
                   >
                     <Tag className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors stroke-[1.5] mr-2" />
                     <span className="text-xs font-medium text-black/60 group-hover:text-black">
@@ -301,15 +354,21 @@ export function CartSidebar({ isOpen, onClose }) {
                 </div>
                 {discount && (
                   <div className="flex justify-between items-center mb-2">
-                     <span className="text-[14px] text-green-600 tracking-tight flex items-center gap-2">
-                       Discount ({discount.code})
-                       <Button variant="ghost" size="icon" showHoverIcon={false} className="h-4 w-4 p-0 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-none ml-2" onClick={removeDiscount}>
-                         <X className="w-3 h-3" />
-                       </Button>
-                     </span>
-                     <span className="text-[16px] font-medium text-green-600">
-                       -৳{Number(discountAmount || 0).toFixed(0)}
-                     </span>
+                    <span className="text-[14px] text-green-600 tracking-tight flex items-center gap-2">
+                      Discount ({discount.code})
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        showHoverIcon={false}
+                        className="h-4 w-4 p-0 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-none ml-2"
+                        onClick={removeDiscount}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </span>
+                    <span className="text-[16px] font-medium text-green-600">
+                      -৳{Number(discountAmount || 0).toFixed(0)}
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between items-center mb-4 mt-2 pt-2 border-t border-gray-100">
@@ -324,7 +383,7 @@ export function CartSidebar({ isOpen, onClose }) {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full shadow-lg"
+                  className="w-full shadow-lg h-6!"
                   href="/checkout"
                   onClick={onClose}
                 >
@@ -384,7 +443,12 @@ export function CartSidebar({ isOpen, onClose }) {
                       placeholder="Enter coupon code"
                       className="flex-1 p-4.5 text-[14px] bg-gray-50 border border-gray-200 focus:border-black focus:bg-white outline-none transition-all placeholder:text-gray-300 uppercase tracking-widest"
                     />
-                    <Button variant="primary" className="px-8" onClick={handleApplyCoupon} disabled={validateDiscount.isPending}>
+                    <Button
+                      variant="primary"
+                      className="px-8"
+                      onClick={handleApplyCoupon}
+                      disabled={validateDiscount.isPending}
+                    >
                       {validateDiscount.isPending ? "Applying..." : "Apply"}
                     </Button>
                   </div>

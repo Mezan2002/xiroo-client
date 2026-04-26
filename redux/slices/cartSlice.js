@@ -19,24 +19,24 @@ const cartSlice = createSlice({
       Object.assign(state, metrics);
     },
     addToCart: (state, action) => {
-      const { product, variant } = action.payload;
+      const { product, variant, quantity = 1 } = action.payload;
       const incomingId = product._id || product.id;
 
       const existingItemIndex = state.items.findIndex(
         (item) =>
           (item._id === incomingId || item.id === incomingId) &&
-          item.variant === variant
+          item.variant === variant,
       );
 
       if (existingItemIndex > -1) {
-        state.items[existingItemIndex].quantity += 1;
+        state.items[existingItemIndex].quantity += quantity;
       } else {
         // Normalize the item by ensuring it has the ID we expect for future lookups
         state.items.push({
           ...product,
           _id: incomingId, // Store under _id for consistent grouping
           variant,
-          quantity: 1,
+          quantity,
           addedAt: new Date().toISOString(),
         });
       }
