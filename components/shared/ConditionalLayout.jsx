@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import BottomNavbar from "./BottomNavbar";
 import Footer from "./Footer";
 import { Navbar } from "./Navbar";
+import Newsletter from "./Newsletter";
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
@@ -27,6 +28,7 @@ export default function ConditionalLayout({ children }) {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="grow pb-24 lg:pb-0">{children}</main>
+      <Newsletter />
       <Footer />
       {/* <ChatBubble /> */}
       <BottomNavbar />

@@ -14,7 +14,7 @@ export default function AboutPage() {
         <div className="relative w-full aspect-video bg-zinc-50 overflow-hidden mb-12">
           <Image
             src="/images/auth/login.png"
-            alt="Xiroo Studio"
+            alt="Xiroo"
             fill
             className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
           />

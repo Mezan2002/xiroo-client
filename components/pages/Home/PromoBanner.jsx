@@ -1,43 +1,57 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
 export default function PromoBanner() {
   return (
-    <section className="relative w-full h-[75vh] min-h-[500px] overflow-hidden mt-12 lg:mt-24">
-      {/* Background Image Layer */}
-      <div className="absolute inset-0 w-full h-full -z-20 bg-black">
+    <section className="relative w-full h-[65vh] min-h-[420px] overflow-hidden font-montserrat">
+      {/* Background */}
+      <div className="absolute inset-0">
         <Image
           src="/images/hero-image.png"
-          alt="Curated Nordic Aesthetics Banner"
+          alt="Xiroo — Curated Collection"
           fill
+          priority
           className="object-cover object-center"
           sizes="100vw"
         />
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/50" />
+        {/* Gradient overlay — heavy at bottom where text lives */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 100%)",
+          }}
+        />
       </div>
 
-      {/* Gradient Overlay for Text Readability */}
-      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent -z-10" />
+      {/* Content — bottom-left, generous padding */}
+      <div className="absolute inset-0 flex flex-col justify-end px-8 pb-12 lg:px-16 lg:pb-16 z-10">
 
-      {/* Content Container */}
-      <div className="relative z-10 w-full h-full px-6 lg:px-12 flex flex-col justify-end pb-12 md:pb-16">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-12 w-full">
-          {/* Main Heading */}
-          <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-mono font-semibold leading-[1.3] tracking-wide lg:tracking-widest max-w-[1000px] uppercase drop-shadow-lg">
-            ELEVATE YOUR DAILY LIVING WITH
-            <br />
-            CURATED NORDIC AESTHETICS
-          </h2>
+        {/* Label */}
+        <span className="text-[8px] font-bold tracking-[0.5em] uppercase text-white/40 mb-5">
+          Collection 2025
+        </span>
 
-          {/* Action Link */}
+        {/* Headline */}
+        <h2 className="text-white font-bold uppercase tracking-tight leading-[1.05] mb-8"
+          style={{ fontSize: "clamp(2rem, 4.5vw, 4rem)" }}
+        >
+          Crafted for<br />Everyday Luxury.
+        </h2>
+
+        {/* Thin rule + CTA in a row */}
+        <div className="flex items-center gap-6">
+          <div className="w-10 h-px bg-white/20" />
           <Link
-            href="/collections/nordic"
-            className="text-white text-[10px] md:text-[11px] lg:text-xs font-semibold tracking-[0.2em] uppercase pb-1 border-b-[1.5px] border-white/60 hover:border-white transition-colors whitespace-nowrap mb-1 lg:mb-3"
+            href="/collections/all"
+            className="text-[10px] font-bold tracking-[0.4em] uppercase text-white/70 hover:text-white transition-colors duration-300"
           >
-            SHOP NOW
+            Shop Now
           </Link>
         </div>
+
       </div>
     </section>
   );

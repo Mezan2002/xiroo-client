@@ -14,7 +14,7 @@ export default function ProductComparison() {
       <div className="w-full lg:w-[55%] h-[40%] lg:h-full flex flex-col justify-center items-center px-6 lg:px-12 bg-white">
         <div className="flex flex-col items-center max-w-[500px] text-center">
           <h2 className="text-[32px] sm:text-4xl md:text-5xl lg:text-[54px] font-light leading-[1.15] mb-8 lg:mb-12 tracking-wide text-[#111] uppercase">
-            SWITCH THE COLOR VARIANT
+            TAKE A LOOK AT OUR FABRIC QUALITIES
           </h2>
           <Link
             href="/collections"
@@ -30,7 +30,7 @@ export default function ProductComparison() {
         {/* Background Image (Dark Variant) */}
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src="/images/featured-product-main.png"
+            src="/images/mannequin-2.png"
             alt="Dark Variant Product View"
             fill
             className="object-cover object-center pointer-events-none"
@@ -43,7 +43,7 @@ export default function ProductComparison() {
           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
         >
           <Image
-            src="/images/image-2.jpeg"
+            src="/images/mannequin.png"
             alt="Light Variant Product View"
             fill
             className="object-cover object-center"

@@ -1,4 +1,5 @@
 import Hero from "@/components/pages/Home/Hero";
+import MarqueeBanner from "@/components/pages/Home/MarqueeBanner";
 import FeaturedCategories from "@/components/pages/Home/FeaturedCategories";
 import FeaturedProduct from "@/components/pages/Home/FeaturedProduct";
 import NewArrival from "@/components/pages/Home/NewArrival";
@@ -9,6 +10,7 @@ const Home = () => {
   return (
     <main>
       <Hero />
+      <MarqueeBanner />
       <FeaturedCategories />
       <FeaturedProduct />
       <NewArrival />

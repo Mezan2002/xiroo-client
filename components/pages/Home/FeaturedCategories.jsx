@@ -69,7 +69,7 @@ export default function FeaturedCategories() {
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >
-              <h2 className="text-[32px] sm:text-4xl lg:text-[52px] font-light uppercase tracking-wide leading-none whitespace-nowrap">
+              <h2 className="text-lg lg:text-[52px] font-light uppercase tracking-wide leading-none whitespace-nowrap">
                 {cat.name}
               </h2>
               <span className="text-sm md:text-base lg:text-xl ml-2 lg:ml-4 font-normal text-gray-400 transition-colors duration-300 group-hover:text-gray-500">
