@@ -35,7 +35,7 @@ export default function Footer() {
               </h4>
               <div className="flex flex-col gap-5">
                 <Link
-                  href="/collections/all"
+                  href="/collections"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
                   All Pieces
