@@ -65,7 +65,7 @@ const Hero = () => {
 
   return (
     <section
-      className="relative w-full h-[70vh] lg:h-[95vh] overflow-hidden font-montserrat bg-grain"
+      className="relative w-full h-[55vh] md:h-[70vh] lg:h-[95vh] overflow-hidden font-montserrat bg-grain"
       style={{
         background: "black",
       }}
@@ -174,7 +174,7 @@ const Hero = () => {
         >
           <span className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]" />
           <span className="relative text-[9px] font-bold tracking-[0.45em] uppercase text-white group-hover:text-black transition-colors duration-300 delay-75">
-            Shop Collection
+            Shop Now
           </span>
           <ArrowRight
             size={9}
@@ -186,7 +186,9 @@ const Hero = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => {
-              setCurrentIndex((currentIndex - 1 + SLIDES.length) % SLIDES.length);
+              setCurrentIndex(
+                (currentIndex - 1 + SLIDES.length) % SLIDES.length,
+              );
               resetTimer();
             }}
             className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300"
@@ -204,7 +206,10 @@ const Hero = () => {
           </span>
 
           <button
-            onClick={() => { setCurrentIndex((currentIndex + 1) % SLIDES.length); resetTimer(); }}
+            onClick={() => {
+              setCurrentIndex((currentIndex + 1) % SLIDES.length);
+              resetTimer();
+            }}
             className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300"
             aria-label="Next slide"
           >
