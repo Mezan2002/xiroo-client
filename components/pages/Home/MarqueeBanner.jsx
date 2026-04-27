@@ -95,28 +95,10 @@ const MarqueeBanner = () => (
     />
 
     {/* ── Row A — left ── */}
-    <div className="overflow-hidden py-[10px] border-b border-white/[0.04]">
+    <div className="overflow-hidden py-[10px] border-b border-white/4">
       <Track items={ROW_A} direction="left" speed={30} />
     </div>
 
-    <style jsx>{`
-      @keyframes xiroo-left {
-        from {
-          transform: translateX(0);
-        }
-        to {
-          transform: translateX(-33.333%);
-        }
-      }
-      @keyframes xiroo-right {
-        from {
-          transform: translateX(-33.333%);
-        }
-        to {
-          transform: translateX(0);
-        }
-      }
-    `}</style>
   </div>
 );
 

@@ -1,23 +1,11 @@
 "use client";
-
-import { useDiscounts } from "@/hooks/api/useDiscounts";
-import { useCart } from "@/hooks/useCart";
-import { useToast } from "@/hooks/useToast";
-import {
-  Minus,
-  Plus,
-  ShoppingBag,
-  StickyNote,
-  Tag,
-  Trash2,
-  X,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { Button } from "../ui/Button";
-
-const FREE_SHIPPING_THRESHOLD = 2000;
+import { Button } from "@/components/ui/Button";
+import { ShoppingBag, X } from "lucide-react";
+import CartDrawers from "./cart-sidebar-sections/CartDrawers";
+import CartItem from "./cart-sidebar-sections/CartItem";
+import CartSummary from "./cart-sidebar-sections/CartSummary";
+import FreeShippingBanner from "./cart-sidebar-sections/FreeShippingBanner";
+import { useCartSidebar } from "./cart-sidebar-sections/useCartSidebar";
 
 export function CartSidebar({ isOpen, onClose }) {
   const {
@@ -28,47 +16,16 @@ export function CartSidebar({ isOpen, onClose }) {
     total,
     updateQuantity,
     removeItem,
-    applyDiscount,
     removeDiscount,
-  } = useCart();
-  const [activeDrawer, setActiveDrawer] = useState(null); // 'note' or 'coupon'
-  const [note, setNote] = useState("");
-  const [coupon, setCoupon] = useState("");
-  const { validateDiscount } = useDiscounts();
-  const { toast } = useToast();
-
-  const handleApplyCoupon = () => {
-    if (!coupon) return;
-    validateDiscount.mutate(
-      { code: coupon, currentOrderValue: subtotal || 0 },
-      {
-        onSuccess: (res) => {
-          applyDiscount(res.data);
-          setActiveDrawer(null);
-          setCoupon("");
-        },
-        onError: (err) => {
-          toast.error(
-            err?.response?.data?.message || err.message || "Invalid Coupon",
-          );
-        },
-      },
-    );
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
-
-  const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
-  const progress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
+    activeDrawer,
+    setActiveDrawer,
+    note,
+    setNote,
+    coupon,
+    setCoupon,
+    handleApplyCoupon,
+    isApplyingCoupon,
+  } = useCartSidebar(isOpen);
 
   return (
     <div
@@ -77,20 +34,13 @@ export function CartSidebar({ isOpen, onClose }) {
       }`}
       onClick={onClose}
     >
-      {/* Backdrop Backdrop Overlay */}
       <div
-        className={`absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`}
       />
 
-      {/* Sidebar Panel Container */}
       <div className="absolute inset-0 flex justify-end overflow-hidden">
-        {/* Sidebar Panel */}
         <aside
-          className={`h-full w-full sm:w-[450px] bg-white shadow-xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
-            isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`h-full w-full sm:w-[450px] bg-white shadow-xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${isOpen ? "translate-x-0" : "translate-x-full"}`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col h-full">
@@ -108,206 +58,45 @@ export function CartSidebar({ isOpen, onClose }) {
                 showHoverIcon={false}
                 onClick={onClose}
                 className="p-1 text-gray-400 hover:text-black transition-colors"
-                aria-label="Close cart"
               >
                 <X className="w-5 h-5 stroke-[1.5]" />
               </Button>
             </div>
 
             {/* Free Shipping Banner */}
-            {items.length > 0 && (
-              <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100">
-                <div className="flex flex-col gap-2">
-                  <p className="text-[13px] text-gray-600">
-                    {remaining > 0 ? (
-                      <>
-                        Add{" "}
-                        <span className="font-semibold text-black">
-                          ৳{Number(remaining || 0).toFixed(0)}
-                        </span>{" "}
-                        more for{" "}
-                        <span className="font-semibold text-black">
-                          FREE SHIPPING!
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        Congratulations! You qualify for{" "}
-                        <span className="font-semibold text-black">
-                          FREE SHIPPING!
-                        </span>
-                      </>
-                    )}
-                  </p>
-                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-black transition-all duration-700 ease-out"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+            {items.length > 0 && <FreeShippingBanner subtotal={subtotal} />}
 
-            {/* Cart Content with Dimming Overlay */}
+            {/* Cart Content */}
             <div className="flex-1 overflow-y-auto px-6 py-4 relative">
-              {/* Dimming Overlay when Drawer is open */}
               <div
-                className={`absolute inset-0 z-10 bg-black/15 transition-opacity duration-500 pointer-events-auto cursor-pointer ${
-                  activeDrawer ? "opacity-100" : "opacity-0 pointer-events-none"
-                }`}
+                className={`absolute inset-0 z-10 bg-black/15 transition-opacity duration-500 pointer-events-auto cursor-pointer ${activeDrawer ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={() => setActiveDrawer(null)}
               />
 
               {items.length > 0 ? (
                 <div className="flex flex-col gap-10">
                   {items.map((item) => (
-                    <div
+                    <CartItem
                       key={`${item._id || item.id}-${item.variant}`}
-                      className="flex gap-4"
-                    >
-                      {/* Thumbnail */}
-                      <Link
-                        href={`/product/${item._id || item.id}`}
-                        onClick={onClose}
-                        className="relative w-24 h-24 bg-gray-50 overflow-hidden shrink-0 border border-gray-100 group/img"
-                      >
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          sizes="96px"
-                          className="object-cover group-hover/img:scale-110 transition-transform duration-700"
-                        />
-                      </Link>
-                      {/* Info Area */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start gap-4 mb-1">
-                          <div className="line-clamp-2">
-                            <Link
-                              href={`/product/${item._id || item.id}`}
-                              onClick={onClose}
-                              className="text-[14px] font-medium text-black leading-tight hover:underline underline-offset-4"
-                            >
-                              {item.title}
-                            </Link>
-                          </div>
-                          <span className="text-[14px] font-medium text-black whitespace-nowrap">
-                            ৳
-                            {parseFloat(
-                              (item.salePrice && item.salePrice > 0
-                                ? item.salePrice
-                                : item.price
-                              )
-                                ?.toString()
-                                .replace(/[^0-9.]/g, "") || 0,
-                            ).toFixed(0)}
-                          </span>
-                        </div>
-                        <p className="text-[13px] text-gray-400 mb-1">
-                          {item.variant}
-                        </p>
-                        <div className="flex items-center gap-2 mb-5">
-                          <p className="text-[13px] text-black font-semibold">
-                            ৳
-                            {parseFloat(
-                              (item.salePrice && item.salePrice > 0
-                                ? item.salePrice
-                                : item.price
-                              )
-                                ?.toString()
-                                .replace(/[^0-9.]/g, "") || 0,
-                            ).toFixed(0)}
-                          </p>
-                          {item.salePrice > 0 && (
-                            <p className="text-[11px] text-gray-400 line-through">
-                              ৳
-                              {parseFloat(
-                                item.price
-                                  ?.toString()
-                                  .replace(/[^0-9.]/g, "") || 0,
-                              ).toFixed(0)}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          {/* Quantity Selector Box */}
-                          <div className="flex items-center border border-gray-200">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              showHoverIcon={false}
-                              onClick={() =>
-                                updateQuantity({
-                                  id: item._id || item.id,
-                                  variant: item.variant,
-                                  delta: -1,
-                                })
-                              }
-                              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
-                              aria-label="Decrease quantity"
-                            >
-                              <Minus className="w-4 h-4 stroke-[1.5]" />
-                            </Button>
-                            <span className="w-10 text-center text-[14px] text-black">
-                              {item.quantity}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              showHoverIcon={false}
-                              onClick={() =>
-                                updateQuantity({
-                                  id: item._id || item.id,
-                                  variant: item.variant,
-                                  delta: 1,
-                                })
-                              }
-                              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
-                              aria-label="Increase quantity"
-                            >
-                              <Plus className="w-4 h-4 stroke-[1.5]" />
-                            </Button>
-                          </div>
-
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            showHoverIcon={false}
-                            onClick={() =>
-                              removeItem({
-                                id: item._id || item.id,
-                                variant: item.variant,
-                              })
-                            }
-                            className="p-2 text-gray-400 hover:text-black transition-colors"
-                            aria-label="Remove item"
-                          >
-                            <Trash2 className="w-5 h-5 stroke-[1.5]" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+                      item={item}
+                      updateQuantity={updateQuantity}
+                      removeItem={removeItem}
+                      onClose={onClose}
+                    />
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center px-10">
-                  <div className="relative mb-10 text-gray-400/50">
-                    <ShoppingBag className="w-24 h-24 stroke-1" />
-                  </div>
-
+                  <ShoppingBag className="w-24 h-24 stroke-1 text-gray-400/50 mb-10" />
                   <h3 className="text-[20px] font-medium text-black mb-3">
                     Your bag is waiting.
                   </h3>
-                  <p className="text-sm text-gray-500 mb-10 leading-relaxed">
+                  <p className="text-sm text-gray-500 mb-10">
                     Looks like you haven&apos;t added any products to your bag
                     yet.
                   </p>
-
                   <Button onClick={onClose}>Shop Now</Button>
-
-                  <p className="text-[13px] text-gray-400 font-light mt-10">
+                  <p className="text-[12px] text-gray-400 font-light mt-10">
                     Free delivery on orders over{" "}
                     <span className="font-semibold text-black">৳2,000</span>
                   </p>
@@ -315,150 +104,30 @@ export function CartSidebar({ isOpen, onClose }) {
               )}
             </div>
 
-            {/* Simple Footer */}
+            {/* Footer */}
             {items.length > 0 && (
-              <div className="px-6 py-4 border-t border-gray-100 bg-white relative z-20">
-                {/* Interaction Row (Note / Coupon) - More Visible Design */}
-                <div className="flex items-center gap-0 mb-4 border border-gray-200 rounded-sm overflow-hidden">
-                  <Button
-                    variant="ghost"
-                    showHoverIcon={false}
-                    onClick={() => setActiveDrawer("note")}
-                    className="flex-1 flex items-center justify-center py-3 hover:bg-gray-50 transition-colors border-r border-gray-200 group bg-white rounded-none h-10!"
-                  >
-                    <StickyNote className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors stroke-[1.5] mr-2" />
-                    <span className="text-xs font-medium text-black/60 group-hover:text-black">
-                      Add Note
-                    </span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    showHoverIcon={false}
-                    onClick={() => setActiveDrawer("coupon")}
-                    className="flex-1 flex items-center justify-center py-3 hover:bg-gray-50 transition-colors group bg-white rounded-none h-10!"
-                  >
-                    <Tag className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors stroke-[1.5] mr-2" />
-                    <span className="text-xs font-medium text-black/60 group-hover:text-black">
-                      Coupon Code
-                    </span>
-                  </Button>
-                </div>
-
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[14px] text-gray-500 tracking-tight">
-                    Subtotal
-                  </span>
-                  <span className="text-[16px] font-medium text-black">
-                    ৳{Number(subtotal || 0).toFixed(0)}
-                  </span>
-                </div>
-                {discount && (
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[14px] text-green-600 tracking-tight flex items-center gap-2">
-                      Discount ({discount.code})
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        showHoverIcon={false}
-                        className="h-4 w-4 p-0 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-none ml-2"
-                        onClick={removeDiscount}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </span>
-                    <span className="text-[16px] font-medium text-green-600">
-                      -৳{Number(discountAmount || 0).toFixed(0)}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between items-center mb-4 mt-2 pt-2 border-t border-gray-100">
-                  <span className="text-[14px] font-bold tracking-tight text-black">
-                    Estimated total
-                  </span>
-                  <span className="text-[22px] font-semibold text-black">
-                    ৳{Number(total || subtotal || 0).toFixed(0)}
-                  </span>
-                </div>
-
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="w-full shadow-lg h-6!"
-                  href="/checkout"
-                  onClick={onClose}
-                >
-                  CHECK OUT
-                </Button>
-              </div>
+              <CartSummary
+                subtotal={subtotal}
+                discount={discount}
+                discountAmount={discountAmount}
+                total={total}
+                removeDiscount={removeDiscount}
+                setActiveDrawer={setActiveDrawer}
+                onClose={onClose}
+              />
             )}
           </div>
 
-          {/* Mini Drawer (Bottom Sheet) - More Visible with Shadow */}
-          <div
-            className={`absolute inset-x-0 bottom-0 z-102 bg-white border-t border-gray-200 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.1)] transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) transform ${
-              activeDrawer ? "translate-y-0" : "translate-y-full"
-            }`}
-          >
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-[15px] font-semibold text-black uppercase tracking-widest">
-                  {activeDrawer === "note" ? "Order Note" : "Discount Coupon"}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  showHoverIcon={false}
-                  onClick={() => setActiveDrawer(null)}
-                  className="p-1.5 bg-gray-50 rounded-full text-gray-400 hover:text-black transition-colors"
-                  aria-label="Close drawer"
-                >
-                  <X className="w-4 h-4 stroke-2" />
-                </Button>
-              </div>
-
-              {activeDrawer === "note" ? (
-                <div className="space-y-5">
-                  <textarea
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    placeholder="Special instructions for your order..."
-                    className="w-full h-40 p-5 text-[14px] bg-gray-50 border border-gray-200 focus:border-black focus:bg-white outline-none transition-all resize-none placeholder:text-gray-300"
-                  />
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => setActiveDrawer(null)}
-                    className="w-full shadow-md"
-                  >
-                    Save Note
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value)}
-                      placeholder="Enter coupon code"
-                      className="flex-1 p-4.5 text-[14px] bg-gray-50 border border-gray-200 focus:border-black focus:bg-white outline-none transition-all placeholder:text-gray-300 uppercase tracking-widest"
-                    />
-                    <Button
-                      variant="primary"
-                      className="px-8"
-                      onClick={handleApplyCoupon}
-                      disabled={validateDiscount.isPending}
-                    >
-                      {validateDiscount.isPending ? "Applying..." : "Apply"}
-                    </Button>
-                  </div>
-                  <p className="text-[12px] text-gray-500 font-medium">
-                    One coupon per order. Terms apply.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <CartDrawers
+            activeDrawer={activeDrawer}
+            setActiveDrawer={setActiveDrawer}
+            note={note}
+            setNote={setNote}
+            coupon={coupon}
+            setCoupon={setCoupon}
+            handleApplyCoupon={handleApplyCoupon}
+            isApplyingCoupon={isApplyingCoupon}
+          />
         </aside>
       </div>
     </div>

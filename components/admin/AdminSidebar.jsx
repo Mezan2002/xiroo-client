@@ -1,30 +1,7 @@
 "use client";
-import {
-  BarChart3,
-  Bell,
-  ChevronDown,
-  Hash,
-  Home,
-  Inbox,
-  Layers,
-  LayoutGrid,
-  LineChart,
-  Mail,
-  Menu,
-  MessageSquare,
-  Package,
-  Palette,
-  Search,
-  Settings,
-  Shield,
-  ShoppingBag,
-  Tag,
-  Users,
-  X,
-} from "lucide-react";
+import { BarChart3, Bell, ChevronDown, Hash, Inbox, Layers, LayoutGrid, LineChart, Mail, MessageSquare, Package, Palette, Search, Settings, Shield, ShoppingBag, Tag, Users, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useAdminSidebar } from "./sidebar-sections/useAdminSidebar";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", icon: BarChart3 },
@@ -44,190 +21,51 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-import { useNotifications } from "@/hooks/api/useNotifications";
-import { useSocket } from "@/context/SocketContext";
-import { useUser } from "@/hooks/api/useUser";
-import { useInbox } from "@/hooks/api/useInbox";
-
 export default function AdminSidebar({ isOpen, onClose }) {
-  const pathname = usePathname();
-  const { unreadCount } = useNotifications();
-  const notificationUnread =
-    typeof unreadCount === "object"
-      ? unreadCount?.unreadCount || 0
-      : unreadCount || 0;
-  const { user } = useUser();
-  const { socket } = useSocket();
-
-  // Dynamic Inbox Sync
-  const { useConversations } = useInbox();
-  const { data: conversations, refetch: refetchInbox } = useConversations({
-    status: "active",
-  });
-
-  useEffect(() => {
-    if (socket) {
-      socket.on("inbox_update", () => refetchInbox());
-      socket.on("new_message", () => refetchInbox());
-      return () => {
-        socket.off("inbox_update");
-        socket.off("new_message");
-      };
-    }
-  }, [socket, refetchInbox]);
-
-  // Auto-close on navigation
-  useEffect(() => {
-    onClose?.();
-  }, [pathname]);
-
-  const inboxUnread =
-    conversations?.reduce((acc, conv) => {
-      return acc + (conv.unreadCount?.[user?._id] || 0);
-    }, 0) || 0;
-
-  const handleOpenSearch = () => {
-    window.dispatchEvent(new CustomEvent("open-admin-search"));
-    onClose?.();
-  };
+  const { pathname, notificationUnread, inboxUnread, handleOpenSearch } = useAdminSidebar(onClose);
 
   return (
     <>
-      {/* Sidebar — always visible on lg+, drawer on mobile */}
-      <aside
-        className={`
-          fixed lg:sticky top-0 z-50 lg:z-auto
-          w-72 lg:w-64 h-screen
-          bg-[#F7F7F5] border-r border-[#EDECE9]
-          flex flex-col shrink-0 select-none font-montserrat antialiased overflow-hidden
-          transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        `}
-      >
-        {/* Sidebar Header */}
+      <aside className={`fixed lg:sticky top-0 z-50 lg:z-auto w-72 lg:w-64 h-screen bg-[#F7F7F5] border-r border-[#EDECE9] flex flex-col shrink-0 select-none font-montserrat antialiased transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 flex-1 px-2 py-2 hover:bg-[#EBEBE9] rounded-none cursor-pointer transition-all active:scale-[0.98] group">
-            <div className="w-7 h-7 bg-black text-white flex items-center justify-center font-bold text-[12px] rounded-none shadow-xl shadow-black/10 ring-1 ring-black/5">
-              X
-            </div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[13px] font-bold text-[#37352F] truncate">
-                  Xiroo HQ
-                </span>
-                <ChevronDown
-                  size={12}
-                  className="text-[#37352F40] group-hover:text-[#37352F80] transition-colors"
-                />
-              </div>
-              <span className="text-[10px] text-[#91918E] font-medium tracking-tight truncate">
-                Commerce Hub
-              </span>
+          <div className="flex items-center gap-3 flex-1 px-2 py-2 hover:bg-[#EBEBE9] cursor-pointer group transition-all">
+            <div className="w-7 h-7 bg-black text-white flex items-center justify-center font-bold text-[12px]">X</div>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5"><span className="text-[13px] font-bold text-[#37352F]">Xiroo HQ</span><ChevronDown size={12} className="text-[#37352F40]" /></div>
+              <span className="text-[10px] text-[#91918E] font-medium tracking-tight">Commerce Hub</span>
             </div>
           </div>
-
-          {/* Close button — mobile only */}
-          <button
-            onClick={onClose}
-            className="lg:hidden p-1.5 text-[#37352F80] hover:text-[#37352F] hover:bg-[#EBEBE9] transition-colors shrink-0 ml-1"
-            aria-label="Close menu"
-          >
-            <X size={16} />
-          </button>
+          <button onClick={onClose} className="lg:hidden p-1.5 text-[#37352F80] hover:text-[#37352F]"><X size={16} /></button>
         </div>
 
-        {/* Primary Items */}
         <div className="px-3 space-y-px">
           {[
             { icon: Search, label: "Search", onClick: handleOpenSearch },
-            {
-              icon: Inbox,
-              label: "Inbox",
-              href: "/admin/inbox",
-              badge: inboxUnread,
-            },
-            {
-              icon: Bell,
-              label: "Notifications",
-              href: "/admin/notifications",
-              badge: notificationUnread,
-            },
+            { icon: Inbox, label: "Inbox", href: "/admin/inbox", badge: inboxUnread },
+            { icon: Bell, label: "Notifications", href: "/admin/notifications", badge: notificationUnread },
           ].map((item, idx) => {
             const Icon = item.icon;
             const isActive = item.href && pathname === item.href;
-
-            if (item.onClick) {
-              return (
-                <button
-                  key={idx}
-                  onClick={item.onClick}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-none text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] outline-none"
-                >
-                  <Icon
-                    size={16}
-                    className="text-[#37352F80] group-hover:text-[#37352F]"
-                  />
-                  <span className="flex-1 text-left">{item.label}</span>
-                </button>
-              );
-            }
-
-            return (
-              <Link
-                key={idx}
-                href={item.href || "#"}
-                className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-none ${
-                  isActive
-                    ? "bg-[#EBEBE9] text-[#37352F]"
-                    : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
-                }`}
-              >
-                <Icon
-                  size={16}
-                  className={isActive ? "text-[#37352F]" : "text-[#37352F80]"}
-                />
-                <span className="flex-1">{item.label}</span>
-                {item.badge > 0 && (
-                  <span className="text-[11px] font-bold text-[#37352F40] mr-1">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
+            const content = (
+              <><Icon size={16} className={isActive ? "text-[#37352F]" : "text-[#37352F80] group-hover:text-[#37352F]"} /><span className="flex-1 text-left">{item.label}</span>{item.badge > 0 && <span className="text-[11px] font-bold text-[#37352F40]">{item.badge}</span>}</>
+            );
+            return item.onClick ? (
+              <button key={idx} onClick={item.onClick} className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]">{content}</button>
+            ) : (
+              <Link key={idx} href={item.href} className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group ${isActive ? "bg-[#EBEBE9] text-[#37352F]" : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"}`}>{content}</Link>
             );
           })}
         </div>
 
-        {/* Main Navigation */}
         <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-6 space-y-6">
           <div className="space-y-0.5">
-            <h4 className="px-3 text-[11px] font-bold text-[#91918E] uppercase tracking-wider mb-2">
-              Operations
-            </h4>
+            <h4 className="px-3 text-[11px] font-bold text-[#91918E] uppercase tracking-wider mb-2">Operations</h4>
             <nav className="space-y-px">
               {NAV_ITEMS.map((item) => {
-                const isActive =
-                  item.href === "/admin"
-                    ? pathname === "/admin"
-                    : pathname === item.href ||
-                      pathname?.startsWith(item.href + "/");
-                const Icon = item.icon;
+                const isActive = item.href === "/admin" ? pathname === "/admin" : pathname === item.href || pathname?.startsWith(item.href + "/");
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group rounded-none ${
-                      isActive
-                        ? "bg-[#EBEBE9] text-[#37352F]"
-                        : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"
-                    }`}
-                  >
-                    <Icon
-                      size={16}
-                      className={
-                        isActive ? "text-[#37352F]" : "text-[#37352F80]"
-                      }
-                    />
-                    <span>{item.label}</span>
+                  <Link key={item.href} href={item.href} className={`flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group ${isActive ? "bg-[#EBEBE9] text-[#37352F]" : "text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]"}`}>
+                    <item.icon size={16} className={isActive ? "text-[#37352F]" : "text-[#37352F80]"} /><span>{item.label}</span>
                   </Link>
                 );
               })}
@@ -235,17 +73,8 @@ export default function AdminSidebar({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="px-3 py-4 border-t border-[#EDECE9]">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] rounded-none transition-all"
-          >
-            <div className="w-5 h-5 bg-gray-200 rounded-none overflow-hidden flex items-center justify-center text-[10px] text-gray-500 font-bold border border-gray-100">
-              A
-            </div>
-            <span>Back to Store</span>
-          </Link>
+          <Link href="/" className="flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F] transition-all"><div className="w-5 h-5 bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold border border-gray-100">A</div><span>Back to Store</span></Link>
         </div>
       </aside>
     </>

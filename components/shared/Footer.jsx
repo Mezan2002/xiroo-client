@@ -18,7 +18,7 @@ export default function Footer() {
               <h3 className="text-3xl font-black tracking-tighter uppercase text-white leading-none">
                 XIROO<span className="text-white/30 ml-1">.</span>
               </h3>
-              <p className="text-[11px] text-white/50 leading-[2] font-medium max-w-[320px]">
+              <p className="text-[11px] text-white/50 leading-loose font-medium max-w-[320px]">
                 Redefining modern streetwear through minimal silhouettes and
                 premium heavyweight fabrics. Designed for the everyday
                 visionary.

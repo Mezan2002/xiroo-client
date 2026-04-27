@@ -29,7 +29,7 @@ export default function Newsletter() {
         </div>
 
         {/* Main Headline */}
-        <h2 className="text-[36px] md:text-[52px] font-black uppercase tracking-[-0.02em] text-white leading-[1] mb-5">
+        <h2 className="text-[36px] md:text-[52px] font-black uppercase tracking-[-0.02em] text-white leading-none mb-5">
           Join The Inner Circle.
         </h2>
 

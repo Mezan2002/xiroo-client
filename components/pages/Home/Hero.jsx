@@ -40,7 +40,7 @@ const Hero = () => {
 
       {/* ── XIROO Backdrop (z-10) ── */}
       <div className="absolute inset-x-0 z-10 top-32 flex items-start justify-center leading-none select-none pointer-events-none overflow-hidden">
-        <h2 className="font-black uppercase leading-[0.82] tracking-[-0.03em] whitespace-nowrap text-[30vw] text-black/60">
+        <h2 className="font-black uppercase leading-[0.82] tracking-[-0.03em] whitespace-nowrap text-[30vw] text-black/40">
           XIROO
         </h2>
       </div>
@@ -59,13 +59,67 @@ const Hero = () => {
         </div>
       </div>
 
+      {/* ── Background Solid Texts (z-15) ── */}
+      <div className="absolute inset-0 z-15 flex items-center justify-center gap-4 lg:gap-12 pointer-events-none overflow-hidden -translate-y-6 lg:-translate-y-10">
+        <h3
+          className="text-white text-[11vw] font-black italic tracking-tight opacity-0 leading-none"
+          style={{
+            animation:
+              "slide-from-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animationDelay: "0.2s",
+            textShadow:
+              "0 20px 50px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.4), 0 0 100px rgba(99,102,241,0.1)",
+          }}
+        >
+          STREET
+        </h3>
+        <h3
+          className="text-white text-[11vw] font-black italic tracking-tight opacity-0 leading-none translate-y-12 lg:translate-y-24"
+          style={{
+            animation:
+              "slide-from-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animationDelay: "0.2s",
+            textShadow:
+              "0 20px 50px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.4), 0 0 100px rgba(99,102,241,0.1)",
+          }}
+        >
+          LUXURY
+        </h3>
+      </div>
+
+      {/* ── Foreground Stroke Texts (z-25) ── */}
+      <div className="absolute inset-0 z-25 flex items-center justify-center gap-4 lg:gap-12 pointer-events-none overflow-hidden -translate-y-6 lg:-translate-y-10">
+        <h3
+          className="text-transparent text-[11vw] font-black italic tracking-tight opacity-0 leading-none"
+          style={{
+            animation:
+              "slide-from-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animationDelay: "0.2s",
+            WebkitTextStroke: "1px rgba(255,255,255,0.4)",
+          }}
+        >
+          STREET
+        </h3>
+        <h3
+          className="text-transparent text-[11vw] font-black italic tracking-tight opacity-0 leading-none translate-y-12 lg:translate-y-24"
+          style={{
+            animation:
+              "slide-from-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animationDelay: "0.2s",
+            WebkitTextStroke: "1px rgba(255,255,255,0.4)",
+          }}
+        >
+          LUXURY
+        </h3>
+      </div>
+
       {/* ── Bottom Bar ── */}
-      <div className="absolute bottom-6 lg:bottom-10 left-0 right-0 px-6 lg:px-14 z-30 flex items-center justify-center lg:justify-between">
+      <div className="absolute bottom-6 lg:bottom-10 left-0 right-0 px-6 lg:px-14 z-30 flex items-center justify-center">
         {/* Center CTA */}
         <div className="flex flex-col items-center gap-3">
           <Link
             href="/collections"
-            className="group flex items-center gap-3 px-8 py-4 border border-white/15 hover:border-white/40 transition-all duration-300"
+            className="group flex items-center gap-3 px-8 py-4 border border-white/15 hover:border-white/40 transition-all duration-300 rounded-full"
           >
             <span className="text-[10px] lg:text-[11px] font-bold tracking-[0.35em] uppercase text-white">
               Shop Collection
@@ -75,16 +129,6 @@ const Hero = () => {
               className="text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all"
             />
           </Link>
-        </div>
-
-        {/* Right: season marker */}
-        <div className="hidden lg:flex flex-col items-end gap-1">
-          <span className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/25">
-            Limited Edition
-          </span>
-          <span className="text-[7px] font-mono tracking-widest text-white/15">
-            XR·2025·LE
-          </span>
         </div>
       </div>
 
