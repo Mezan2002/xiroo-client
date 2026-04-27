@@ -20,9 +20,9 @@ export default function LoggedInProfile({
   ];
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
-      {/* Profile Header */}
-      <div className="px-10 py-12 text-left bg-black text-white">
+    <div className="flex flex-col h-full">
+      {/* Profile Header (Sticky) */}
+      <div className="shrink-0 px-10 py-12 text-left bg-black text-white">
         <UserAvatar
           user={currentUser}
           className="w-20 h-20 rounded-full bg-white border border-gray-100 mb-8 shadow-sm text-black"
@@ -37,8 +37,10 @@ export default function LoggedInProfile({
         <p className="text-[11px] text-gray-400 font-medium uppercase tracking-widest">{currentUser.email}</p>
       </div>
 
-      {/* Activity Stats */}
-      <div className="grid grid-cols-3 border-y border-gray-100 py-8 bg-white">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+        {/* Activity Stats */}
+        <div className="grid grid-cols-3 border-y border-gray-100 py-8 bg-white shrink-0">
         {[
           { label: "Orders", val: orders.length },
           { label: "Wishlist", val: wishlistItemsCount },
@@ -52,7 +54,7 @@ export default function LoggedInProfile({
       </div>
 
       {/* Loyalty Stats */}
-      <div className="grid grid-cols-2 border-b border-gray-100 py-8 bg-gray-50/50">
+      <div className="grid grid-cols-2 border-b border-gray-100 py-8 bg-gray-50/50 shrink-0">
         <div className="flex flex-col items-center border-r border-gray-100">
           <span className="text-[16px] font-bold text-black mb-1 uppercase tracking-tight">{currentUser.tier || "Bronze"}</span>
           <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Prestige Tier</span>
@@ -85,7 +87,7 @@ export default function LoggedInProfile({
       </div>
 
       {/* Sign Out Footer */}
-      <div className="mt-auto p-10 pb-12 border-t border-gray-50">
+      <div className="mt-auto p-10 pb-12 border-t border-gray-50 shrink-0">
         <button
           className="w-full flex items-center justify-center gap-3 py-5 border border-red-100 bg-red-50/50 hover:bg-red-50 text-red-500 transition-all rounded-full group"
           onClick={handleLogout}
@@ -93,6 +95,7 @@ export default function LoggedInProfile({
           <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-[12px] font-bold tracking-[0.3em] uppercase">Sign Out</span>
         </button>
+      </div>
       </div>
     </div>
   );
