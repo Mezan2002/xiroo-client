@@ -1,9 +1,13 @@
 "use client";
-import ProductCard from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
+import ProductCard from "@/components/ui/ProductCard";
 import { SlidersHorizontal } from "lucide-react";
 
-export default function ProductGrid({ isLoading, filteredProducts, resetFilters }) {
+export default function ProductGrid({
+  isLoading,
+  filteredProducts,
+  resetFilters,
+}) {
   if (isLoading) {
     return (
       <div className="w-full h-96 flex items-center justify-center">
@@ -34,7 +38,7 @@ export default function ProductGrid({ isLoading, filteredProducts, resetFilters 
   }
 
   return (
-    <div className="w-full grid grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-10 sm:gap-y-16">
+    <div className="w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-10 sm:gap-y-16">
       {filteredProducts.map((product, idx) => (
         <ProductCard
           key={product._id}

@@ -24,7 +24,7 @@ export default function CategoryView({ category }) {
       : category.replace(/-/g, " ").toUpperCase());
 
   return (
-    <div className="w-full flex flex-col min-h-screen bg-white pt-24 lg:pt-32 pb-24 px-4 md:px-6 lg:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="w-full flex flex-col min-h-screen bg-white pt-24 lg:pt-32 pb-24 px-4 md:px-6 lg:px-12 overflow-hidden">
       {/* Category Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end border-b border-gray-100 pb-8 lg:pb-10 mb-10 lg:mb-12 gap-6">
         <div className="flex flex-col gap-4">
@@ -49,7 +49,8 @@ export default function CategoryView({ category }) {
           </button>
 
           <div className="flex text-[9px] md:text-[11px] font-bold tracking-[0.15em] text-gray-400 uppercase pb-1">
-            <span className="text-black">{filteredProducts.length}</span> &nbsp;Items
+            <span className="text-black">{filteredProducts.length}</span>{" "}
+            &nbsp;Items
           </div>
         </div>
       </div>

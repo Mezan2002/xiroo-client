@@ -28,13 +28,17 @@ export default function ProductCard({
 
   return (
     <div
-      className="group flex flex-col w-full relative font-montserrat"
+      className="group flex flex-col w-full relative font-montserrat cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setCurrentImageIndex(0); }}
+      onClick={() => router.push(`/product/${id}`)}
     >
       <div className="relative w-full mb-4 overflow-hidden bg-white border border-zinc-100 group-hover:border-zinc-200 transition-colors duration-500">
         {!showRemove && badgeText && (
-          <div className="absolute top-0 left-0 z-30 px-2 py-1 bg-black">
+          <div 
+            className="absolute top-0 left-0 z-30 px-2 py-1 bg-black"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p className="text-[8px] font-bold tracking-[0.2em] text-white uppercase">{badgeText}</p>
           </div>
         )}
@@ -71,9 +75,9 @@ export default function ProductCard({
       </div>
 
       <div className="flex flex-col text-left relative z-10">
-        <Link href={`/product/${id}`} className="group/title block">
-          <h3 className="text-[10px] md:text-[11px] font-medium text-black tracking-[0.12em] uppercase leading-[1.6] mb-1 line-clamp-2 transition-all duration-300 group-hover/title:underline decoration-1 hover:font-semibold">{title}</h3>
-        </Link>
+        <h3 className="text-[10px] md:text-[11px] font-medium text-black tracking-[0.12em] uppercase leading-[1.6] mb-1 line-clamp-2 transition-all duration-300 group-hover:underline decoration-1 hover:font-semibold">
+          {title}
+        </h3>
         <div className="flex items-center justify-between border-t border-zinc-100 pt-2.5 mt-1">
           <div className="flex flex-col">
             {["out-of-stock", "upcoming"].includes(stockStage) ? (

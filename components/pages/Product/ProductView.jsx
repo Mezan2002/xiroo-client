@@ -48,7 +48,7 @@ export default function ProductView({ productId }) {
 
   useEffect(() => {
     if (!cartRef.current) return;
-    
+
     const cartObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
@@ -78,7 +78,7 @@ export default function ProductView({ productId }) {
 
   return (
     <div className="w-full pt-12 md:pt-24 lg:pt-32">
-      <div className="max-w-[1400px] w-full mx-auto px-4 md:px-8 xl:px-12">
+      <div className="w-full px-4 md:px-8">
         {/* Split Architecture Container */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 relative">
           {/* Left Side: Image Gallery */}
@@ -149,10 +149,10 @@ export default function ProductView({ productId }) {
           <Button
             size="sm"
             className="h-10 md:h-11 px-4 md:px-6 text-[10px] tracking-[0.15em] font-bold shrink-0 flex items-center justify-center"
-
             onClick={() => {
-              const hasVariants = product.variants && product.variants.length > 0;
-              
+              const hasVariants =
+                product.variants && product.variants.length > 0;
+
               if (hasVariants) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
                 return;
@@ -163,7 +163,7 @@ export default function ProductView({ productId }) {
                 router.push(`/login?redirect=${redirectPath}`);
                 return;
               }
-              
+
               // Standard add to cart logic (simplified for view)
               addItem({
                 product: {
@@ -174,7 +174,7 @@ export default function ProductView({ productId }) {
                   image: product.images?.[0] || "",
                 },
                 variant: "Standard",
-                silent: true
+                silent: true,
               });
               toast.success("Added to your shopping bag");
             }}
