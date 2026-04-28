@@ -177,11 +177,11 @@ const Hero = () => {
           className="group relative flex items-center justify-center gap-3 border border-white/20 px-7 py-3 overflow-hidden w-full md:w-auto"
         >
           <span className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]" />
-          <span className="relative text-[9px] font-bold tracking-[0.45em] uppercase text-white group-hover:text-black transition-colors duration-300 delay-75">
+          <span className="relative text-xs font-bold uppercase text-white group-hover:text-black transition-colors duration-300 delay-75">
             Shop Collections
           </span>
           <ArrowRight
-            size={9}
+            size={12}
             className="relative text-white/40 group-hover:text-black group-hover:translate-x-1 transition-all duration-300 delay-75"
           />
         </Link>
