@@ -83,7 +83,7 @@ const Hero = () => {
         key={`backdrop-${currentIndex}`}
         className="absolute inset-x-0 z-10 top-32 flex items-start justify-center leading-none select-none pointer-events-none overflow-hidden animate-in fade-in zoom-in-75 duration-1000"
       >
-        <h2 className="font-black uppercase leading-[0.82] tracking-[-0.03em] whitespace-nowrap text-[30vw] text-white/[0.03]">
+        <h2 className="font-black uppercase leading-[0.82] tracking-[-0.03em] whitespace-nowrap text-[28vw] text-white/3">
           {slide.backdrop}
         </h2>
       </div>
@@ -93,7 +93,7 @@ const Hero = () => {
         key={`mannequin-${currentIndex}`}
         className="absolute inset-0 z-20 flex items-end justify-center pointer-events-none animate-in fade-in slide-in-from-bottom-20 duration-1000"
       >
-        <div className="relative w-[480px] max-w-[58vw] h-[90%]">
+        <div className="relative w-[85vw] md:w-[70vw] lg:w-[55vw] max-w-[1000px] h-[90%]">
           <Image
             src={slide.image}
             alt="Xiroo Mannequin"
@@ -108,11 +108,12 @@ const Hero = () => {
       {/* ── Background Solid Texts (z-15) ── */}
       <div
         key={`text-solid-${currentIndex}`}
-        className="absolute inset-0 z-15 flex items-center justify-center gap-4 lg:gap-12 pointer-events-none overflow-hidden -translate-y-6 lg:-translate-y-10"
+        className="absolute inset-0 z-15 flex flex-col md:flex-row items-center justify-center gap-0 md:gap-8 lg:gap-12 pointer-events-none overflow-hidden -translate-y-8 md:-translate-y-6 lg:-translate-y-10"
       >
         <h3
-          className="text-white text-[11vw] font-black italic tracking-tight opacity-0 leading-none"
+          className="text-white font-black italic tracking-tight opacity-0 leading-[0.8] md:leading-none -translate-x-6 md:translate-x-0"
           style={{
+            fontSize: "clamp(5.5rem, 20vw, 14rem)",
             animation:
               "slide-from-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
@@ -123,8 +124,9 @@ const Hero = () => {
           {slide.text1}
         </h3>
         <h3
-          className="text-white text-[11vw] font-black italic tracking-tight opacity-0 leading-none translate-y-12 lg:translate-y-24"
+          className="text-white font-black italic tracking-tight opacity-0 leading-[0.8] md:leading-none translate-x-6 md:translate-x-0 md:translate-y-12 lg:translate-y-24"
           style={{
+            fontSize: "clamp(5.5rem, 20vw, 14rem)",
             animation:
               "slide-from-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
@@ -139,11 +141,12 @@ const Hero = () => {
       {/* ── Foreground Stroke Texts (z-25) ── */}
       <div
         key={`text-stroke-${currentIndex}`}
-        className="absolute inset-0 z-25 flex items-center justify-center gap-4 lg:gap-12 pointer-events-none overflow-hidden -translate-y-6 lg:-translate-y-10"
+        className="absolute inset-0 z-25 flex flex-col md:flex-row items-center justify-center gap-0 md:gap-8 lg:gap-12 pointer-events-none overflow-hidden -translate-y-8 md:-translate-y-6 lg:-translate-y-10"
       >
         <h3
-          className="text-transparent text-[11vw] font-black italic tracking-tight opacity-0 leading-none"
+          className="text-transparent font-black italic tracking-tight opacity-0 leading-[0.8] md:leading-none -translate-x-6 md:translate-x-0"
           style={{
+            fontSize: "clamp(5.5rem, 20vw, 14rem)",
             animation:
               "slide-from-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
@@ -153,8 +156,9 @@ const Hero = () => {
           {slide.text1}
         </h3>
         <h3
-          className="text-transparent text-[11vw] font-black italic tracking-tight opacity-0 leading-none translate-y-12 lg:translate-y-24"
+          className="text-transparent font-black italic tracking-tight opacity-0 leading-[0.8] md:leading-none translate-x-6 md:translate-x-0 md:translate-y-12 lg:translate-y-24"
           style={{
+            fontSize: "clamp(5.5rem, 20vw, 14rem)",
             animation:
               "slide-from-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
@@ -166,15 +170,15 @@ const Hero = () => {
       </div>
 
       {/* ── Bottom Bar ── */}
-      <div className="absolute bottom-6 lg:bottom-10 left-0 right-0 px-6 lg:px-14 z-30 flex items-center justify-between">
+      <div className="absolute bottom-6 lg:bottom-10 left-0 right-0 px-6 lg:px-14 z-30 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">
         {/* CTA — sharp bordered button, bottom-left */}
         <Link
           href="/collections"
-          className="group relative flex items-center gap-3 border border-white/20 px-7 py-3 overflow-hidden"
+          className="group relative flex items-center justify-center gap-3 border border-white/20 px-7 py-3 overflow-hidden w-full md:w-auto"
         >
           <span className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]" />
           <span className="relative text-[9px] font-bold tracking-[0.45em] uppercase text-white group-hover:text-black transition-colors duration-300 delay-75">
-            Shop Now
+            Shop Collections
           </span>
           <ArrowRight
             size={9}
@@ -183,7 +187,7 @@ const Hero = () => {
         </Link>
 
         {/* Arrow navigation — bottom-right */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto px-4 md:px-0">
           <button
             onClick={() => {
               setCurrentIndex(
@@ -191,7 +195,7 @@ const Hero = () => {
               );
               resetTimer();
             }}
-            className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300"
+            className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300 shrink-0"
             aria-label="Previous slide"
           >
             <ArrowRight
@@ -200,7 +204,7 @@ const Hero = () => {
             />
           </button>
 
-          <span className="text-[10px] font-bold text-white/30 tracking-widest tabular-nums select-none">
+          <span className="text-[10px] font-bold text-white/30 tracking-widest tabular-nums select-none shrink-0">
             {String(currentIndex + 1).padStart(2, "0")}&nbsp;/&nbsp;
             {String(SLIDES.length).padStart(2, "0")}
           </span>
@@ -210,7 +214,7 @@ const Hero = () => {
               setCurrentIndex((currentIndex + 1) % SLIDES.length);
               resetTimer();
             }}
-            className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300"
+            className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300 shrink-0"
             aria-label="Next slide"
           >
             <ArrowRight
