@@ -30,9 +30,10 @@ export default function ProductComparison() {
         {/* Background Image (Dark Variant) */}
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src="/images/compersion-1.jpg"
+            src="/images/compersion-2.jpg"
             alt="Dark Variant Product View"
-            fill
+            width={1000}
+            height={1000}
             className="object-cover object-center pointer-events-none"
           />
         </div>
@@ -43,9 +44,10 @@ export default function ProductComparison() {
           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
         >
           <Image
-            src="/images/compersion-2.jpg"
+            src="/images/compersion-1.jpg"
             alt="Light Variant Product View"
-            fill
+            width={1000}
+            height={1000}
             className="object-cover object-center"
           />
         </div>

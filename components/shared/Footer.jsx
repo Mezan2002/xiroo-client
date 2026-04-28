@@ -80,10 +80,10 @@ export default function Footer() {
                   Shipping & Delivery
                 </Link>
                 <Link
-                  href="/returns"
+                  href="/return-policy"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  Returns & Exchanges
+                  Return Policy
                 </Link>
                 <Link
                   href="/contact"
@@ -145,22 +145,26 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a
-              href="#"
-              className="text-white/40 hover:text-white transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram size={16} strokeWidth={1.5} />
-            </a>
-            <a
-              href="#"
+            <Link
+              href="https://www.facebook.com/xirooshop/"
+              target="_blank"
               className="text-white/40 hover:text-white transition-colors"
               aria-label="Facebook"
             >
               <Facebook size={16} strokeWidth={1.5} />
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="https://www.instagram.com/xirooshop/"
+              target="_blank"
+              className="text-white/40 hover:text-white transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram size={16} strokeWidth={1.5} />
+            </Link>
+
+            <Link
+              href="https://www.tiktok.com/@xirooshop"
+              target="_blank"
               className="text-white/40 hover:text-white transition-colors"
               aria-label="TikTok"
             >
@@ -175,7 +179,7 @@ export default function Footer() {
               >
                 <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
