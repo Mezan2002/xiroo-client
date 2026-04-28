@@ -1,13 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/Button";
 import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import MegaMenu from "./MegaMenu";
+import NavLinks from "../NavLinks";
 import { UserAvatar } from "../UserAvatar";
-
-const NavLinks = dynamic(() => import("../NavLinks"), { ssr: false });
+import MegaMenu from "./MegaMenu";
 
 export default function DesktopNavbar({
   isSolid,
@@ -23,18 +21,25 @@ export default function DesktopNavbar({
   setIsSearchOpen,
   setIsCartOpen,
   setIsUserOpen,
+  setIsMobileMenuOpen,
 }) {
   return (
     <div
       className="hidden lg:flex items-center justify-between w-full h-full px-12"
       onMouseLeave={() => setActiveMenu(null)}
     >
-      <div className="flex items-center gap-8 w-[350px] h-full">
-        <NavLinks
-          navItems={navItems}
-          activeMenu={activeMenu}
-          setActiveMenu={setActiveMenu}
-        />
+      <div
+        className="flex items-center gap-8 w-[350px] h-full"
+        suppressHydrationWarning
+      >
+        <div className="flex items-center gap-8 h-full">
+          <NavLinks
+            navItems={navItems}
+            activeMenu={activeMenu}
+            setActiveMenu={setActiveMenu}
+          />
+        </div>
+
         <MegaMenu
           activeMenu={activeMenu}
           scrolled={scrolled}

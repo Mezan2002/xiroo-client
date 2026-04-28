@@ -28,35 +28,29 @@ export default function Footer() {
 
           {/* Navigation Links Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:col-span-8 gap-12 lg:gap-16 lg:pl-16">
-            {/* Collections Column */}
+            {/* Shop Column */}
             <div className="flex flex-col gap-8">
               <h4 className="text-[10px] font-bold tracking-[0.25em] uppercase text-white">
-                Collections
+                Explore
               </h4>
               <div className="flex flex-col gap-5">
                 <Link
                   href="/collections"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  All Pieces
+                  Collections
                 </Link>
                 <Link
-                  href="/collections/heavyweight"
+                  href="/new-in"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  Heavyweight Tees
+                  New In
                 </Link>
                 <Link
-                  href="/collections/outerwear"
+                  href="/hot-sale"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  Outerwear
-                </Link>
-                <Link
-                  href="/collections/accessories"
-                  className="text-[11px] text-white/50 hover:text-white transition-colors"
-                >
-                  Accessories
+                  Hot Sale
                 </Link>
               </div>
             </div>
@@ -68,22 +62,10 @@ export default function Footer() {
               </h4>
               <div className="flex flex-col gap-5">
                 <Link
-                  href="/faq"
+                  href="/about"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  FAQ
-                </Link>
-                <Link
-                  href="/shipping"
-                  className="text-[11px] text-white/50 hover:text-white transition-colors"
-                >
-                  Shipping & Delivery
-                </Link>
-                <Link
-                  href="/return-policy"
-                  className="text-[11px] text-white/50 hover:text-white transition-colors"
-                >
-                  Return Policy
+                  Our Story
                 </Link>
                 <Link
                   href="/contact"
@@ -91,32 +73,38 @@ export default function Footer() {
                 >
                   Contact Us
                 </Link>
+                <Link
+                  href="/faq"
+                  className="text-[11px] text-white/50 hover:text-white transition-colors"
+                >
+                  FAQ
+                </Link>
               </div>
             </div>
 
-            {/* About Column */}
+            {/* Account Column */}
             <div className="flex flex-col gap-8">
               <h4 className="text-[10px] font-bold tracking-[0.25em] uppercase text-white">
-                The Brand
+                My Account
               </h4>
               <div className="flex flex-col gap-5">
                 <Link
-                  href="/about"
+                  href="/account/orders"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  Our Story
+                  Track Orders
                 </Link>
                 <Link
-                  href="/sustainability"
+                  href="/account/profile"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  Sustainability
+                  Profile Settings
                 </Link>
                 <Link
-                  href="/stockists"
+                  href="/login"
                   className="text-[11px] text-white/50 hover:text-white transition-colors"
                 >
-                  Stockists
+                  Login / Register
                 </Link>
               </div>
             </div>
@@ -130,6 +118,18 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-8">
+            <Link
+              href="/shipping"
+              className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
+            >
+              Shipping
+            </Link>
+            <Link
+              href="/return-policy"
+              className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
+            >
+              Returns
+            </Link>
             <Link
               href="/privacy"
               className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"

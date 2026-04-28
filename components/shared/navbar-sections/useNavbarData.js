@@ -4,14 +4,20 @@ import axiosInstance from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+const DEFAULT_NAV_ITEMS = [
+  { id: "collections", label: "COLLECTIONS", categories: [], products: [] },
+  { id: "new-in", label: "NEW IN", categories: [], products: [] },
+  { id: "hot-sale", label: "HOT SALE", categories: [], products: [] },
+];
+
 export const useNavbarData = () => {
   const [navItems, setNavItems] = useState(() => {
-    if (typeof window === "undefined") return [];
+    if (typeof window === "undefined") return DEFAULT_NAV_ITEMS;
     try {
       const cached = localStorage.getItem("xiroo_cached_nav");
-      if (cached) return JSON.parse(cached).items || [];
+      if (cached) return JSON.parse(cached).items || DEFAULT_NAV_ITEMS;
     } catch (e) {}
-    return [];
+    return DEFAULT_NAV_ITEMS;
   });
 
   const [menusData, setMenusData] = useState(() => {
@@ -23,22 +29,25 @@ export const useNavbarData = () => {
     return {};
   });
 
+
   const { data: menuResponse } = useQuery({
     queryKey: ["menus"],
     queryFn: async () => {
       const response = await axiosInstance.get("/menus");
       return response.data || response;
     },
-    staleTime: 60 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes fresh
     gcTime: 24 * 60 * 60 * 1000,
     placeholderData: (prev) => prev,
   });
 
+
   const { useAllProducts } = useProducts({
-    staleTime: 30 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes fresh
     gcTime: 60 * 60 * 1000,
     placeholderData: (prev) => prev,
   });
+
   const { data: productsResponse } = useAllProducts({ limit: 50 });
 
   useEffect(() => {

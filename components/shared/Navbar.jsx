@@ -80,7 +80,9 @@ export function Navbar() {
           setActiveMenu={setActiveMenu}
           scrolled={scrolled}
           menusData={menusData}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
+
       </nav>
 
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
