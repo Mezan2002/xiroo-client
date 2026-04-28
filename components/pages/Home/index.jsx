@@ -1,10 +1,13 @@
-import FeaturedCategories from "@/components/pages/Home/FeaturedCategories";
-import FeaturedProduct from "@/components/pages/Home/FeaturedProduct";
+import dynamic from "next/dynamic";
 import Hero from "@/components/pages/Home/Hero";
 import MarqueeBanner from "@/components/pages/Home/MarqueeBanner";
-import NewArrival from "@/components/pages/Home/NewArrival";
-import ProductComparison from "@/components/pages/Home/ProductComparison";
-import PromoBanner from "@/components/pages/Home/PromoBanner";
+
+// Dynamic imports for below-the-fold components
+const FeaturedCategories = dynamic(() => import("@/components/pages/Home/FeaturedCategories"));
+const FeaturedProduct = dynamic(() => import("@/components/pages/Home/FeaturedProduct"));
+const NewArrival = dynamic(() => import("@/components/pages/Home/NewArrival"));
+const PromoBanner = dynamic(() => import("@/components/pages/Home/PromoBanner"));
+const ProductComparison = dynamic(() => import("@/components/pages/Home/ProductComparison"));
 
 const Home = () => {
   return (
@@ -21,3 +24,4 @@ const Home = () => {
 };
 
 export default Home;
+

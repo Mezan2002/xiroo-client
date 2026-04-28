@@ -20,13 +20,17 @@ export const metadata = {
   },
 };
 
+import dynamic from "next/dynamic";
 import ConditionalLayout from "@/components/shared/ConditionalLayout";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { SocketProvider } from "@/context/SocketContext";
 import AppInitializer from "@/components/AppInitializer";
-import ToastContainer from "@/components/shared/ToastContainer";
 import RouteGuard from "@/components/shared/RouteGuard";
+
+const ToastContainer = dynamic(() => import("@/components/shared/ToastContainer"));
+
+
 
 export default function RootLayout({ children }) {
   return (

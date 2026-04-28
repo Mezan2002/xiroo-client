@@ -1,10 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import BottomNavbar from "./BottomNavbar";
-import Footer from "./Footer";
 import { Navbar } from "./Navbar";
-import Newsletter from "./Newsletter";
+
+const BottomNavbar = dynamic(() => import("./BottomNavbar"));
+const Footer = dynamic(() => import("./Footer"));
+const Newsletter = dynamic(() => import("./Newsletter"));
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
@@ -36,3 +38,4 @@ export default function ConditionalLayout({ children }) {
     </div>
   );
 }
+

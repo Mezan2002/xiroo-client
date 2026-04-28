@@ -32,8 +32,8 @@ export default function ProductComparison() {
           <Image
             src="/images/compersion-2.jpg"
             alt="Dark Variant Product View"
-            width={1000}
-            height={1000}
+            fill
+            sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover object-center pointer-events-none"
           />
         </div>
@@ -46,11 +46,12 @@ export default function ProductComparison() {
           <Image
             src="/images/compersion-1.jpg"
             alt="Light Variant Product View"
-            width={1000}
-            height={1000}
+            fill
+            sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover object-center"
           />
         </div>
+
 
         {/* Visual Slider Line & Handle */}
         <div

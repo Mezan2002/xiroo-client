@@ -99,6 +99,7 @@ const Hero = () => {
             alt="Xiroo Mannequin"
             fill
             priority
+            sizes="(max-width: 768px) 85vw, (max-width: 1024px) 70vw, 55vw"
             className="object-contain object-bottom"
             draggable={false}
           />

@@ -119,12 +119,14 @@ export default function FeaturedProduct() {
                     src={img}
                     alt={`${product.title} view ${idx + 1}`}
                     fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     className={`object-cover object-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
                       idx === currentImageIndex
                         ? "opacity-100 scale-100"
                         : "opacity-0 scale-[1.02]"
                     }`}
                   />
+
                 ))}
               </>
             ) : (
