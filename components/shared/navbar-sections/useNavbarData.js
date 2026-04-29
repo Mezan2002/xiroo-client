@@ -1,34 +1,28 @@
 "use client";
 import { useProducts } from "@/hooks/api/useProducts";
 import axiosInstance from "@/lib/axios";
+import { getFromStorage, saveToStorage } from "@/lib/storage";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-const DEFAULT_NAV_ITEMS = [
-  { id: "collections", label: "COLLECTIONS", categories: [], products: [] },
-  { id: "new-in", label: "NEW IN", categories: [], products: [] },
-  { id: "hot-sale", label: "HOT SALE", categories: [], products: [] },
-];
-
 export const useNavbarData = () => {
   const [navItems, setNavItems] = useState(() => {
-    if (typeof window === "undefined") return DEFAULT_NAV_ITEMS;
+    if (typeof window === "undefined") return [];
     try {
-      const cached = localStorage.getItem("xiroo_cached_nav");
-      if (cached) return JSON.parse(cached).items || DEFAULT_NAV_ITEMS;
+      const cached = getFromStorage("xiroo_cached_nav");
+      if (cached) return cached.items || [];
     } catch (e) {}
-    return DEFAULT_NAV_ITEMS;
+    return [];
   });
 
   const [menusData, setMenusData] = useState(() => {
     if (typeof window === "undefined") return {};
     try {
-      const cached = localStorage.getItem("xiroo_cached_nav");
-      if (cached) return JSON.parse(cached).data || {};
+      const cached = getFromStorage("xiroo_cached_nav");
+      if (cached) return cached.data || {};
     } catch (e) {}
     return {};
   });
-
 
   const { data: menuResponse } = useQuery({
     queryKey: ["menus"],
@@ -40,7 +34,6 @@ export const useNavbarData = () => {
     gcTime: 24 * 60 * 60 * 1000,
     placeholderData: (prev) => prev,
   });
-
 
   const { useAllProducts } = useProducts({
     staleTime: 5 * 60 * 1000, // 5 minutes fresh
@@ -86,10 +79,7 @@ export const useNavbarData = () => {
       setNavItems(items);
       setMenusData(data);
       if (typeof window !== "undefined" && items.length > 0) {
-        localStorage.setItem(
-          "xiroo_cached_nav",
-          JSON.stringify({ items, data }),
-        );
+        saveToStorage("xiroo_cached_nav", { items, data });
       }
     }
   }, [menuResponse, productsResponse]);

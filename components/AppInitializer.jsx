@@ -10,6 +10,7 @@ import { addNotification } from "@/redux/slices/notificationSlice";
 import { addToast } from "@/redux/slices/toastSlice";
 import { useNotifications } from "@/hooks/api/useNotifications";
 import { useUser } from "@/hooks/api/useUser";
+import { getFromStorage } from "@/lib/storage";
 
 /** 
  * Senior Dev Component: AppInitializer
@@ -30,14 +31,14 @@ export default function AppInitializer({ children }) {
     // Registry Hydration (Client-only)
     if (typeof window !== "undefined") {
       try {
-        const cartData = localStorage.getItem("xiroo_cart_registry");
-        if (cartData) dispatch(setCart(JSON.parse(cartData)));
+        const cartData = getFromStorage("xiroo_cart_registry");
+        if (cartData) dispatch(setCart(cartData));
 
-        const wishlistData = localStorage.getItem("xiroo_wishlist_registry");
-        if (wishlistData) dispatch(setWishlist(JSON.parse(wishlistData)));
+        const wishlistData = getFromStorage("xiroo_wishlist_registry");
+        if (wishlistData) dispatch(setWishlist(wishlistData));
 
-        const recentData = localStorage.getItem("xiroo_recently_viewed");
-        if (recentData) dispatch(setRecentlyViewed(JSON.parse(recentData)));
+        const recentData = getFromStorage("xiroo_recently_viewed");
+        if (recentData) dispatch(setRecentlyViewed(recentData));
       } catch (error) {
         console.error("Critical Hydration Failure:", error);
       }

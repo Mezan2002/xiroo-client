@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                           {activity.badge}
                         </span>
                       </p>
-                      <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-[0.1em] mt-0.5">
+                      <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest mt-0.5">
                         {activity.description}
                       </p>
                     </div>

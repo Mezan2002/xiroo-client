@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { encrypt, decrypt } from "@/lib/storage";
+import { getFromStorage, saveToStorage } from "@/lib/storage";
 
 /**
  * Xiroo Security Hook: Encrypted LocalStorage Management
@@ -14,9 +14,8 @@ export function useLocalStorage(key, initialValue) {
       return initialValue;
     }
     try {
-      const item = window.localStorage.getItem(key);
-      // Parse stored json or if none return initialValue
-      return item ? decrypt(item) : initialValue;
+      const item = getFromStorage(key);
+      return item !== null ? item : initialValue;
     } catch (error) {
       console.log(error);
       return initialValue;
@@ -33,9 +32,7 @@ export function useLocalStorage(key, initialValue) {
       // Save state
       setStoredValue(valueToStore);
       // Save to local storage
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, encrypt(valueToStore));
-      }
+      saveToStorage(key, valueToStore);
     } catch (error) {
       console.log(error);
     }

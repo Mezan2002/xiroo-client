@@ -82,7 +82,6 @@ export function Navbar() {
           menusData={menusData}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
-
       </nav>
 
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

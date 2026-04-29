@@ -1,11 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/Button";
 import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import NavLinks from "../NavLinks";
 import { UserAvatar } from "../UserAvatar";
 import MegaMenu from "./MegaMenu";
+const NavLinks = dynamic(() => import("../NavLinks"), { ssr: false });
 
 export default function DesktopNavbar({
   isSolid,
