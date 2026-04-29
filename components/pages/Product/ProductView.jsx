@@ -158,12 +158,6 @@ export default function ProductView({ productId }) {
                 return;
               }
 
-              if (!user) {
-                const redirectPath = encodeURIComponent(pathname);
-                router.push(`/login?redirect=${redirectPath}`);
-                return;
-              }
-
               // Standard add to cart logic (simplified for view)
               addItem({
                 product: {

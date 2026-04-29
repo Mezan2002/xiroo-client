@@ -10,8 +10,23 @@ export const useOrders = () => {
 
   // 1. Transactional Protocol: Create Order Registry
   const placeOrder = useMutation({
+    mutationFn: async (payload) => {
+      // Support both direct payload or { orderData, token } for auto-flow
+      const isAutoFlow = payload?.orderData && payload?.token;
+      const orderData = isAutoFlow ? payload.orderData : payload;
+      const config = isAutoFlow ? { headers: { Authorization: payload.token } } : {};
+      
+      const response = await axiosInstance.post("/orders", orderData, config);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  const placeGuestOrder = useMutation({
     mutationFn: async (orderData) => {
-      const response = await axiosInstance.post("/orders", orderData);
+      const response = await axiosInstance.post("/orders/guest", orderData);
       return response;
     },
     onSuccess: () => {
@@ -116,6 +131,7 @@ export const useOrders = () => {
 
   return {
     placeOrder,
+    placeGuestOrder,
     useOrderHistory,
     useMyOrders,
     useOrderStats,

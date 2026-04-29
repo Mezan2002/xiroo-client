@@ -27,6 +27,14 @@ export default function NavLinks({ navItems, activeMenu, setActiveMenu }) {
           </Link>
         </div>
       ))}
+      <div className="flex items-center h-full cursor-pointer">
+        <Link
+          href="/track-order"
+          className="text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max hover:opacity-70"
+        >
+          TRACK ORDER
+        </Link>
+      </div>
     </>
   );
 }

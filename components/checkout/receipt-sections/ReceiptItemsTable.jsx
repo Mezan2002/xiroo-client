@@ -2,6 +2,23 @@ import Image from "next/image";
 import React from "react";
 
 export default function ReceiptItemsTable({ items }) {
+  // Group items by product ID and variant
+  const groupedItems = React.useMemo(() => {
+    const groups = (items || []).reduce((acc, item) => {
+      const productId = item.product?._id || item.product;
+      const variant = item.variant || "Standard";
+      const key = `${productId}-${variant}`;
+      
+      if (acc[key]) {
+        acc[key].quantity += item.quantity;
+      } else {
+        acc[key] = { ...item };
+      }
+      return acc;
+    }, {});
+    return Object.values(groups);
+  }, [items]);
+
   return (
     <>
       {/* Table Head */}
@@ -35,7 +52,7 @@ export default function ReceiptItemsTable({ items }) {
 
       {/* Table Body */}
       <div style={{ flex: 1 }}>
-        {items.map((item, idx) => (
+        {groupedItems.map((item, idx) => (
           <div
             key={idx}
             style={{
@@ -78,6 +95,19 @@ export default function ReceiptItemsTable({ items }) {
               >
                 {item.product?.title}
               </p>
+              {item.variant && item.variant !== "Standard" && (
+                <p
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                    color: "#666",
+                    marginTop: "2px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Variant: {item.variant}
+                </p>
+              )}
               <p
                 style={{
                   fontSize: "12px",

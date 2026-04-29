@@ -168,11 +168,6 @@ export default function FeaturedProduct() {
                 size="icon"
                 showHoverIcon={false}
                 onClick={() => {
-                  if (!user) {
-                    const redirectPath = encodeURIComponent(pathname);
-                    router.push(`/login?redirect=${redirectPath}`);
-                    return;
-                  }
                   if (product.variants?.length > 0) {
                     router.push(`/product/${product._id}`);
                     return;

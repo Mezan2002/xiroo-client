@@ -2,6 +2,7 @@
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Button } from "@/components/ui/Button";
 import { useOrders } from "@/hooks/api/useOrders";
+import { useUsers } from "@/hooks/api/useUsers";
 import {
   BarChart3,
   Clock,
@@ -9,37 +10,85 @@ import {
   LayoutDashboard,
   ShoppingBag,
   TrendingUp,
+  UserPlus,
   Zap,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 export default function AdminDashboard() {
-  const { useOrderStats } = useOrders();
-  const { data, isLoading } = useOrderStats();
+  const router = useRouter();
+  const { useOrderStats, useOrderHistory } = useOrders();
+  const { useAllUsers } = useUsers();
+
+  const { data: statsData, isLoading: statsLoading } = useOrderStats();
+  const { data: recentOrders, isLoading: ordersLoading } = useOrderHistory({
+    limit: 10,
+    sort: "-createdAt",
+  });
+  const { data: recentUsers, isLoading: usersLoading } = useAllUsers({
+    limit: 10,
+    sort: "-createdAt",
+  });
 
   const stats = [
     {
       label: "Total Revenue",
-      value: `৳${(data?.totalRevenue || 0).toLocaleString()}`,
+      value: `৳${(statsData?.totalRevenue || 0).toLocaleString()}`,
       icon: TrendingUp,
     },
     {
       label: "Total Orders",
-      value: (data?.totalOrders || 0).toString(),
+      value: (statsData?.totalOrders || 0).toString(),
       icon: ShoppingBag,
     },
     {
       label: "Pending Registry",
       value: (
-        data?.statusDistribution?.find((s) => s._id === "pending")?.count || 0
+        statsData?.statusDistribution?.find((s) => s._id === "pending")
+          ?.count || 0
       ).toString(),
       icon: Clock,
     },
   ];
 
+  // Merge and sort activities
+  const allActivities = useMemo(() => {
+    const orderActivities = (recentOrders || []).map((o) => ({
+      id: o._id,
+      type: "order",
+      title: o.user
+        ? `${o.user.firstName} ${o.user.lastName}`
+        : `${o.guestInfo?.firstName} ${o.guestInfo?.lastName}`,
+      description: `Placed Order ${o.orderId}`,
+      meta: `৳${o.totalPrice?.toLocaleString()}`,
+      time: new Date(o.createdAt),
+      icon: ShoppingBag,
+      link: `/admin/orders/${o._id}`,
+      badge: o.user ? "Member" : "Guest",
+    }));
+
+    const userActivities = (recentUsers || []).map((u) => ({
+      id: u._id,
+      type: "user",
+      title: `${u.firstName} ${u.lastName}`,
+      description: `New Identity Registered: ${u.email}`,
+      meta: u.role?.toUpperCase(),
+      time: new Date(u.createdAt),
+      icon: UserPlus,
+      link: `/admin/users`,
+      badge: "New User",
+    }));
+
+    return [...orderActivities, ...userActivities]
+      .sort((a, b) => b.time - a.time)
+      .slice(0, 6);
+  }, [recentOrders, recentUsers]);
+
   return (
     <div className="space-y-8 md:space-y-12 pb-24">
       <ModuleHeader
-        label="System Monitoring"
+        label="Dashboard"
         title="Dashboard"
         icon={LayoutDashboard}
         tabs={["Overview", "Live", "Reports"]}
@@ -47,7 +96,7 @@ export default function AdminDashboard() {
 
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-        {isLoading
+        {statsLoading
           ? [1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -90,16 +139,59 @@ export default function AdminDashboard() {
             <Button
               variant="ghost"
               icon={ExternalLink}
+              onClick={() => router.push("/admin/orders")}
               className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black"
             >
               View All
             </Button>
           </div>
 
-          <div className="space-y-2">
-            <div className="p-8 md:p-12 text-center border-2 border-dashed border-gray-50 italic text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-widest">
-              Activity Feed Synchronizing...
-            </div>
+          <div className="space-y-4">
+            {ordersLoading || usersLoading ? (
+              <div className="p-12 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-300 animate-pulse">
+                Synchronizing Global Feed...
+              </div>
+            ) : allActivities.length > 0 ? (
+              allActivities.map((activity) => (
+                <div
+                  key={`${activity.type}-${activity.id}`}
+                  className="flex items-center justify-between p-5 bg-white border border-zinc-100 hover:border-black transition-all group cursor-pointer"
+                  onClick={() => router.push(activity.link)}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-zinc-50 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
+                      <activity.icon size={16} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-bold text-zinc-900 tracking-tight">
+                        {activity.title}
+                        <span className="ml-2 text-[8px] font-black px-1 py-0.5 border border-zinc-100 uppercase tracking-widest">
+                          {activity.badge}
+                        </span>
+                      </p>
+                      <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-[0.1em] mt-0.5">
+                        {activity.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[13px] font-black text-zinc-900 tracking-tight">
+                      {activity.meta}
+                    </p>
+                    <p className="text-[8px] text-zinc-400 font-black uppercase tracking-widest mt-0.5">
+                      {activity.time.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-12 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                No Registry Activity Detected
+              </div>
+            )}
           </div>
         </div>
 

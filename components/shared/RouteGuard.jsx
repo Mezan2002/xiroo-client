@@ -17,7 +17,7 @@ export default function RouteGuard({ children }) {
   const [authorized, setAuthorized] = useState(false);
 
   // Define Protected Regions (Live Security List)
-  const protectedRoutes = ["/account", "/admin", "/checkout"];
+  const protectedRoutes = ["/account", "/admin"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );

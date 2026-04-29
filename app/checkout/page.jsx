@@ -8,8 +8,6 @@ import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 
 import { useUser } from "@/hooks/api/useUser";
-import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 
 export default function CheckoutPage() {
@@ -18,32 +16,10 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
-  const router = useRouter();
-  const pathname = usePathname();
- 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      const redirectPath = encodeURIComponent(pathname);
-      router.push(`/login?redirect=${redirectPath}`);
-    }
-  }, [user, isLoading, router, pathname]);
- 
+
   const baseShipping = district === "Dhaka" ? 80 : district ? 150 : 0;
   const shipping = baseShipping + (deliveryMethod === "fast" ? 50 : 0);
   const total = subtotal + shipping;
- 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="text-2xl font-bold tracking-tighter">XIROO</div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Verifying Session...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-white">

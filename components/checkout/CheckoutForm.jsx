@@ -19,6 +19,7 @@ export default function CheckoutForm({
   total,
 }) {
   const {
+    user,
     formData,
     handleChange,
     handleDistrictChange,
@@ -46,7 +47,13 @@ export default function CheckoutForm({
           />
         )}
 
-        {step === 3 && <PaymentSection />}
+        {step === 3 && (
+          <PaymentSection
+            user={user}
+            formData={formData}
+            handleChange={handleChange}
+          />
+        )}
 
         <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-gray-100">
           <Button

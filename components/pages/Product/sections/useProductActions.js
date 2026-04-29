@@ -108,10 +108,6 @@ export const useProductActions = (product) => {
   const selectedBundle = activeBundles.find((b) => b.id === selectedBundleId);
 
   const handleAddToCart = () => {
-    if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
-      return;
-    }
     const totalRequired = product.variants?.length || 0;
     const totalSelected = Object.keys(selectedVariants).length;
     if (totalSelected < totalRequired) {
@@ -143,10 +139,6 @@ export const useProductActions = (product) => {
   };
 
   const handleOrderNow = () => {
-    if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
-      return;
-    }
     const totalRequired = product.variants?.length || 0;
     const totalSelected = Object.keys(selectedVariants).length;
     if (totalSelected < totalRequired) {

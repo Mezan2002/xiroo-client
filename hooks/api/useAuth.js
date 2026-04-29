@@ -21,9 +21,10 @@ export const useAuth = () => {
   const loginMutation = useMutation({
     mutationFn: async (credentials) => {
       const response = await axiosInstance.post("/auth/login", credentials);
-      return response.data;
+      return response;
     },
-    onSuccess: (data) => {
+    onSuccess: (response) => {
+      const data = response?.data || response;
       dispatch(setCredentials({ token: data.accessToken }));
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       toast.success("Identity Verified. Session active.");
@@ -33,7 +34,7 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: async (formData) => {
       const response = await axiosInstance.post("/auth/register", formData);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       toast.info("Onboarding successful. Awaiting verification.");
@@ -47,14 +48,21 @@ export const useAuth = () => {
         otp,
         type,
       });
-      return response.data;
+      return response;
+    },
+    onSuccess: (response) => {
+      const data = response?.data || response;
+      if (data.accessToken) {
+        dispatch(setCredentials({ token: data.accessToken }));
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      }
     },
   });
 
   const resendOtpMutation = useMutation({
     mutationFn: async ({ email }) => {
       const response = await axiosInstance.post("/auth/resend-otp", { email });
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       toast.success("Security Code Dispatched.");
@@ -68,7 +76,7 @@ export const useAuth = () => {
         otp,
         newPassword,
       });
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       toast.success("Security Credential Updated.");
@@ -80,7 +88,7 @@ export const useAuth = () => {
       const response = await axiosInstance.post("/auth/forgot-password", {
         email,
       });
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       toast.success("Recovery Protocol Initiated.");

@@ -46,11 +46,7 @@ export function useProductCard({ id, title, price, salePrice, image, images: ima
     e.preventDefault();
     e.stopPropagation();
 
-    if (!user) {
-      const redirectPath = encodeURIComponent(pathname);
-      router.push(`/login?redirect=${redirectPath}`);
-      return;
-    }
+    // Guest users should be able to add to cart without logging in
 
     if (hasVariants) {
       router.push(`/product/${id}`);

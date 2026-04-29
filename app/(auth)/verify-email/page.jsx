@@ -3,19 +3,24 @@
 import { Button } from "@/components/ui/Button";
 import { useLayout } from "@/hooks/useLayout";
 import { useToast } from "@/hooks/useToast";
-import { Mail, RefreshCw, ShieldCheck } from "lucide-react";
+import { RefreshCw, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useAuth } from "@/hooks/api/useAuth";
+import { useOrders } from "@/hooks/api/useOrders";
+import { useCart } from "@/hooks/useCart";
 
 function VerifyEmailContent() {
   const { updateAuthLayout } = useLayout();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { verifyOtpMutation, resendOtpMutation } = useAuth();
+  const { placeOrder } = useOrders();
+  const { clearCart } = useCart();
   const { toast } = useToast();
   const email = searchParams.get("email") || "your email";
   const mode = searchParams.get("mode");
+  const flow = searchParams.get("flow");
   const isOtp = mode === "otp";
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -86,17 +91,60 @@ function VerifyEmailContent() {
     const code = otp.join("");
     
     verifyOtpMutation.mutate({ email, otp: code, type: isOtp ? undefined : "recovery" }, {
-      onSuccess: () => {
+      onSuccess: async (data) => {
         toast.success(isOtp ? "Identity Verified Successfully." : "Recovery Signature Validated.");
+        
+        // Handle Checkout Flow
+        if (flow === "checkout" && isOtp) {
+          try {
+            const pendingOrderStr = sessionStorage.getItem("pending_order");
+            if (pendingOrderStr) {
+              const pendingOrder = JSON.parse(pendingOrderStr);
+              // Injected User ID if missing (Defensive extraction)
+              const responseData = data?.data || data;
+              const accessToken = responseData?.accessToken || data?.accessToken;
+              const userObj = responseData?.user || data?.user;
+              
+              if (accessToken) {
+                const userId = userObj?._id || userObj?.id;
+                if (userId) pendingOrder.user = userId;
+                
+                // Place order with immediate token
+                const orderResponse = await placeOrder.mutateAsync({ 
+                  orderData: pendingOrder, 
+                  token: accessToken 
+                });
+                
+                if (orderResponse.success) {
+                  toast.success("Order placed successfully!");
+                  clearCart();
+                  sessionStorage.removeItem("pending_order");
+                  router.push(`/checkout/success?id=${orderResponse.data._id || orderResponse.data.id}`);
+                  return;
+                }
+              } else {
+                console.warn("Verification successful but no access token returned.");
+              }
+            }
+          } catch (orderErr) {
+            console.error("Order placement failed after verification:", orderErr);
+            toast.error("Account verified, but order placement failed. Returning to checkout.");
+            router.push("/checkout?error=order_failed");
+            return;
+          }
+        }
+
         setTimeout(() => {
-          const redirect = searchParams.get("redirect");
-          const redirectSuffix = redirect ? `&redirect=${redirect}` : "";
+          const redirect = searchParams.get("redirect") || "/checkout";
+          const redirectSuffix = redirect.includes("?") ? `&redirect=${redirect}` : `?redirect=${redirect}`;
+          
           if (isOtp) {
-            router.push(`/login?verified=true${redirectSuffix}`);
+            // Navigate back to checkout or redirect instead of login
+            router.push(redirect);
           } else {
             router.push(`/reset-password?email=${encodeURIComponent(email)}&code=${code}${redirectSuffix}`);
           }
-        }, 2000);
+        }, 1500);
       },
       onError: (err) => {
         toast.error(err.message || "Verification Failure: Invalid OTP Signature");

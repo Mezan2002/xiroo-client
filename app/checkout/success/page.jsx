@@ -58,6 +58,23 @@ function OrderSuccessContent() {
   const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const delivery = order.shippingFee || (order.totalPrice - subtotal);
 
+  // Group items by product ID and variant
+  const groupedItems = order.items.reduce((acc, item) => {
+    const productId = item.product?._id || item.product;
+    const variant = item.variant || "Standard";
+    const key = `${productId}-${variant}`;
+    
+    if (acc[key]) {
+      acc[key].quantity += item.quantity;
+      // We assume price is the same for the same variant
+    } else {
+      acc[key] = { ...item };
+    }
+    return acc;
+  }, {});
+
+  const displayItems = Object.values(groupedItems);
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       <main className="px-6 pt-24 pb-12 flex justify-center">
@@ -100,6 +117,17 @@ function OrderSuccessContent() {
                 </Button>
               </Link>
             </div>
+
+            {/* Note for guest users to track their order */}
+            {(!order.user || typeof order.user === "string") && (
+              <div className="p-5 mt-2 bg-yellow-50/50 border border-yellow-100 text-center">
+                <p className="text-[11px] font-medium text-gray-600 leading-relaxed uppercase tracking-widest">
+                  Guest Checkout? <br/> 
+                  Please copy your Order ID <strong className="text-black select-all ml-1">{order.orderId || order._id}</strong>. <br/>
+                  You can paste it on the <Link href="/track-order" className="text-black font-bold underline decoration-black/20 hover:decoration-black underline-offset-4 transition-all">Track Order</Link> page to monitor your status.
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-gray-100">
               <div className="space-y-2">
@@ -173,7 +201,7 @@ function OrderSuccessContent() {
 
               {/* Order Items */}
               <div className="space-y-8">
-                {order.items.map((item, idx) => (
+                {displayItems.map((item, idx) => (
                   <div key={idx} className="flex gap-4 group">
                     <div className="relative w-16 h-16 bg-white border border-gray-100 shrink-0 overflow-hidden">
                       {/* item.product is likely populated by backend now */}
@@ -188,6 +216,11 @@ function OrderSuccessContent() {
                       <div className="flex justify-between items-start gap-4">
                         <h3 className="text-[10px] font-bold text-black uppercase tracking-widest leading-normal line-clamp-2">
                           {item.product?.title || "Product Registry Title"}
+                          {item.variant && item.variant !== "Standard" && (
+                            <span className="block text-[9px] text-gray-500 mt-0.5">
+                              Variant: {item.variant}
+                            </span>
+                          )}
                         </h3>
                         <span className="text-[11px] font-bold text-black tracking-widest">
                           ৳{item.price}
