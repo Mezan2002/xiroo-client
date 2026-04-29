@@ -24,6 +24,7 @@ export default function ProductInfo({ product, cartRef }) {
     activeTab,
     setActiveTab,
     handleAddToCart,
+    handleOrderNow,
     variantPriceOverride,
   } = useProductActions(product);
 
@@ -69,7 +70,7 @@ export default function ProductInfo({ product, cartRef }) {
             <Button
               variant="outline"
               className="w-full h-14 border-black text-black text-[11px] font-bold tracking-[0.3em] hover:bg-black hover:text-white transition-all active:scale-[0.98]"
-              onClick={() => {}}
+              onClick={handleOrderNow}
             >
               ORDER NOW
             </Button>

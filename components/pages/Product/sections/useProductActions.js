@@ -142,6 +142,41 @@ export const useProductActions = (product) => {
     toast.success("Added to your shopping bag");
   };
 
+  const handleOrderNow = () => {
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+    const totalRequired = product.variants?.length || 0;
+    const totalSelected = Object.keys(selectedVariants).length;
+    if (totalSelected < totalRequired) {
+      toast.info("Please select all options before ordering.");
+      return;
+    }
+    const variantString = Object.entries(selectedVariants)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(", ");
+
+    addItem({
+      product: {
+        id: product._id,
+        title: product.title,
+        price: displayPrice,
+        salePrice:
+          variantPriceOverride > 0
+            ? 0
+            : isSaleActive
+              ? product.salePrice
+              : undefined,
+        image: product.images?.[0] || "",
+      },
+      variant: variantString || "Standard",
+      quantity,
+      silent: true,
+    });
+    router.push("/checkout");
+  };
+
   return {
     dates,
     timeLeft,
@@ -157,6 +192,7 @@ export const useProductActions = (product) => {
     activeTab,
     setActiveTab,
     handleAddToCart,
+    handleOrderNow,
     variantPriceOverride,
   };
 };
