@@ -13,14 +13,19 @@ export default function FacebookPixel() {
 
     const initPixel = async () => {
       try {
-        const { data } = await axiosInstance.get("/marketing");
-        const settings = data?.data;
+        let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+        let isEnabled = !!pixelId;
 
-        if (!settings || !settings.isEnabled || !settings.pixelId) {
-          return;
+        if (!pixelId) {
+          const { data } = await axiosInstance.get("/marketing");
+          const settings = data?.data;
+          pixelId = settings?.pixelId;
+          isEnabled = settings?.isEnabled;
         }
 
-        const pixelId = settings.pixelId;
+        if (!pixelId || !isEnabled) {
+          return;
+        }
 
         // Standard Facebook Pixel initialization
         !(function (f, b, e, v, n, t, s) {
@@ -49,6 +54,27 @@ export default function FacebookPixel() {
 
         window.fbq("init", pixelId);
         window.fbq("track", "PageView");
+
+        // Provide a global wrapper for other components to use
+        window.trackFacebookEvent = async (eventName, customData = {}) => {
+          // 1. Track via Browser (Pixel)
+          window.fbq("track", eventName, customData);
+
+          // 2. Track via Server (CAPI)
+          try {
+            await axiosInstance.post("/marketing/track", {
+              eventName,
+              customData,
+              eventSourceUrl: window.location.href,
+              userData: {
+                // Basic user data if available (e.g. from a global auth state)
+                // You can expand this as needed
+              },
+            });
+          } catch (error) {
+            console.error("Failed to track CAPI event:", error);
+          }
+        };
       } catch (error) {
         console.error("Failed to initialize Facebook Pixel:", error);
       }

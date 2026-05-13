@@ -22,8 +22,8 @@ export default function CheckoutPage() {
   const total = subtotal + shipping;
   
   useEffect(() => {
-    if (window.fbq) {
-      window.fbq("track", "InitiateCheckout", {
+    if (window.trackFacebookEvent) {
+      window.trackFacebookEvent("InitiateCheckout", {
         content_ids: items.map(item => item.product.id),
         content_type: "product",
         value: total,

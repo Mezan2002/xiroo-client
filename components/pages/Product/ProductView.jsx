@@ -41,9 +41,9 @@ export default function ProductView({ productId }) {
       }),
     );
 
-    // --- Marketing Protocol: Facebook Pixel ---
-    if (window.fbq) {
-      window.fbq("track", "ViewContent", {
+    // --- Marketing Protocol: Facebook Tracking (Pixel + CAPI) ---
+    if (window.trackFacebookEvent) {
+      window.trackFacebookEvent("ViewContent", {
         content_name: product.title,
         content_category: product.category?.name || "Product",
         content_ids: [product._id],

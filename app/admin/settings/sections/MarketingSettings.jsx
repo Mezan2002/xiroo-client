@@ -11,6 +11,8 @@ export default function MarketingSettings() {
     accessToken: "",
     testEventCode: "",
     isEnabled: false,
+    isPixelIdManaged: false,
+    isTokenManaged: false,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -21,7 +23,11 @@ export default function MarketingSettings() {
       try {
         const { data } = await axiosInstance.get("/marketing");
         if (data.data) {
-          setSettings(data.data);
+          setSettings({
+            ...data.data,
+            isPixelIdManaged: !!process.env.NEXT_PUBLIC_FB_PIXEL_ID,
+            isTokenManaged: data.data.accessToken === "********************",
+          });
         }
       } catch (error) {
         toast.error("Failed to fetch marketing settings");
@@ -84,35 +90,54 @@ export default function MarketingSettings() {
         {/* Settings Form */}
         <div className="lg:col-span-7 space-y-8">
           <div className="space-y-6">
+            {/* Pixel ID Field */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                Pixel ID
-              </label>
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Pixel ID
+                </label>
+                {settings.isPixelIdManaged && (
+                  <span className="text-[9px] text-green-600 font-bold uppercase tracking-widest bg-green-50 px-2 py-0.5 rounded">
+                    Managed by ENV
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
-                value={settings.pixelId}
+                value={process.env.NEXT_PUBLIC_FB_PIXEL_ID || settings.pixelId}
                 onChange={(e) => setSettings({ ...settings, pixelId: e.target.value })}
                 placeholder="e.g. 123456789012345"
-                className="w-full h-14 bg-gray-50 border-none px-6 text-sm font-medium focus:ring-2 focus:ring-black transition-all outline-none"
+                disabled={!!process.env.NEXT_PUBLIC_FB_PIXEL_ID}
+                className={`w-full h-14 bg-gray-50 border-none px-6 text-sm font-medium focus:ring-2 focus:ring-black transition-all outline-none ${process.env.NEXT_PUBLIC_FB_PIXEL_ID ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
 
+            {/* CAPI Token Field */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                CAPI Access Token
-              </label>
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  CAPI Access Token
+                </label>
+                {settings.isTokenManaged && (
+                  <span className="text-[9px] text-green-600 font-bold uppercase tracking-widest bg-green-50 px-2 py-0.5 rounded">
+                    Securely Managed in ENV
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <textarea
                   value={settings.accessToken}
                   onChange={(e) => setSettings({ ...settings, accessToken: e.target.value })}
                   placeholder="EAAB..."
                   rows={4}
-                  className="w-full bg-gray-50 border-none p-6 text-sm font-medium focus:ring-2 focus:ring-black transition-all outline-none resize-none"
+                  disabled={settings.isTokenManaged}
+                  className={`w-full bg-gray-50 border-none p-6 text-sm font-medium focus:ring-2 focus:ring-black transition-all outline-none resize-none ${settings.isTokenManaged ? "opacity-50 cursor-not-allowed font-mono" : ""}`}
                 />
-                <Shield className="absolute top-6 right-6 w-5 h-5 text-gray-300 pointer-events-none" />
+                <Shield className={`absolute top-6 right-6 w-5 h-5 transition-colors ${settings.isTokenManaged ? "text-green-500" : "text-gray-300 pointer-events-none"}`} />
               </div>
             </div>
 
+            {/* Test Event Code Field */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
@@ -134,6 +159,7 @@ export default function MarketingSettings() {
               </p>
             </div>
 
+            {/* Toggle Switch */}
             <div className="pt-4">
               <label className="flex items-center gap-4 cursor-pointer group">
                 <div className="relative">
@@ -170,8 +196,8 @@ export default function MarketingSettings() {
             <div className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-white/10">
                 <span className="text-[10px] font-medium text-white/50 uppercase tracking-widest">Pixel Status</span>
-                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.pixelId ? "text-green-400" : "text-yellow-400"}`}>
-                  {settings.pixelId ? "Configured" : "Missing ID"}
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.pixelId || process.env.NEXT_PUBLIC_FB_PIXEL_ID ? "text-green-400" : "text-yellow-400"}`}>
+                  {settings.pixelId || process.env.NEXT_PUBLIC_FB_PIXEL_ID ? "Configured" : "Missing ID"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-white/10">
