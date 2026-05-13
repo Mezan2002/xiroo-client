@@ -5,6 +5,7 @@ import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import OperationalSettings from "./sections/OperationalSettings";
 import SecurityApiSettings from "./sections/SecurityApiSettings";
 import BillingSettings from "./sections/BillingSettings";
+import MarketingSettings from "./sections/MarketingSettings";
 import { useAdminSettings } from "./sections/useAdminSettings";
 
 export default function AdminSettings() {
@@ -24,7 +25,7 @@ export default function AdminSettings() {
           icon: RotateCcw,
           onClick: () => console.log("Rotate Keys"),
           className: "bg-red-600 hover:bg-red-700"
-        } : {
+        } : activeTab === "Marketing" ? null : {
           label: "Save Config",
           icon: Save,
           onClick: () => console.log("Save Config")
@@ -49,6 +50,7 @@ export default function AdminSettings() {
       </div>
 
       {activeTab === "Operational" && <OperationalSettings shipping={shipping} setShipping={setShipping} />}
+      {activeTab === "Marketing" && <MarketingSettings />}
       {activeTab === "Security & API" && <SecurityApiSettings />}
       {activeTab === "Billing" && <BillingSettings />}
     </div>

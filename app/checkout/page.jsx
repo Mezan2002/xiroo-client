@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -20,6 +20,18 @@ export default function CheckoutPage() {
   const baseShipping = district === "Dhaka" ? 80 : district ? 150 : 0;
   const shipping = baseShipping + (deliveryMethod === "fast" ? 50 : 0);
   const total = subtotal + shipping;
+  
+  useEffect(() => {
+    if (window.fbq) {
+      window.fbq("track", "InitiateCheckout", {
+        content_ids: items.map(item => item.product.id),
+        content_type: "product",
+        value: total,
+        currency: "BDT",
+        num_items: items.length
+      });
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">

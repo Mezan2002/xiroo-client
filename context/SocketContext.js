@@ -14,14 +14,9 @@ export const SocketProvider = ({ children }) => {
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
     const socketUrl = apiUrl.replace("/api/v1", "");
 
-    // Vercel serverless functions do not support persistent Socket.io connections.
-    // Skip connection on Vercel to avoid 404 errors in console.
-    if (socketUrl.includes("vercel.app")) {
-      console.warn(
-        "--- Socket: Environment detected as Vercel. Connection skipped (Not Supported) ---",
-      );
-      return;
-    }
+    // Socket.io has been removed from the server for Vercel compatibility.
+    // We'll return null for now to avoid connection errors in the console.
+    return;
 
     const socketInstance = io(socketUrl, {
       reconnectionAttempts: 2,

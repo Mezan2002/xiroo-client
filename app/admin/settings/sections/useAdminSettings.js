@@ -10,7 +10,7 @@ export const useAdminSettings = () => {
     fastDelivery: 50,
   });
 
-  const TABS = ["Operational", "Security & API", "Billing"];
+  const TABS = ["Operational", "Marketing", "Security & API", "Billing"];
 
   return {
     activeTab, setActiveTab, shipping, setShipping, TABS

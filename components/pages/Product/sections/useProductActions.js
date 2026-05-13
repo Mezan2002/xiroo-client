@@ -136,6 +136,17 @@ export const useProductActions = (product) => {
       silent: true,
     });
     toast.success("Added to your shopping bag");
+
+    // --- Marketing Protocol: Facebook Pixel ---
+    if (window.fbq) {
+      window.fbq("track", "AddToCart", {
+        content_name: product.title,
+        content_ids: [product._id],
+        content_type: "product",
+        value: displayPrice * quantity,
+        currency: "BDT",
+      });
+    }
   };
 
   const handleOrderNow = () => {
@@ -166,6 +177,19 @@ export const useProductActions = (product) => {
       quantity,
       silent: true,
     });
+
+    // --- Marketing Protocol: Facebook Pixel ---
+    if (window.fbq) {
+      window.fbq("track", "AddToCart", {
+        content_name: product.title,
+        content_ids: [product._id],
+        content_type: "product",
+        value: displayPrice * quantity,
+        currency: "BDT",
+      });
+      window.fbq("track", "InitiateCheckout");
+    }
+
     router.push("/checkout");
   };
 

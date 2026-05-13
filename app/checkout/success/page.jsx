@@ -22,6 +22,18 @@ function OrderSuccessContent() {
   const receiptRef = useRef(null);
   const pdfRef = useRef(null);
   
+  useEffect(() => {
+    if (order && window.fbq) {
+      window.fbq("track", "Purchase", {
+        content_ids: order.items.map(item => item.product?._id || item.product),
+        content_type: "product",
+        value: order.totalPrice,
+        currency: "BDT",
+        num_items: order.items.length
+      });
+    }
+  }, [order]);
+  
   if (isLoading) {
     return (
 

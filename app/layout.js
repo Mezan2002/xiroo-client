@@ -26,6 +26,8 @@ import ConditionalLayout from "@/components/shared/ConditionalLayout";
 import RouteGuard from "@/components/shared/RouteGuard";
 import { SocketProvider } from "@/context/SocketContext";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import FacebookPixel from "@/components/Marketing/FacebookPixel";
 
 const ToastContainer = dynamic(
   () => import("@/components/shared/ToastContainer"),
@@ -42,6 +44,9 @@ export default function RootLayout({ children }) {
           <QueryProvider>
             <SocketProvider>
               <AppInitializer>
+                <Suspense fallback={null}>
+                  <FacebookPixel />
+                </Suspense>
                 <RouteGuard>
                   <ConditionalLayout>{children}</ConditionalLayout>
                 </RouteGuard>

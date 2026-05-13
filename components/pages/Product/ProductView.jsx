@@ -40,6 +40,18 @@ export default function ProductView({ productId }) {
         images: product.images?.slice(0, 1) || [],
       }),
     );
+
+    // --- Marketing Protocol: Facebook Pixel ---
+    if (window.fbq) {
+      window.fbq("track", "ViewContent", {
+        content_name: product.title,
+        content_category: product.category?.name || "Product",
+        content_ids: [product._id],
+        content_type: "product",
+        value: product.salePrice || product.price,
+        currency: "BDT",
+      });
+    }
   }, [product, dispatch]);
 
   // Sticky bar: shows once cart buttons scroll past the top, stays visible until page end
