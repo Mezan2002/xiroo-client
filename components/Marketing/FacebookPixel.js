@@ -11,17 +11,26 @@ export default function FacebookPixel() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Define a fallback stub immediately to prevent "undefined" errors
+    window.trackFacebookEvent = async (eventName, customData = {}) => {
+      console.warn("Facebook Tracking not yet initialized for:", eventName);
+    };
+
     const initPixel = async () => {
       try {
         let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+        let testCode = "";
         let isEnabled = !!pixelId;
 
+        // Fetch from server if not in ENV or to get additional settings (like Test Code)
+        const { data } = await axiosInstance.get("/marketing");
+        const settings = data?.data;
+        
         if (!pixelId) {
-          const { data } = await axiosInstance.get("/marketing");
-          const settings = data?.data;
           pixelId = settings?.pixelId;
           isEnabled = settings?.isEnabled;
         }
+        testCode = settings?.testEventCode || "";
 
         if (!pixelId || !isEnabled) {
           return;
@@ -55,10 +64,15 @@ export default function FacebookPixel() {
         window.fbq("init", pixelId);
         window.fbq("track", "PageView");
 
-        // Provide a global wrapper for other components to use
+        // Provide a robust global wrapper
         window.trackFacebookEvent = async (eventName, customData = {}) => {
+          // Generate a unique event ID for deduplication between Pixel and CAPI
+          const eventId = "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+
           // 1. Track via Browser (Pixel)
-          window.fbq("track", eventName, customData);
+          if (window.fbq) {
+            window.fbq("track", eventName, customData, { event_id: eventId });
+          }
 
           // 2. Track via Server (CAPI)
           try {
@@ -66,9 +80,11 @@ export default function FacebookPixel() {
               eventName,
               customData,
               eventSourceUrl: window.location.href,
+              eventId, // Pass for deduplication
+              testEventCode: testCode, // For testing in Events Manager
               userData: {
-                // Basic user data if available (e.g. from a global auth state)
-                // You can expand this as needed
+                // Pass basic user agent info
+                userAgent: window.navigator.userAgent,
               },
             });
           } catch (error) {
