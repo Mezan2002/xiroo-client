@@ -8,6 +8,8 @@ import ClassificationRegistry from "./sections/ClassificationRegistry";
 import MediaManager from "./sections/MediaManager";
 import SpecManager from "./sections/SpecManager";
 import VariantManager from "./sections/VariantManager";
+import PricingInventory from "./sections/PricingInventory";
+import QRManager from "./sections/QRManager";
 import { useProductForm } from "./sections/useProductForm";
 
 const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
@@ -79,6 +81,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
         subCategoryOptions={subCategoryOptions}
       />
 
+      <PricingInventory product={product} setProduct={setProduct} />
+
       <VariantManager
         product={product}
         suggestedAttributes={suggestedAttributes}
@@ -108,6 +112,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
         removeBundle={removeBundle}
         updateBundle={updateBundle}
       />
+
+      <QRManager product={product} />
     </div>
   );
 });

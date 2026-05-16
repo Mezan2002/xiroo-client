@@ -46,13 +46,13 @@ export default function ProductGallery({ images = [], title }) {
             {images.map((img, index) => (
               <div
                 key={index}
-                className="relative w-full shrink-0 snap-center aspect-4/5 sm:aspect-square md:aspect-4/5 overflow-hidden"
+                className="relative w-full shrink-0 snap-center aspect-square overflow-hidden"
               >
                 <Image
                   src={img}
                   alt={`${title} - view ${index + 1}`}
                   fill
-                  className="object-cover object-center transition-all duration-700"
+                  className="object-contain object-center transition-all duration-700"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority={index === 0}
                 />
@@ -80,7 +80,7 @@ export default function ProductGallery({ images = [], title }) {
                     src={img}
                     alt={`Thumbnail ${index + 1}`}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="80px"
                   />
                 </button>
@@ -95,13 +95,13 @@ export default function ProductGallery({ images = [], title }) {
         {images.map((img, index) => (
           <div
             key={index}
-            className="relative w-full aspect-4/5 overflow-hidden bg-[#fafafa] rounded-[2px] group"
+            className="relative w-full aspect-square overflow-hidden bg-[#fafafa] rounded-[2px] group"
           >
             <Image
               src={img}
               alt={`${title} - view ${index + 1}`}
               fill
-              className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,1,0.5,1)]"
+              className="object-contain object-center group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,1,0.5,1)]"
               sizes="60vw"
               priority={index < 2}
             />

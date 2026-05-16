@@ -12,7 +12,7 @@ const BasicInfo = ({ product, setProduct }) => {
             Block 01
           </h2>
           <p className="text-xl md:text-2xl font-light text-black tracking-tight">
-            Product Narrative
+            Basic Information
           </p>
         </div>
       </div>
@@ -102,7 +102,7 @@ const BasicInfo = ({ product, setProduct }) => {
 
       <div className="space-y-12">
         <div className="space-y-4">
-          <Label>Product Nomenclature</Label>
+          <Label>Product Title</Label>
           <input
             type="text"
             value={product.title}
@@ -110,11 +110,11 @@ const BasicInfo = ({ product, setProduct }) => {
               setProduct({ ...product, title: e.target.value })
             }
             className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-xl md:text-3xl font-light placeholder:text-zinc-200 text-black py-4"
-            placeholder="Name of Product"
+            placeholder="Enter product name"
           />
         </div>
         <div className="space-y-4">
-          <Label>Core Details (Description)</Label>
+          <Label>Product Description</Label>
           <div className="border border-zinc-200 p-px">
             <TiptapEditor
               content={product.description}

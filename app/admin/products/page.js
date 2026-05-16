@@ -25,6 +25,10 @@ export default function AdminInventory() {
     router.push(`/admin/products/${product._id}`);
   };
 
+  const handleView = (product) => {
+    router.push(`/admin/products/${product._id}/details`);
+  };
+
   const handleDeleteClick = (product) => {
     setSelectedProduct(product);
     setIsDeleteModalOpen(true);
@@ -93,7 +97,7 @@ export default function AdminInventory() {
     },
     { 
       key: "inventory", 
-      label: "Registry Count", 
+      label: "Stock Quantity", 
       width: "140px",
       render: (row) => (
         <div className="flex flex-col">
@@ -112,7 +116,7 @@ export default function AdminInventory() {
           { label: "Admin", href: "/admin" },
           { label: "Products", active: true }
         ]}
-        title="Inventory Registry" 
+        title="Product Inventory" 
         icon={Package}
         primaryAction={{
           label: "Add Product",
@@ -125,6 +129,7 @@ export default function AdminInventory() {
         columns={COLUMNS}
         data={products}
         loading={isLoading}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
       />
@@ -134,8 +139,8 @@ export default function AdminInventory() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         loading={deleteMutation.isPending}
-        title="Terminate Registry?"
-        message={`Are you sure you want to delete "${selectedProduct?.title}"? This protocol is permanent and will remove all associated architectural data.`}
+        title="Delete Product?"
+        message={`Are you sure you want to delete "${selectedProduct?.title}"? This action is permanent and cannot be undone.`}
       />
     </div>
   );

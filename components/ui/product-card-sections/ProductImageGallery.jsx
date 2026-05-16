@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Image from "next/image";
@@ -38,21 +39,25 @@ export default function ProductImageGallery({
   if (!images || images.length === 0) {
     return (
       <div className="aspect-4/5 w-full bg-zinc-50 flex items-center justify-center">
-        <span className="text-[10px] text-zinc-300 uppercase tracking-widest font-medium">No Image</span>
+        <span className="text-[10px] text-zinc-300 uppercase tracking-widest font-medium">
+          No Image
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="relative aspect-4/5 w-full overflow-hidden bg-zinc-50">
+    <div className="relative aspect-square w-full overflow-hidden bg-zinc-50">
       {images.map((img, index) => (
         <Image
           key={`${id}-img-${index}`}
           src={img}
           alt={`${title} - view ${index + 1}`}
           fill
-          className={`object-cover object-center transition-all duration-700 ease-in-out ${
-            index === currentImageIndex ? "opacity-100 scale-100" : "opacity-0 scale-105"
+          className={`object-contain object-center transition-all duration-700 ease-in-out ${
+            index === currentImageIndex
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-105"
           }`}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           priority={priority && index === 0}
@@ -66,7 +71,9 @@ export default function ProductImageGallery({
             <div
               key={index}
               className={`h-[1.5px] transition-all duration-500 ${
-                index === currentImageIndex ? "w-4 bg-black" : "w-1.5 bg-black/20"
+                index === currentImageIndex
+                  ? "w-4 bg-black"
+                  : "w-1.5 bg-black/20"
               }`}
             />
           ))}

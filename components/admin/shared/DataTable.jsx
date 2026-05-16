@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
  * @param {Array} columns - [{ key, label, type: 'text' | 'image' | 'status' | 'actions' | 'custom', render: (row) => ... }]
  * @param {Array} data - Array of row objects
  */
-export default function DataTable({ columns, data, loading, onEdit, onDelete, onView }) {
+export default function DataTable({ columns, data, loading, onEdit, onDelete, onView, className = "" }) {
   const renderCell = (col, row) => {
     if (col.render) return col.render(row);
 
@@ -98,7 +98,7 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
   };
 
   return (
-    <div className="w-full -mx-4 sm:mx-0 overflow-x-auto">
+    <div className={`w-full -mx-4 sm:mx-0 overflow-x-auto ${className}`}>
       <div className="min-w-[600px] sm:min-w-0">
       <table className="w-full text-left border-collapse border-t border-[#EDECE9]">
         <thead>

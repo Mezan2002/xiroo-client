@@ -20,8 +20,37 @@ export function Select({
   size = "default"
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const containerRef = useRef(null);
   const selectedOption = options.find(opt => opt.value === value);
+
+  const checkSpace = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      // Drop up only if space below is too small AND there's more space above
+      if (spaceBelow < 260 && spaceAbove > spaceBelow) {
+        setDropUp(true);
+      } else {
+        setDropUp(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      checkSpace();
+      window.addEventListener("scroll", checkSpace, true);
+      window.addEventListener("resize", checkSpace);
+    }
+    return () => {
+      window.removeEventListener("scroll", checkSpace, true);
+      window.removeEventListener("resize", checkSpace);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -76,7 +105,10 @@ export function Select({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 right-0 z-50 -mt-px bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden shadow-xl">
+        <div className={`
+          absolute left-0 right-0 z-50 bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden shadow-xl
+          ${dropUp ? "bottom-full mb-px" : "top-full -mt-px"}
+        `}>
           <div className="max-h-60 overflow-y-auto py-0">
             {options.map((option) => (
               <button

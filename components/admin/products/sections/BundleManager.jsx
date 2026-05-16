@@ -7,7 +7,7 @@ const BundleManager = ({ product, addBundle, removeBundle, updateBundle }) => {
     <section>
       <SectionHeader
         label="Block 06"
-        title="Bundle Architecture"
+        title="Product Bundles"
         action={
           <button
             onClick={addBundle}
@@ -20,7 +20,7 @@ const BundleManager = ({ product, addBundle, removeBundle, updateBundle }) => {
       {product.bundles.length === 0 ? (
         <div className="bg-zinc-50 border border-zinc-200 p-10 md:p-20 text-center">
           <p className="text-[11px] md:text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
-            No bundle configurations present.
+            No bundles created yet.
           </p>
         </div>
       ) : (
@@ -50,7 +50,7 @@ const BundleManager = ({ product, addBundle, removeBundle, updateBundle }) => {
 
               <div className="space-y-3">
                 <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">
-                  Marketing Label
+                  Bundle Subtitle
                 </span>
                 <input
                   className="w-full bg-transparent border-b border-zinc-100 focus:border-black outline-none text-[12px] font-bold text-zinc-900 uppercase tracking-widest py-1"
@@ -63,7 +63,7 @@ const BundleManager = ({ product, addBundle, removeBundle, updateBundle }) => {
 
               <div className="space-y-3">
                 <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">
-                  Valuation (Price)
+                  Bundle Price
                 </span>
                 <input
                   type="number"
@@ -75,7 +75,7 @@ const BundleManager = ({ product, addBundle, removeBundle, updateBundle }) => {
 
               <div className="space-y-3">
                 <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">
-                  Unit Constant
+                  Price per Unit
                 </span>
                 <input
                   type="number"

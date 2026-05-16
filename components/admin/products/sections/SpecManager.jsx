@@ -15,7 +15,7 @@ const SpecManager = ({
     <section>
       <SectionHeader
         label="Block 05"
-        title="Technical Registry"
+        title="Product Specifications"
         action={
           <button
             onClick={addSpecGroup}
@@ -28,7 +28,7 @@ const SpecManager = ({
       {product.specifications.length === 0 ? (
         <div className="bg-zinc-50 border border-zinc-200 p-10 md:p-20 text-center">
           <p className="text-[11px] md:text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
-            Define metric constants for engineering verification.
+            Add specifications like material, weight, or dimensions.
           </p>
         </div>
       ) : (

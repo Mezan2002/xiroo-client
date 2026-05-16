@@ -48,9 +48,13 @@ export const useProductForm = (initialData, onSubmit) => {
     if (!product.title) return toast.error("Product Nomenclature Required.");
     if (!product.price) return toast.error("Monetary Valuation Required.");
     if (!product.category) return toast.error("Category Registry Required.");
+    if (!product.sku) return toast.error("Product SKU Required.");
+    if (!product.images || product.images.length === 0) return toast.error("At least one image is required.");
 
     const payload = {
       ...product,
+      subCategory: product.subCategory || undefined,
+      sku: product.sku.toUpperCase(),
       price: Number(product.price),
       salePrice: product.salePrice ? Number(product.salePrice) : undefined,
       saleStartDate: product.saleStartDate ? new Date(product.saleStartDate) : undefined,

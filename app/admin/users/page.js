@@ -227,7 +227,12 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      <DataTable columns={COLUMNS} data={filteredUsers} loading={loading} />
+      <DataTable 
+        columns={COLUMNS} 
+        data={filteredUsers} 
+        loading={loading} 
+        className="min-h-[calc(100vh-300px)] bg-white border border-[#EDECE9] rounded-sm shadow-sm"
+      />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

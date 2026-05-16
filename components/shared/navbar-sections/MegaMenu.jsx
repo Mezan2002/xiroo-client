@@ -1,9 +1,15 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import { useEffect, useState } from "react";
 import ProductCard from "@/components/ui/ProductCard";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default function MegaMenu({ activeMenu, scrolled, menusData, setActiveMenu }) {
+export default function MegaMenu({
+  activeMenu,
+  scrolled,
+  menusData,
+  setActiveMenu,
+}) {
   const [displayMenu, setDisplayMenu] = useState(null);
 
   useEffect(() => {
@@ -18,9 +24,10 @@ export default function MegaMenu({ activeMenu, scrolled, menusData, setActiveMen
   }, [activeMenu]);
 
   const currentMenu = displayMenu || activeMenu;
-  const currentMenuData = currentMenu && menusData[currentMenu]
-    ? menusData[currentMenu]
-    : { categories: [], products: [] };
+  const currentMenuData =
+    currentMenu && menusData[currentMenu]
+      ? menusData[currentMenu]
+      : { categories: [], products: [] };
 
   return (
     <div
@@ -65,7 +72,7 @@ export default function MegaMenu({ activeMenu, scrolled, menusData, setActiveMen
         <div className="flex gap-6 items-start min-h-[150px]">
           {currentMenuData.products.length > 0 ? (
             currentMenuData.products.map((product, idx) => (
-              <div key={idx} className="w-[180px] shrink-0">
+              <div key={idx} className="w-[250px] shrink-0">
                 <ProductCard
                   id={product._id}
                   title={product.title}

@@ -65,9 +65,9 @@ export default function FeaturedProduct() {
   if (!product) return null;
 
   return (
-    <section className="w-full flex flex-col lg:flex-row min-h-screen lg:min-h-[400px] border-t border-gray-100">
+    <section className="w-full flex flex-col lg:flex-row items-center border-t border-gray-100 bg-[#f5f5f5]">
       {/* Left Side: Studio Product Image */}
-      <div className="w-full lg:w-1/2 relative h-[50vh] lg:h-[95vh] bg-[#e5e5e5]">
+      <div className="w-full lg:w-1/2 relative aspect-square bg-[#e5e5e5] overflow-hidden">
         <Link
           href={`/product/${product._id}`}
           className="absolute inset-0 w-full h-full block"
@@ -90,7 +90,7 @@ export default function FeaturedProduct() {
       </div>
 
       {/* Right Side: Product Details & Lifestyle Gallery */}
-      <div className="w-full lg:w-1/2 bg-[#f5f5f5] p-6 lg:p-12 flex flex-col justify-center items-center">
+      <div className="w-full lg:w-1/2 bg-[#f5f5f5] p-6 flex flex-col justify-center items-center">
         <div className="w-full max-w-[500px] flex flex-col">
           {/* Header: Title and Pricing */}
           <div className="flex justify-between items-center mb-6 lg:mb-8">
@@ -110,7 +110,7 @@ export default function FeaturedProduct() {
           </div>
 
           {/* Gallery Image Container */}
-          <div className="relative w-full aspect-square lg:aspect-5/4 bg-[#ececec] overflow-hidden shadow-sm group">
+          <div className="relative w-full aspect-square bg-[#ececec] overflow-hidden shadow-sm group">
             {images.length > 0 ? (
               <>
                 {images.map((img, idx) => (
@@ -120,13 +120,12 @@ export default function FeaturedProduct() {
                     alt={`${product.title} view ${idx + 1}`}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className={`object-cover object-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                    className={`object-contain object-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
                       idx === currentImageIndex
                         ? "opacity-100 scale-100"
                         : "opacity-0 scale-[1.02]"
                     }`}
                   />
-
                 ))}
               </>
             ) : (

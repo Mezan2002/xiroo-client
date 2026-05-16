@@ -10,24 +10,24 @@ const ClassificationRegistry = ({
 }) => {
   return (
     <section>
-      <SectionHeader label="Block 02" title="Registry Classification" />
+      <SectionHeader label="Block 03" title="Category Selection" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20">
         <div className="space-y-6">
-          <Label>Main Category Registry</Label>
+          <Label>Main Category</Label>
           <Select
             options={rootCategories}
             value={product.category}
             onChange={(val) =>
               setProduct({ ...product, category: val, subCategory: "" })
             }
-            placeholder="Select Primary Root"
+            placeholder="Select a category"
           />
           <p className="text-[10px] text-zinc-400 font-medium italic">
-            Assign this product to a top-level architectural branch.
+            Assign this product to a main category.
           </p>
         </div>
         <div className="space-y-6">
-          <Label>Sub-category Mapping</Label>
+          <Label>Sub Category</Label>
           <Select
             options={subCategoryOptions}
             value={product.subCategory}
@@ -42,7 +42,7 @@ const ClassificationRegistry = ({
             disabled={!product.category || subCategoryOptions.length === 0}
           />
           <p className="text-[10px] text-zinc-400 font-medium italic">
-            Refine the product placement within the selected branch.
+            Optionally refine the product category.
           </p>
         </div>
       </div>

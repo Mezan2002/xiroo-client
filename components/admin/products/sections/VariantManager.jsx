@@ -15,8 +15,8 @@ const VariantManager = ({
   return (
     <section>
       <SectionHeader
-        label="Block 03"
-        title="Design Matrix"
+        label="Block 04"
+        title="Product Variants"
         action={
           <button
             onClick={() => addVariant()}
@@ -30,7 +30,7 @@ const VariantManager = ({
       {/* Suggested Attributes */}
       {suggestedAttributes.length > 0 && (
         <div className="mb-12 space-y-4 overflow-hidden">
-          <Label>Suggested Registry Attributes (Based on Category)</Label>
+          <Label>Recommended Options (Based on Category)</Label>
           <div className="flex flex-wrap gap-2 md:gap-3">
             {suggestedAttributes.map((attr) => (
               <button
@@ -51,7 +51,7 @@ const VariantManager = ({
       {product.variants.length === 0 ? (
         <div className="bg-zinc-50 border border-zinc-200 p-10 md:p-20 text-center">
           <p className="text-[11px] md:text-[12px] font-bold text-zinc-400 uppercase tracking-widest italic opacity-60">
-            No configuration variants active.
+            No variants added yet.
           </p>
         </div>
       ) : (
