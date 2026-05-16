@@ -209,7 +209,7 @@ const ProductDetails = ({ product }) => {
         <div className="flex flex-col md:flex-row items-center gap-12 bg-white border border-zinc-200 p-8 md:p-12">
           <div className="flex flex-col items-center gap-4 bg-white p-6 border border-black shadow-xl">
             <QRCodeSVG
-              value={`${process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com"}/product/${product._id || product.id}`}
+              value={`${(process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com").replace(/\/$/, "")}/product/${product._id || product.id}`}
               size={180}
               level="H"
             />
@@ -231,7 +231,7 @@ const ProductDetails = ({ product }) => {
               </p>
             </div>
             <div className="p-4 bg-zinc-50 border border-zinc-100 font-mono text-[10px] text-zinc-500 break-all">
-              {`${process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com"}/product/${product._id || product.id}`}
+              {`${(process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com").replace(/\/$/, "")}/product/${product._id || product.id}`}
             </div>
           </div>
         </div>
