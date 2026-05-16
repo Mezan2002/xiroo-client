@@ -1,9 +1,15 @@
-import { JetBrains_Mono, Montserrat } from "next/font/google";
+import { JetBrains_Mono, Montserrat, Libre_Barcode_39 } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
+});
+
+const barcodeFont = Libre_Barcode_39({
+  variable: "--font-barcode",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 const mono = JetBrains_Mono({
@@ -37,7 +43,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${mono.variable} antialiased`}
+      className={`${montserrat.variable} ${mono.variable} ${barcodeFont.variable} antialiased`}
     >
       <body className="min-h-screen selection:bg-black selection:text-white">
         <ReduxProvider>

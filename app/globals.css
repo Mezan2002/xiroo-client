@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-montserrat: var(--font-montserrat);
   --font-mono: var(--font-mono);
+  --font-barcode: var(--font-barcode);
 }
 
 body {

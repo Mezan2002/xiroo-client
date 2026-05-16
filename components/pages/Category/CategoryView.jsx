@@ -19,16 +19,23 @@ export default function CategoryView({ category }) {
 
   const title =
     categoryData?.data?.name ||
+    categoryData?.name ||
     (category.toLowerCase() === "all"
       ? "ALL PRODUCTS"
-      : category.replace(/-/g, " ").toUpperCase());
+      : category.replace(/-/g, " ").replace(/\btshirt\b/gi, "T-SHIRT").toUpperCase());
 
   return (
     <div className="w-full flex flex-col min-h-screen bg-white pt-24 lg:pt-32 pb-24 px-4 md:px-6 lg:px-12 overflow-hidden">
       {/* Category Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end border-b border-gray-100 pb-8 lg:pb-10 mb-10 lg:mb-12 gap-6">
         <div className="flex flex-col gap-4">
-          <Breadcrumb />
+          <Breadcrumb 
+            customItems={[
+              { label: "Home", href: "/" },
+              { label: "Collections", href: "/collections" },
+              { label: title }
+            ]}
+          />
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-[60px] font-light tracking-wide text-black uppercase leading-tight lg:leading-none pr-4">
             {title}
           </h1>

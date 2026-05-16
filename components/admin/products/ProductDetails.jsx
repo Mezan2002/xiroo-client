@@ -1,26 +1,9 @@
 "use client";
-import { ImageIcon, Info, Layers, List, QrCode, Tag } from "lucide-react";
+import { ImageIcon, Info, Layers, List, QrCode, Tag, Download } from "lucide-react";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-
-const Barcode = ({ text }) => {
-  if (!text) return null;
-  const pattern = text
-    .split("")
-    .map((c) => c.charCodeAt(0).toString(2))
-    .join("");
-  return (
-    <div className="flex items-center gap-px h-10 w-full overflow-hidden opacity-80">
-      {pattern.split("").map((b, i) => (
-        <div
-          key={i}
-          className={`h-full shrink-0 ${b === "1" ? "bg-black" : "bg-transparent"}`}
-          style={{ width: i % 3 === 0 ? "2px" : "1px" }}
-        />
-      ))}
-    </div>
-  );
-};
+import { useRef } from "react";
+import { toPng } from "html-to-image";
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-6 border-b border-zinc-100 pb-8 mb-10 group">
@@ -48,7 +31,30 @@ const DetailField = ({ label, value, fullWidth = false }) => (
 );
 
 const ProductDetails = ({ product }) => {
+  const qrTagRef = useRef(null);
+
   if (!product) return null;
+
+  const productUrl = `${(process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com").replace(/\/$/, "")}/product/${product._id || product.id}`;
+
+  const downloadTag = () => {
+    if (qrTagRef.current === null) return;
+    
+    toPng(qrTagRef.current, { 
+      cacheBust: true, 
+      backgroundColor: '#ffffff', 
+      pixelRatio: 3 
+    })
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `product-qr-${product.sku}.png`;
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.error('Could not generate QR image', err);
+      });
+  };
 
   return (
     <div className="space-y-24 max-w-7xl mx-auto pb-24">
@@ -199,40 +205,61 @@ const ProductDetails = ({ product }) => {
           </div>
         </section>
       )}
+
       {/* 06. Product Labels */}
       <section>
         <SectionHeader
           icon={QrCode}
-          title="Product Labels"
-          subtitle="Physical tag generation"
+          title="Product QR System"
+          subtitle="Digital asset generation"
         />
-        <div className="flex flex-col md:flex-row items-center gap-12 bg-white border border-zinc-200 p-8 md:p-12">
-          <div className="flex flex-col items-center gap-4 bg-white p-6 border border-black shadow-xl">
-            <QRCodeSVG
-              value={`${(process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com").replace(/\/$/, "")}/product/${product._id || product.id}`}
-              size={180}
-              level="H"
-            />
-            <div className="w-full space-y-2">
-              <Barcode text={product.sku} />
-              <div className="text-center font-bold text-[10px] tracking-[0.3em] uppercase">
+        
+        <div className="flex flex-col lg:grid lg:grid-cols-12 items-center gap-12 bg-white border border-zinc-200 p-8 md:p-16">
+          {/* Tag Preview Area */}
+          <div className="lg:col-span-4 flex flex-col items-center">
+            <div 
+              ref={qrTagRef}
+              className="bg-white p-10 border-2 border-black shadow-2xl flex flex-col items-center gap-6 w-fit"
+            >
+              <QRCodeSVG value={productUrl} size={200} level="H" />
+              <div className="text-center font-bold text-[10px] tracking-[0.5em] uppercase pt-4 border-t border-zinc-100 w-full">
                 {product.sku}
               </div>
             </div>
           </div>
-          <div className="flex-1 space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-[14px] font-bold uppercase tracking-widest">
-                Digital Product Tag
-              </h4>
-              <p className="text-[11px] text-zinc-400 font-medium leading-relaxed max-w-md">
-                This tag links the physical item to the online catalog. Scan the
-                QR code to access live pricing and specifications.
+
+          {/* Tag Information & Actions */}
+          <div className="lg:col-span-8 space-y-8 w-full">
+            <div className="space-y-3">
+              <h4 className="text-xl font-bold uppercase tracking-tight">Digital Product QR</h4>
+              <p className="text-[12px] text-zinc-400 font-medium leading-relaxed max-w-lg">
+                Generate a professional-grade QR code linked directly to your production catalog. This tag allows customers to access real-time specifications and pricing instantly.
               </p>
             </div>
-            <div className="p-4 bg-zinc-50 border border-zinc-100 font-mono text-[10px] text-zinc-500 break-all">
-              {`${(process.env.NEXT_PUBLIC_CLIENT_URL || "https://xirooshop.com").replace(/\/$/, "")}/product/${product._id || product.id}`}
+
+            <div className="space-y-4">
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Linked Production URL</span>
+              <div className="p-5 bg-zinc-50 border border-zinc-100 font-mono text-[11px] text-zinc-500 break-all select-all flex justify-between items-center group">
+                {productUrl}
+                <button 
+                   onClick={() => {
+                     navigator.clipboard.writeText(productUrl);
+                     alert("Copied!");
+                   }}
+                   className="opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase tracking-widest text-black border-b border-black"
+                >
+                  Copy
+                </button>
+              </div>
             </div>
+
+            <button
+              onClick={downloadTag}
+              className="w-full md:w-fit h-14 px-12 bg-black text-white flex items-center justify-center gap-4 text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-zinc-800 transition-all group"
+            >
+              <Download size={16} className="group-hover:-translate-y-0.5 transition-transform" />
+              Download QR Tag
+            </button>
           </div>
         </div>
       </section>
