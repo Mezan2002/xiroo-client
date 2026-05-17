@@ -60,7 +60,7 @@ export default function AdminInventory() {
         <div className="flex items-center gap-4 overflow-hidden">
           <div className="w-10 h-10 bg-[#F7F7F5] relative shrink-0 rounded-sm overflow-hidden border border-[#EDECE9]">
             {row.images?.[0] && (
-              <Image src={row.images[0]} alt="" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+              <Image src={row.images[0]} alt="" fill className="object-cover" />
             )}
           </div>
           <div className="flex flex-col min-w-0">

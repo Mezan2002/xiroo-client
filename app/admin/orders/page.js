@@ -129,9 +129,9 @@ export default function AdminOrders() {
         title="Orders" 
         icon={ShoppingBag}
         primaryAction={{
-          label: "Refresh",
-          icon: Loader2,
-          onClick: () => refetch()
+          label: "Create Order",
+          icon: Plus,
+          onClick: () => router.push("/admin/orders/new")
         }}
       />
 

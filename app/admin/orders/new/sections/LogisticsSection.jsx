@@ -1,5 +1,5 @@
 "use client";
-import { MapPin, Check } from "lucide-react";
+import { MapPin, Check, Truck } from "lucide-react";
 
 const Label = ({ children }) => (
   <label className="text-[10px] font-bold text-zinc-900 uppercase block mb-3 tracking-[0.2em]">
@@ -17,7 +17,22 @@ const SectionHeader = ({ label, title }) => (
 );
 
 export default function LogisticsSection({ order, setOrder }) {
-  const paymentMethods = ["Cash on Delivery", "Bank Transfer", "Digital Wallet"];
+  const paymentMethods = [
+    { id: "cod", label: "Cash on Delivery" },
+    { id: "online", label: "Online Payment" }
+  ];
+
+  const deliveryMethods = [
+    { id: "normal", label: "Normal Delivery", fee: 60 },
+    { id: "fast", label: "Fast Delivery", fee: 120 }
+  ];
+
+  const handleShippingChange = (field, value) => {
+    setOrder(prev => ({
+      ...prev,
+      shipping: { ...prev.shipping, [field]: value }
+    }));
+  };
 
   return (
     <section>
@@ -27,18 +42,52 @@ export default function LogisticsSection({ order, setOrder }) {
           <div className="space-y-4">
             <Label>Shipping Destination</Label>
             <div className="relative group">
-              <input placeholder="House 12, Road 4, Sector 7" className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-xl font-light py-4" />
+              <input 
+                placeholder="House 12, Road 4, Sector 7" 
+                value={order.shipping.address}
+                onChange={(e) => handleShippingChange('address', e.target.value)}
+                className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-xl font-light py-4" 
+              />
               <MapPin className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-black" size={20} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-12">
             <div className="space-y-4">
               <Label>Fulfillment Area</Label>
-              <input placeholder="Uttara" className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none text-[13px] font-medium py-2" />
+              <input 
+                placeholder="Uttara" 
+                value={order.shipping.area}
+                onChange={(e) => handleShippingChange('area', e.target.value)}
+                className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none text-[13px] font-medium py-2" 
+              />
             </div>
             <div className="space-y-4">
               <Label>Registry Postcode</Label>
-              <input placeholder="1230" className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none text-[13px] font-medium py-2" />
+              <input 
+                placeholder="1230" 
+                value={order.shipping.postcode}
+                onChange={(e) => handleShippingChange('postcode', e.target.value)}
+                className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none text-[13px] font-medium py-2" 
+              />
+            </div>
+          </div>
+
+          <div className="space-y-6 pt-4">
+            <Label>Delivery Velocity</Label>
+            <div className="flex gap-4">
+              {deliveryMethods.map((method) => (
+                <button
+                  key={method.id}
+                  onClick={() => setOrder({ ...order, deliveryMethod: method.id, shippingFee: method.fee })}
+                  className={`flex-1 flex items-center justify-between p-6 border transition-all ${order.deliveryMethod === method.id ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-zinc-400 border-zinc-100 hover:border-zinc-300'}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <Truck size={18} />
+                    <span className="text-[11px] font-bold uppercase tracking-widest">{method.label}</span>
+                  </div>
+                  <span className="text-[12px] font-bold">৳{method.fee}</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -47,11 +96,11 @@ export default function LogisticsSection({ order, setOrder }) {
           <div className="space-y-4">
             {paymentMethods.map((method) => (
               <button
-                key={method} onClick={() => setOrder({...order, paymentMethod: method})}
-                className={`w-full flex items-center justify-between p-4 border transition-all ${order.paymentMethod === method ? 'bg-black text-white border-black' : 'bg-white text-zinc-400 border-zinc-100 hover:border-zinc-300'}`}
+                key={method.id} onClick={() => setOrder({...order, paymentMethod: method.id})}
+                className={`w-full flex items-center justify-between p-4 border transition-all ${order.paymentMethod === method.id ? 'bg-black text-white border-black shadow-lg scale-[1.02]' : 'bg-white text-zinc-400 border-zinc-100 hover:border-zinc-300'}`}
               >
-                <span className="text-[11px] font-bold uppercase tracking-widest">{method}</span>
-                {order.paymentMethod === method && <Check size={14} />}
+                <span className="text-[11px] font-bold uppercase tracking-widest">{method.label}</span>
+                {order.paymentMethod === method.id && <Check size={14} />}
               </button>
             ))}
           </div>

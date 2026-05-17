@@ -5,15 +5,33 @@ export const useNewOrder = () => {
   const [order, setOrder] = useState({
     customer: "",
     email: "",
+    phone: "",
     items: [],
     shipping: { address: "", area: "", city: "Dhaka", postcode: "" },
-    paymentMethod: "Cash on Delivery"
+    paymentMethod: "cod",
+    deliveryMethod: "normal",
+    shippingFee: 60
   });
 
-  const addItem = () => {
+  const addItem = (product) => {
+    // If product is provided, use its data, otherwise add a blank item
+    const newItem = product ? {
+      id: Date.now(),
+      product: product._id,
+      name: product.title,
+      price: product.salePrice || product.price,
+      quantity: 1
+    } : {
+      id: Date.now(),
+      product: null,
+      name: "",
+      price: 0,
+      quantity: 1
+    };
+
     setOrder(prev => ({
       ...prev,
-      items: [...prev.items, { id: Date.now(), name: "", price: 0, qty: 1 }]
+      items: [...prev.items, newItem]
     }));
   };
 
@@ -31,7 +49,8 @@ export const useNewOrder = () => {
     }));
   };
 
-  const calculateSubtotal = () => order.items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const calculateSubtotal = () => order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const calculateTotal = () => calculateSubtotal() + (Number(order.shippingFee) || 0);
 
-  return { order, setOrder, addItem, removeItem, updateItem, calculateSubtotal };
+  return { order, setOrder, addItem, removeItem, updateItem, calculateSubtotal, calculateTotal };
 };
