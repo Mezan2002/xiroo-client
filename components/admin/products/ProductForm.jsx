@@ -2,6 +2,7 @@
 import { useAttributes } from "@/hooks/api/useAttributes";
 import { useCategories } from "@/hooks/api/useCategories";
 import { forwardRef, useImperativeHandle, useMemo } from "react";
+import { Save } from "lucide-react";
 import BasicInfo from "./sections/BasicInfo";
 import BundleManager from "./sections/BundleManager";
 import ClassificationRegistry from "./sections/ClassificationRegistry";
@@ -72,7 +73,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
   }, [categories, product.category]);
 
   return (
-    <div className="space-y-16 md:space-y-32 pb-24">
+    <div className="space-y-16 md:space-y-32 pb-24 animate-in fade-in duration-700">
       <BasicInfo product={product} setProduct={setProduct} />
 
       <ClassificationRegistry
@@ -118,6 +119,19 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
       <SEOManager product={product} setProduct={setProduct} />
 
       <QRManager product={product} />
+
+      {/* Floating Save Action Bar */}
+      <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom duration-500">
+        <button
+          type="button"
+          onClick={validateAndSave}
+          disabled={isPending}
+          className="h-12 md:h-14 px-6 md:px-8 bg-black hover:bg-zinc-800 text-white text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] flex items-center gap-2 md:gap-3 shadow-2xl transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+        >
+          <Save size={14} className={isPending ? "animate-spin" : ""} />
+          {isPending ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
     </div>
   );
 });

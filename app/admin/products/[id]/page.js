@@ -32,8 +32,9 @@ export default function EditProductPage() {
 
 
   return (
-    <div className="space-y-24 font-montserrat antialiased text-zinc-900 animate-in fade-in duration-700">
+    <div className="space-y-24 font-montserrat antialiased text-zinc-900">
       <ModuleHeader
+        sticky={true}
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Products", href: "/admin/products" },

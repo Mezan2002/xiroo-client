@@ -12,6 +12,7 @@ export default function ModuleHeader({
   actions,
   tabs = [],
   icon: Icon = Globe,
+  sticky = false,
 }) {
   const breadcrumbItems =
     breadcrumbs.length > 0
@@ -22,7 +23,11 @@ export default function ModuleHeader({
         ];
 
   return (
-    <div className="mb-8 md:mb-14 font-montserrat">
+    <div className={`font-montserrat transition-all duration-300 animate-in fade-in duration-700 ${
+      sticky 
+        ? "sticky top-0 z-30 bg-white/95 backdrop-blur-md py-4 md:py-6 border-b border-zinc-100 mb-8 md:mb-14 -mt-4 sm:-mt-6 lg:-mt-10 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10" 
+        : "mb-8 md:mb-14"
+    }`}>
       {/* Refined Navigation Bar */}
       <div className="flex flex-col gap-8">
         {/* Top Tier: Context & Breadcrumbs */}
