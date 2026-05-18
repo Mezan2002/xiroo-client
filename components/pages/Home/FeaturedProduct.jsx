@@ -15,7 +15,9 @@ export default function FeaturedProduct() {
   const { data: response, isLoading } = useFeaturedProducts();
   const featuredProducts = response?.data || [];
 
-  const product = featuredProducts[0] || null;
+  const [activeProductIndex, setActiveProductIndex] = useState(0);
+
+  const product = featuredProducts[activeProductIndex] || null;
   const images = product?.images || [];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -24,8 +26,10 @@ export default function FeaturedProduct() {
   useEffect(() => {
     if (images.length > 1) {
       setCurrentImageIndex(1);
+    } else {
+      setCurrentImageIndex(0);
     }
-  }, [images.length]);
+  }, [images.length, activeProductIndex]);
 
   const { user } = useUser();
   const { addItem } = useCart();
@@ -201,15 +205,62 @@ export default function FeaturedProduct() {
             )}
           </div>
 
-          {/* View Product Link */}
-          <div className="mt-6 flex justify-center">
-            <Link
-              href={`/product/${product._id}`}
-              className="text-[10px] md:text-[11px] font-medium text-gray-400 hover:text-black uppercase tracking-[0.2em] transition-colors"
-            >
-              VIEW PRODUCT
-            </Link>
-          </div>
+          {/* View Product Link & Selector Controls on the Same Horizontal Row */}
+          {featuredProducts.length > 1 ? (
+            <div className="mt-4 flex items-center justify-between w-full border-t border-zinc-100 pt-2 select-none">
+              <Link
+                href={`/product/${product._id}`}
+                className="text-[10px] md:text-[11px] font-medium text-gray-400 hover:text-black uppercase tracking-[0.2em] transition-colors"
+              >
+                VIEW PRODUCT
+              </Link>
+
+              <div className="flex items-center gap-0.5 bg-white border border-zinc-200/80 p-0.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveProductIndex(
+                      (prev) =>
+                        (prev - 1 + featuredProducts.length) %
+                        featuredProducts.length,
+                    );
+                  }}
+                  className="w-7 h-7 flex items-center justify-center bg-transparent hover:bg-zinc-50 text-black transition-colors"
+                  aria-label="Previous Featured Product"
+                >
+                  <ArrowLeft strokeWidth={1.5} size={12} />
+                </button>
+                <span className="text-[8px] font-bold text-zinc-400 px-1.5 select-none tracking-widest min-w-[24px] text-center">
+                  {activeProductIndex + 1} / {featuredProducts.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveProductIndex(
+                      (prev) => (prev + 1) % featuredProducts.length,
+                    );
+                  }}
+                  className="w-7 h-7 flex items-center justify-center bg-transparent hover:bg-zinc-50 text-black transition-colors"
+                  aria-label="Next Featured Product"
+                >
+                  <ArrowRight strokeWidth={1.5} size={12} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6 flex justify-center border-t border-zinc-100 pt-4">
+              <Link
+                href={`/product/${product._id}`}
+                className="text-[10px] md:text-[11px] font-medium text-gray-400 hover:text-black uppercase tracking-[0.2em] transition-colors"
+              >
+                VIEW PRODUCT
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </section>
