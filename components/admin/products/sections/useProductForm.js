@@ -11,6 +11,7 @@ export const useProductForm = (initialData, onSubmit) => {
     title: "", description: "", price: "", salePrice: "", saleStartDate: "", saleEndDate: "",
     inventory: "", sku: "", tax: "15", variants: [], specifications: [], bundles: [],
     category: "", subCategory: "", images: [], stockStage: "in-stock", isFeatured: false, badge: "",
+    seoTitle: "", seoDescription: "", seoKeywords: "",
   });
 
   const variantHandlers = useVariantHandlers(setProduct);
@@ -40,6 +41,9 @@ export const useProductForm = (initialData, onSubmit) => {
           items: g.items?.map((it, j) => ({ ...it, id: it.id || `it-${Date.now()}-${j}` })) || [],
         })) || [],
         bundles: initialData.bundles?.map((b, i) => ({ ...b, id: b.id || `b-${Date.now()}-${i}` })) || [],
+        seoTitle: initialData.seoTitle || "",
+        seoDescription: initialData.seoDescription || "",
+        seoKeywords: initialData.seoKeywords || "",
       });
     }
   }, [initialData]);
@@ -67,6 +71,9 @@ export const useProductForm = (initialData, onSubmit) => {
       })),
       specifications: product.specifications.map((g) => ({ group: g.group, items: g.items.map((i) => ({ label: i.label, value: i.value })) })),
       bundles: product.bundles.map((b) => ({ ...b, price: Number(b.price), unitPrice: Number(b.unitPrice) })),
+      seoTitle: product.seoTitle || undefined,
+      seoDescription: product.seoDescription || undefined,
+      seoKeywords: product.seoKeywords || undefined,
     };
     onSubmit(payload);
   };

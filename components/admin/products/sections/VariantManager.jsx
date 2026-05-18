@@ -4,7 +4,8 @@ import { Label, SectionHeader } from "./Shared";
 
 const VariantManager = ({
   product,
-  suggestedAttributes,
+  suggestedAttributes = [],
+  allAttributes = [],
   addVariant,
   removeVariant,
   updateVariantName,
@@ -12,6 +13,9 @@ const VariantManager = ({
   updateVariantValuePrice,
   removeVariantValue,
 }) => {
+  const otherAttributes = allAttributes.filter(
+    (attr) => !suggestedAttributes.some((s) => s._id === attr._id)
+  );
   return (
     <section>
       <SectionHeader
@@ -33,6 +37,28 @@ const VariantManager = ({
           <Label>Recommended Options (Based on Category)</Label>
           <div className="flex flex-wrap gap-2 md:gap-3">
             {suggestedAttributes.map((attr) => (
+              <button
+                key={attr._id}
+                onClick={() => addVariant(attr.name, attr.values)}
+                className="px-4 md:px-6 py-2 md:py-3 bg-white border border-[#EDECE9] text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:border-black hover:text-black transition-all flex items-center gap-2 md:gap-3 group"
+              >
+                <Plus
+                  size={12}
+                  className="text-zinc-300 group-hover:text-black"
+                />
+                {attr.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other Saved Attributes */}
+      {otherAttributes.length > 0 && (
+        <div className="mb-12 space-y-4 overflow-hidden">
+          <Label>Other Saved Attributes</Label>
+          <div className="flex flex-wrap gap-2 md:gap-3">
+            {otherAttributes.map((attr) => (
               <button
                 key={attr._id}
                 onClick={() => addVariant(attr.name, attr.values)}

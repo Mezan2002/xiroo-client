@@ -1,5 +1,5 @@
 "use client";
-import { ImageIcon, Info, Layers, List, QrCode, Tag, Download } from "lucide-react";
+import { ImageIcon, Info, Layers, List, QrCode, Tag, Download, Globe } from "lucide-react";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
@@ -260,6 +260,46 @@ const ProductDetails = ({ product }) => {
               <Download size={16} className="group-hover:-translate-y-0.5 transition-transform" />
               Download QR Tag
             </button>
+          </div>
+        </div>
+      </section>
+      {/* 07. Search Engine Optimization (SEO) */}
+      <section>
+        <SectionHeader
+          icon={Globe}
+          title="Search Engine Optimization"
+          subtitle="SEO Meta & Search Engine performance"
+        />
+        <div className="bg-zinc-50 p-8 border border-zinc-100 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <DetailField label="Meta Title" value={product.seoTitle} />
+            <DetailField label="SEO Keywords" value={product.seoKeywords} />
+            <DetailField label="Meta Description" value={product.seoDescription} fullWidth={true} />
+          </div>
+          
+          <div className="pt-8 border-t border-zinc-200">
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-4">
+              Google Search Snippet Simulator
+            </span>
+            <div className="bg-white p-6 border border-zinc-200 rounded-lg max-w-2xl shadow-sm">
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-5 h-5 rounded-full bg-zinc-100 flex items-center justify-center text-[9px] font-bold text-zinc-500">
+                  X
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] text-zinc-800 font-semibold leading-none">XIROO</span>
+                  <span className="text-[9px] text-zinc-400 leading-none mt-0.5 break-all">
+                    https://xirooshop.com › product › {product.slug || product._id || product.id || "slug"}
+                  </span>
+                </div>
+              </div>
+              <h4 className="text-[18px] text-[#1a0dab] font-medium leading-snug hover:underline cursor-pointer mb-1 break-words">
+                {product.seoTitle || `${product.title} | XIROO`}
+              </h4>
+              <p className="text-[12px] text-[#4d5156] leading-relaxed break-words">
+                {product.seoDescription || (product.description ? product.description.replace(/<[^>]*>/g, '').substring(0, 160) : 'No description provided. Add an SEO meta description or product description to preview.')}
+              </p>
+            </div>
           </div>
         </div>
       </section>

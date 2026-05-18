@@ -10,6 +10,7 @@ import SpecManager from "./sections/SpecManager";
 import VariantManager from "./sections/VariantManager";
 import PricingInventory from "./sections/PricingInventory";
 import QRManager from "./sections/QRManager";
+import SEOManager from "./sections/SEOManager";
 import { useProductForm } from "./sections/useProductForm";
 
 const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
@@ -86,6 +87,7 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
       <VariantManager
         product={product}
         suggestedAttributes={suggestedAttributes}
+        allAttributes={attributes}
         addVariant={addVariant}
         removeVariant={removeVariant}
         updateVariantName={updateVariantName}
@@ -112,6 +114,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
         removeBundle={removeBundle}
         updateBundle={updateBundle}
       />
+
+      <SEOManager product={product} setProduct={setProduct} />
 
       <QRManager product={product} />
     </div>
