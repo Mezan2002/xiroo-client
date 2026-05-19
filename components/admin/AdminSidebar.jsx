@@ -47,7 +47,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
             const Icon = item.icon;
             const isActive = item.href && pathname === item.href;
             const content = (
-              <><Icon size={16} className={isActive ? "text-[#37352F]" : "text-[#37352F80] group-hover:text-[#37352F]"} /><span className="flex-1 text-left">{item.label}</span>{item.badge > 0 && <span className="text-[11px] font-bold text-[#37352F40]">{item.badge}</span>}</>
+              <><Icon size={16} className={isActive ? "text-[#37352F]" : "text-[#37352F80] group-hover:text-[#37352F]"} /><span className="flex-1 text-left">{item.label}</span>{item.badge > 0 && <span className="text-[10px] font-bold bg-[#37352F] text-white px-1.5 py-0.5 rounded-full min-w-[18px] text-center">{item.badge}</span>}</>
             );
             return item.onClick ? (
               <button key={idx} onClick={item.onClick} className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[14px] font-medium transition-all group text-[#37352FA6] hover:bg-[#EBEBE9] hover:text-[#37352F]">{content}</button>
