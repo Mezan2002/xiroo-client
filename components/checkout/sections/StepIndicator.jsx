@@ -13,7 +13,7 @@ export default function StepIndicator({ step }) {
       {steps.map((s) => (
         <div key={s.id} className="flex items-center gap-2 md:gap-3">
           <span
-            className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest ${step === s.id ? "text-black" : "text-gray-300"}`}
+            className={`text-[10px] md:text-[11px] font-medium uppercase tracking-wider ${step === s.id ? "text-black" : "text-gray-300"}`}
           >
             {s.label}
           </span>

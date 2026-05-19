@@ -13,7 +13,7 @@ export default function PaymentSection({ user, formData, handleChange }) {
 
       {/* Payment Method */}
       <div className="space-y-4">
-        <h2 className="text-[18px] font-bold uppercase tracking-widest">
+        <h2 className="text-[18px] font-medium uppercase tracking-wider">
           Payment Method
         </h2>
         <div className="space-y-4">
@@ -33,7 +33,7 @@ export default function PaymentSection({ user, formData, handleChange }) {
                 disabled={!m.active}
                 className="w-4 h-4 accent-black shrink-0"
               />
-              <span className="text-[13px] md:text-sm font-bold uppercase tracking-widest leading-tight mt-px">
+              <span className="text-[13px] md:text-sm font-medium uppercase tracking-wider leading-tight mt-px">
                 {m.label}
               </span>
             </label>
@@ -45,7 +45,7 @@ export default function PaymentSection({ user, formData, handleChange }) {
       {!user && (
         <div className="border border-gray-100 bg-gray-50/40 p-6 sm:p-8 space-y-6 animate-in fade-in duration-500">
           <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-black">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-black">
               Save Your Info for Next Time
             </p>
             <p className="text-[11px] text-gray-400 font-medium leading-relaxed">
@@ -85,14 +85,14 @@ export default function PaymentSection({ user, formData, handleChange }) {
               onChange={handleChange}
               className="sr-only"
             />
-            <span className="text-[11px] font-bold uppercase tracking-widest select-none">
+            <span className="text-[11px] font-medium uppercase tracking-wider select-none">
               Yes, create my account
             </span>
           </label>
 
           {formData.shouldRegister && (
             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
+              <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">
                 Choose a Password
               </label>
               <input
@@ -105,7 +105,7 @@ export default function PaymentSection({ user, formData, handleChange }) {
                 placeholder="At least 8 characters"
                 className="w-full h-14 px-6 bg-white border border-gray-200 focus:border-black outline-none transition-all text-sm font-medium placeholder:text-gray-300"
               />
-              <p className="text-[9px] text-gray-400 uppercase tracking-widest font-medium">
+              <p className="text-[9px] text-gray-400 uppercase tracking-wider font-medium">
                 A verification email will be sent after your order is placed.
               </p>
             </div>
@@ -115,7 +115,7 @@ export default function PaymentSection({ user, formData, handleChange }) {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-black font-bold underline underline-offset-4"
+              className="text-black font-medium underline underline-offset-4"
             >
               Sign in
             </Link>

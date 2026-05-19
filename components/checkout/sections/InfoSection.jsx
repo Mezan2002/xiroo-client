@@ -5,11 +5,11 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-4">
-        <h2 className="text-[18px] font-bold uppercase tracking-widest">
+        <h2 className="text-[18px] font-medium uppercase tracking-wider">
           Contact Information
         </h2>
         <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">
             Email Address
           </label>
           <input
@@ -25,7 +25,7 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
       </div>
 
       <div className="space-y-4 pt-4">
-        <h2 className="text-[18px] font-bold uppercase tracking-widest">
+        <h2 className="text-[18px] font-medium uppercase tracking-wider">
           Delivery Address
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -60,7 +60,7 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gray-50 border border-gray-100 px-6 pt-3 h-16 flex flex-col justify-center transition-all group focus-within:border-black focus-within:bg-white">
-            <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1 block">
+            <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
               District
             </label>
             <SearchableDistrict
@@ -71,7 +71,7 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
             />
           </div>
           <div className="bg-gray-50 border border-gray-100 px-6 pt-3 h-16 flex flex-col justify-center transition-all group focus-within:border-black focus-within:bg-white">
-            <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1 block">
+            <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
               Upazila / Thana
             </label>
             <input

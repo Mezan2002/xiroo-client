@@ -9,7 +9,7 @@ export default function DeliverySection({ deliveryMethod, setDeliveryMethod }) {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
       <div className="space-y-4">
-        <h2 className="text-[18px] font-bold uppercase tracking-widest">
+        <h2 className="text-[18px] font-medium uppercase tracking-wider">
           Delivery Method
         </h2>
         <div className="border border-gray-100 divide-y divide-gray-100 overflow-hidden">
@@ -27,7 +27,7 @@ export default function DeliverySection({ deliveryMethod, setDeliveryMethod }) {
                   className="w-4 h-4 accent-black shrink-0"
                 />
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold uppercase tracking-widest leading-tight">
+                  <span className="text-sm font-medium uppercase tracking-wider leading-tight">
                     {m.label}
                   </span>
                   <span className="text-[11px] text-gray-400 font-medium mt-0.5">
@@ -35,7 +35,7 @@ export default function DeliverySection({ deliveryMethod, setDeliveryMethod }) {
                   </span>
                 </div>
               </div>
-              <span className="text-sm font-bold uppercase sm:text-right pl-8 sm:pl-0">
+              <span className="text-sm font-medium uppercase sm:text-right pl-8 sm:pl-0">
                 {m.price}
               </span>
             </label>

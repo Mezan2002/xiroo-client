@@ -30,7 +30,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:col-span-8 gap-12 lg:gap-16 lg:pl-16">
             {/* Shop Column */}
             <div className="flex flex-col gap-8">
-              <h4 className="text-[10px] font-bold tracking-[0.25em] uppercase text-white">
+              <h4 className="text-[10px] font-semibold tracking-widest uppercase text-white">
                 Explore
               </h4>
               <div className="flex flex-col gap-5">
@@ -57,7 +57,7 @@ export default function Footer() {
 
             {/* Support Column */}
             <div className="flex flex-col gap-8">
-              <h4 className="text-[10px] font-bold tracking-[0.25em] uppercase text-white">
+              <h4 className="text-[10px] font-semibold tracking-widest uppercase text-white">
                 Client Care
               </h4>
               <div className="flex flex-col gap-5">
@@ -84,7 +84,7 @@ export default function Footer() {
 
             {/* Account Column */}
             <div className="flex flex-col gap-8">
-              <h4 className="text-[10px] font-bold tracking-[0.25em] uppercase text-white">
+              <h4 className="text-[10px] font-semibold tracking-widest uppercase text-white">
                 My Account
               </h4>
               <div className="flex flex-col gap-5">

@@ -65,18 +65,18 @@ export default function ReceiptFeatures({ order, receiptRef }) {
   return (
     <div className="flex items-center justify-between w-full mb-10">
       <div className="space-y-1">
-        <label className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter leading-none">
+        <label className="text-[10px] font-medium text-gray-500 uppercase tracking-tighter leading-none">
           Receipt
         </label>
         <div 
-          className="flex items-center gap-2 text-black/80 font-bold text-[13px] tracking-tight group/copy cursor-pointer" 
+          className="flex items-center gap-2 text-black/80 font-medium text-[13px] tracking-tight group/copy cursor-pointer" 
           onClick={handleCopyOrderId}
         >
           {order.orderId}
           {copied ? (
             <Check className="w-3 h-3 text-green-500" />
           ) : (
-            <Copy className="w-3 h-3 text-gray-400 group-hover/copy:text-black transition-colors" />
+            <Copy className="w-3 h-3 text-gray-500 group-hover/copy:text-black transition-colors" />
           )}
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function ReceiptFeatures({ order, receiptRef }) {
           <Loader2 className="w-5 h-5 text-black animate-spin" />
         ) : (
           <Download 
-            className="w-5 h-5 text-gray-400 hover:text-black transition-colors cursor-pointer" 
+            className="w-5 h-5 text-gray-500 hover:text-black transition-colors cursor-pointer" 
             onClick={handleDownloadReceipt}
           />
         )}

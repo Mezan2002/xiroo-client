@@ -13,6 +13,7 @@ export const useCategoryFilters = (category) => {
   const [tempMaxPrice, setTempMaxPrice] = useState("");
   const [isFilterMobileOpen, setIsFilterMobileOpen] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState({});
+  const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState([]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -20,6 +21,10 @@ export const useCategoryFilters = (category) => {
     }, 500);
     return () => clearTimeout(handler);
   }, [tempSearchQuery]);
+
+  useEffect(() => {
+    setSelectedSubCategoryIds([]);
+  }, [category]);
 
   const { useCategoryDetail } = useCategories();
   const { data: categoryData } = useCategoryDetail(category);
@@ -77,6 +82,13 @@ export const useCategoryFilters = (category) => {
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
+    if (selectedSubCategoryIds.length > 0) {
+      filtered = filtered.filter((product) => {
+        const subId = product.subCategory?._id || product.subCategory;
+        return selectedSubCategoryIds.includes(subId);
+      });
+    }
+
     if (selectedStatuses.length > 0) {
       filtered = filtered.filter((product) => {
         const status = product.stockStage || (product.inventory > 0 ? "in-stock" : "out-of-stock");
@@ -114,7 +126,7 @@ export const useCategoryFilters = (category) => {
     }
 
     return filtered;
-  }, [products, selectedVariants, selectedStatuses, minPrice, maxPrice]);
+  }, [products, selectedSubCategoryIds, selectedVariants, selectedStatuses, minPrice, maxPrice]);
 
   const counts = {
     inStock: products.filter((p) => p.inventory > 0).length,
@@ -124,7 +136,7 @@ export const useCategoryFilters = (category) => {
   };
 
   const isFiltering =
-    tempSearchQuery || selectedStatuses.length > 0 || minPrice || maxPrice || Object.values(selectedVariants).some((vals) => vals.length > 0);
+    tempSearchQuery || selectedSubCategoryIds.length > 0 || selectedStatuses.length > 0 || minPrice || maxPrice || Object.values(selectedVariants).some((vals) => vals.length > 0);
 
   const resetFilters = () => {
     setSearchQuery("");
@@ -135,6 +147,7 @@ export const useCategoryFilters = (category) => {
     setTempMinPrice("");
     setTempMaxPrice("");
     setSelectedVariants({});
+    setSelectedSubCategoryIds([]);
   };
 
   const toggleStatusFilter = (status) => {
@@ -146,6 +159,14 @@ export const useCategoryFilters = (category) => {
   const applyPriceFilter = () => {
     setMinPrice(tempMinPrice);
     setMaxPrice(tempMaxPrice);
+  };
+
+  const toggleSubCategory = (subId) => {
+    setSelectedSubCategoryIds((prev) =>
+      prev.includes(subId)
+        ? prev.filter((id) => id !== subId)
+        : [...prev, subId]
+    );
   };
 
   return {
@@ -164,6 +185,8 @@ export const useCategoryFilters = (category) => {
     applyPriceFilter,
     selectedVariants,
     toggleVariantFilter,
+    selectedSubCategoryIds,
+    toggleSubCategory,
     isFiltering,
     resetFilters,
     isLoading,

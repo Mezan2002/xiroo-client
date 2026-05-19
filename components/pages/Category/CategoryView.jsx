@@ -6,6 +6,8 @@ import FilterContent from "./sections/FilterContent";
 import FilterDrawer from "./sections/FilterDrawer";
 import ProductGrid from "./sections/ProductGrid";
 import { useCategoryFilters } from "./sections/useCategoryFilters";
+import { useCategories } from "@/hooks/api/useCategories";
+import { useMemo } from "react";
 
 export default function CategoryView({ category }) {
   const {
@@ -14,31 +16,65 @@ export default function CategoryView({ category }) {
     isLoading,
     isFilterMobileOpen,
     setIsFilterMobileOpen,
+    selectedSubCategoryIds = [],
+    toggleSubCategory,
     ...filterProps
   } = useCategoryFilters(category);
+
+  const { useCategoryTree } = useCategories();
+  const { data: allCategories = [] } = useCategoryTree();
+
+  const subCategories = useMemo(() => {
+    if (!categoryData?.data?._id && !categoryData?._id) return [];
+    const currentId = categoryData?.data?._id || categoryData?._id;
+    return allCategories.filter((cat) => cat.parentId === currentId);
+  }, [allCategories, categoryData]);
 
   const title =
     categoryData?.data?.name ||
     categoryData?.name ||
     (category.toLowerCase() === "all"
       ? "ALL PRODUCTS"
-      : category.replace(/-/g, " ").replace(/\btshirt\b/gi, "T-SHIRT").toUpperCase());
+      : category
+          .replace(/-/g, " ")
+          .replace(/\btshirt\b/gi, "T-SHIRT")
+          .toUpperCase());
 
   return (
     <div className="w-full flex flex-col min-h-screen bg-white pt-24 lg:pt-32 pb-24 px-4 md:px-6 lg:px-12 overflow-hidden">
       {/* Category Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end border-b border-gray-100 pb-8 lg:pb-10 mb-10 lg:mb-12 gap-6">
         <div className="flex flex-col gap-4">
-          <Breadcrumb 
+          <Breadcrumb
             customItems={[
               { label: "Home", href: "/" },
               { label: "Collections", href: "/collections" },
-              { label: title }
+              { label: title },
             ]}
           />
-          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-[60px] font-light tracking-wide text-black uppercase leading-tight lg:leading-none pr-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-wide text-black uppercase leading-tight lg:leading-none pr-4">
             {title}
           </h1>
+          {subCategories.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mt-2 select-none">
+              {subCategories.map((sub) => {
+                const isActive = selectedSubCategoryIds.includes(sub._id);
+                return (
+                  <button
+                    key={sub._id}
+                    onClick={() => toggleSubCategory(sub._id)}
+                    className={`px-3 py-1.5 border text-[9px] font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 ${
+                      isActive
+                        ? "bg-black border-black text-white"
+                        : "bg-white border-zinc-200 text-zinc-500 hover:border-black hover:text-black"
+                    }`}
+                  >
+                    {sub.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
         <div className="flex flex-row justify-between lg:justify-end items-center lg:items-end gap-6 w-full lg:w-auto">
           <button

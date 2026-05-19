@@ -22,9 +22,9 @@ export default function CheckoutPage() {
   const total = subtotal + shipping;
   
   useEffect(() => {
-    if (window.trackFacebookEvent) {
+    if (window.trackFacebookEvent && items) {
       window.trackFacebookEvent("InitiateCheckout", {
-        content_ids: items.map(item => item.product.id),
+        content_ids: items.map(item => item?.product?.id || item?.product?._id || item?.id || item?._id).filter(Boolean),
         content_type: "product",
         value: total,
         currency: "BDT",
@@ -38,12 +38,12 @@ export default function CheckoutPage() {
       {/* Minimal Header */}
       <header className="border-b border-gray-100 py-6">
         <div className="container mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold tracking-tighter">
+          <Link href="/" className="text-2xl font-medium tracking-tighter">
             XIROO
           </Link>
           <div className="flex items-center gap-2 text-gray-400">
             <Lock className="w-4 h-4" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Secure Checkout</span>
+            <span className="text-[10px] font-medium uppercase tracking-wider">Secure Checkout</span>
           </div>
         </div>
       </header>
@@ -61,7 +61,7 @@ export default function CheckoutPage() {
               className="inline-flex items-center gap-2 text-gray-400 hover:text-black transition-colors mb-8 md:mb-10 group"
             >
               <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-[11px] font-bold uppercase tracking-widest">Return to store</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider">Return to store</span>
             </Link>
 
             <CheckoutForm 
@@ -94,7 +94,7 @@ export default function CheckoutPage() {
       {/* Footer */}
       <footer className="border-t border-gray-100 py-10 mt-20">
         <div className="container mx-auto px-6">
-          <div className="flex flex-wrap justify-center gap-8 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+          <div className="flex flex-wrap justify-center gap-8 text-[10px] text-gray-400 font-medium uppercase tracking-wider">
             <Link href="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-black transition-colors">Terms of Service</Link>
             <Link href="/shipping" className="hover:text-black transition-colors">Shipping Policy</Link>
