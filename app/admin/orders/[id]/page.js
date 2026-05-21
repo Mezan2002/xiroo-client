@@ -1,7 +1,8 @@
 "use client";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileX, ArrowLeft, ClipboardList } from "lucide-react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import CourierLogisticsCard from "./sections/CourierLogisticsCard";
 import CustomerIdentityCard from "./sections/CustomerIdentityCard";
 import OrderHeader from "./sections/OrderHeader";
@@ -25,7 +26,7 @@ const StatusTimelineItem = ({ status, date, current }) => (
 export default function OrderDetailsPage() {
   const { id } = useParams();
   const {
-    order, loading, isCancelModalOpen, setIsCancelModalOpen,
+    order, loading, error, isError, isCancelModalOpen, setIsCancelModalOpen,
     selectedCourier, setSelectedCourier, manualTrackingId, setManualTrackingId,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     isUpdatingStatus, isCancelling, isDispatching
@@ -39,8 +40,42 @@ export default function OrderDetailsPage() {
     );
   }
 
-  if (!order) {
-    return <div className="p-12 text-center text-zinc-400">Order record not found.</div>;
+  if (isError || !order) {
+    return (
+      <div className="min-h-[500px] flex items-center justify-center p-4 animate-in fade-in duration-500">
+        <div className="w-full max-w-md bg-white border border-[#EDECE9] p-8 text-center space-y-6 relative overflow-hidden shadow-2xl shadow-black/5">
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-red-500 via-amber-500 to-red-500" />
+          
+          <div className="w-16 h-16 bg-red-50 rounded-none flex items-center justify-center mx-auto">
+            <FileX className="w-8 h-8 text-red-500" strokeWidth={1.5} />
+          </div>
+          
+          <div className="space-y-2">
+            <h2 className="text-[16px] font-bold text-zinc-900 uppercase tracking-wider">Order Registry Excised</h2>
+            <p className="text-[13px] text-[#37352FA6] font-medium leading-relaxed max-w-sm mx-auto">
+              This order protocol is no longer active in the database. It may have been permanently deleted or archived by another administrator.
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link 
+              href="/admin/orders" 
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-zinc-800 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all"
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              Order Registry
+            </Link>
+            <Link 
+              href="/admin/notifications" 
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-[#EDECE9] hover:bg-[#F7F7F5] text-zinc-700 text-[10px] font-bold uppercase tracking-[0.2em] transition-all"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Notifications
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

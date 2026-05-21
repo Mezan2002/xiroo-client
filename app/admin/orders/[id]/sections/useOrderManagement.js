@@ -6,7 +6,7 @@ import { useState } from "react";
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
   const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier } = useOrders();
-  const { data: order, isLoading: loading } = useOrderDetail(id);
+  const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedCourier, setSelectedCourier] = useState("steadfast");
@@ -45,7 +45,7 @@ export const useOrderManagement = (id) => {
   };
 
   return {
-    order, loading, isCancelModalOpen, setIsCancelModalOpen,
+    order, loading, error, isError, isCancelModalOpen, setIsCancelModalOpen,
     selectedCourier, setSelectedCourier, manualTrackingId, setManualTrackingId,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     isUpdatingStatus: updateStatus.isPending,

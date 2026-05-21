@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
  * @param {Array} columns - [{ key, label, type: 'text' | 'image' | 'status' | 'actions' | 'custom', render: (row) => ... }]
  * @param {Array} data - Array of row objects
  */
-export default function DataTable({ columns, data, loading, onEdit, onDelete, onView, className = "" }) {
+export default function DataTable({ columns, data, loading, onEdit, onDelete, onView, pagination, className = "" }) {
   const renderCell = (col, row) => {
     if (col.render) return col.render(row);
 
@@ -153,6 +153,65 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
         </tbody>
       </table>
       </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-[#EDECE9] mt-2">
+          <span className="text-[12px] text-[#37352F80]">
+            Showing {((pagination.currentPage - 1) * pagination.limit) + 1}–{Math.min(pagination.currentPage * pagination.limit, pagination.total)} of {pagination.total} products
+          </span>
+          <div className="flex items-center gap-1">
+            {/* Prev */}
+            <button
+              onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage <= 1}
+              className="px-3 py-1.5 text-[12px] font-medium text-[#37352F] border border-[#EDECE9] rounded-sm hover:bg-[#F7F7F5] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Prev
+            </button>
+
+            {/* Page numbers */}
+            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+              .filter(p =>
+                p === 1 ||
+                p === pagination.totalPages ||
+                Math.abs(p - pagination.currentPage) <= 1
+              )
+              .reduce((acc, p, idx, arr) => {
+                if (idx > 0 && p - arr[idx - 1] > 1) acc.push("...");
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, idx) =>
+                p === "..." ? (
+                  <span key={`ellipsis-${idx}`} className="px-2 text-[12px] text-[#37352F80]">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => pagination.onPageChange(p)}
+                    className={`w-8 h-8 text-[12px] font-medium rounded-sm border transition-colors ${
+                      p === pagination.currentPage
+                        ? "bg-[#37352F] text-white border-[#37352F]"
+                        : "text-[#37352F] border-[#EDECE9] hover:bg-[#F7F7F5]"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )
+            }
+
+            {/* Next */}
+            <button
+              onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage >= pagination.totalPages}
+              className="px-3 py-1.5 text-[12px] font-medium text-[#37352F] border border-[#EDECE9] rounded-sm hover:bg-[#F7F7F5] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,13 +9,20 @@ import { useToast } from "@/hooks/useToast";
 import { useProducts } from "@/hooks/api/useProducts";
 import Image from "next/image";
 
+const PAGE_LIMIT = 10;
 
 export default function AdminInventory() {
   const router = useRouter();
   const { toast } = useToast();
   const { useAllProducts, useProductMutation } = useProducts();
-  const { data: response, isLoading } = useAllProducts();
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: response, isLoading } = useAllProducts({ page: currentPage, limit: PAGE_LIMIT });
   const products = response?.data || [];
+  const meta = response?.meta || {};
+  const totalPages = meta.totalPage || 1;
+
   const { deleteMutation } = useProductMutation();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,6 +47,10 @@ export default function AdminInventory() {
         onSuccess: () => {
           toast.success("Product Registry Deactivated.");
           setIsDeleteModalOpen(false);
+          // If we deleted the last item on a page > 1, go back one page
+          if (products.length === 1 && currentPage > 1) {
+            setCurrentPage((p) => p - 1);
+          }
         },
         onError: (err) => {
           toast.error(err.message || "Failed to terminate registry.");
@@ -47,7 +58,6 @@ export default function AdminInventory() {
       });
     }
   };
-
 
   const COLUMNS = useMemo(() => [
     { 
@@ -132,6 +142,13 @@ export default function AdminInventory() {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        pagination={{
+          currentPage,
+          totalPages,
+          total: meta.total || 0,
+          limit: PAGE_LIMIT,
+          onPageChange: setCurrentPage,
+        }}
       />
 
       <ConfirmModal 
