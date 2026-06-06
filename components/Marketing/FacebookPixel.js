@@ -17,25 +17,32 @@ export default function FacebookPixel() {
     };
 
     const initPixel = async () => {
-      try {
-        let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
-        let testCode = "";
-        let isEnabled = !!pixelId;
+      let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+      let testCode = "";
+      let isEnabled = !!pixelId;
 
+      try {
         // Fetch from server if not in ENV or to get additional settings (like Test Code)
         const { data } = await axiosInstance.get("/marketing");
-        const settings = data?.data;
+        // Axios response interceptor returns response.data, which is already the settings object
+        const settings = data;
         
-        if (!pixelId) {
-          pixelId = settings?.pixelId;
-          isEnabled = settings?.isEnabled;
+        if (settings) {
+          if (!pixelId) {
+            pixelId = settings.pixelId;
+            isEnabled = settings.isEnabled;
+          }
+          testCode = settings.testEventCode || "";
         }
-        testCode = settings?.testEventCode || "";
+      } catch (error) {
+        console.warn("Failed to fetch marketing settings from server, falling back to client env:", error);
+      }
 
-        if (!pixelId || !isEnabled) {
-          return;
-        }
+      if (!pixelId || !isEnabled) {
+        return;
+      }
 
+      try {
         // Standard Facebook Pixel initialization
         !(function (f, b, e, v, n, t, s) {
           if (f.fbq) return;
@@ -92,7 +99,7 @@ export default function FacebookPixel() {
           }
         };
       } catch (error) {
-        console.error("Failed to initialize Facebook Pixel:", error);
+        console.error("Failed to initialize Facebook Pixel script:", error);
       }
     };
 
