@@ -93,7 +93,7 @@ const Hero = () => {
         key={`mannequin-${currentIndex}`}
         className="absolute inset-0 z-20 flex items-end justify-center pointer-events-none animate-in fade-in slide-in-from-bottom-20 duration-1000"
       >
-        <div className="relative w-[85vw] md:w-[70vw] lg:w-[55vw] max-w-[1000px] h-[90%]">
+        <div className="relative w-[85vw] md:w-[70vw] lg:w-[55vw] max-w-[1000px] h-[90%] lg:h-[80%]">
           <Image
             src={slide.image}
             alt="Xiroo Mannequin"
