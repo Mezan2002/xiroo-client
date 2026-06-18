@@ -6,6 +6,7 @@ export default function CartSummary({
   subtotal,
   discount,
   discountAmount,
+  autoBundleDiscountAmount,
   total,
   removeDiscount,
   setActiveDrawer,
@@ -44,6 +45,17 @@ export default function CartSummary({
           ৳{Number(subtotal || 0).toFixed(0)}
         </span>
       </div>
+
+      {autoBundleDiscountAmount > 0 && (
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-[14px] text-green-600 tracking-tight flex items-center gap-2">
+            Bundle Discount (10%)
+          </span>
+          <span className="text-[16px] font-medium text-green-600">
+            -৳{Number(autoBundleDiscountAmount || 0).toFixed(0)}
+          </span>
+        </div>
+      )}
 
       {discount && (
         <div className="flex justify-between items-center mb-2">

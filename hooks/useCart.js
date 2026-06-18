@@ -8,21 +8,21 @@ import { addToast } from "@/redux/slices/toastSlice";
  */
 export const useCart = () => {
   const dispatch = useDispatch();
-  const { items, subtotal, itemCount, discount, discountAmount, total } = useSelector((state) => state.cart);
+  const { items, subtotal, itemCount, discount, discountAmount, autoBundleDiscountAmount, isBundleFreeShipping, total } = useSelector((state) => state.cart);
 
-  const addItem = ({ product, variant = "Standard", quantity = 1, silent = false }) => {
-    dispatch(addToCart({ product, variant, quantity }));
+  const addItem = ({ product, variant = "Standard", quantity = 1, bundleId = null, silent = false }) => {
+    dispatch(addToCart({ product, variant, quantity, bundleId }));
     if (!silent) {
       dispatch(addToast({ message: "Product added to cart.", type: "success" }));
     }
   };
 
-  const updateItemQuantity = ({ id, variant, delta }) => {
-    dispatch(updateQuantity({ id, variant, delta }));
+  const updateItemQuantity = ({ id, variant, delta, bundleId = null }) => {
+    dispatch(updateQuantity({ id, variant, delta, bundleId }));
   };
 
-  const removeItemItem = ({ id, variant }) => {
-    dispatch(removeFromCart({ id, variant }));
+  const removeItemItem = ({ id, variant, bundleId = null }) => {
+    dispatch(removeFromCart({ id, variant, bundleId }));
     dispatch(addToast({ message: "Item removed from cart.", type: "info" }));
   };
 
@@ -46,6 +46,8 @@ export const useCart = () => {
     itemCount,
     discount,
     discountAmount,
+    autoBundleDiscountAmount,
+    isBundleFreeShipping,
     total,
     addItem,
     updateQuantity: updateItemQuantity,

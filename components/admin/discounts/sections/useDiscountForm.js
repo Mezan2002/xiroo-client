@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useDiscountForm = (initialData) => {
   const [formData, setFormData] = useState({
@@ -16,6 +16,26 @@ export const useDiscountForm = (initialData) => {
     status: initialData.status || "Active",
     ...initialData
   });
+
+  useEffect(() => {
+    if (Object.keys(initialData).length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        code: initialData.code || "",
+        type: initialData.type || "Percentage",
+        value: initialData.value || "",
+        minRequirement: initialData.minRequirement || "None",
+        minAmount: initialData.minAmount || "",
+        minQty: initialData.minQty || "",
+        usageLimit: initialData.usageLimit || "",
+        limitPerCustomer: initialData.limitPerCustomer || false,
+        startDate: initialData.startDate || "",
+        endDate: initialData.endDate || "",
+        status: initialData.status || "Active",
+        ...initialData
+      }));
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

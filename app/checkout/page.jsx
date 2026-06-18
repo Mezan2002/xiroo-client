@@ -12,13 +12,13 @@ import { useCart } from "@/hooks/useCart";
 
 export default function CheckoutPage() {
   const { user, isLoading } = useUser();
-  const { items, subtotal } = useCart();
+  const { items, subtotal, isBundleFreeShipping } = useCart();
   const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
 
   const baseShipping = district === "Dhaka" ? 80 : district ? 150 : 0;
-  const shipping = baseShipping + (deliveryMethod === "fast" ? 50 : 0);
+  const shipping = isBundleFreeShipping ? 0 : baseShipping + (deliveryMethod === "fast" ? 50 : 0);
   const total = subtotal + shipping;
   
   useEffect(() => {

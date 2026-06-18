@@ -27,7 +27,21 @@ export default function NavLinks({ navItems, activeMenu, setActiveMenu }) {
           </Link>
         </div>
       ))}
-      <div className="flex items-center h-full cursor-pointer">
+      <div 
+        className="flex items-center h-full cursor-pointer"
+        onMouseEnter={() => setActiveMenu(null)}
+      >
+        <Link
+          href="/bundles/create"
+          className="text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max hover:opacity-70"
+        >
+          CREATE BUNDLE
+        </Link>
+      </div>
+      <div 
+        className="flex items-center h-full cursor-pointer"
+        onMouseEnter={() => setActiveMenu(null)}
+      >
         <Link
           href="/track-order"
           className="text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max hover:opacity-70"

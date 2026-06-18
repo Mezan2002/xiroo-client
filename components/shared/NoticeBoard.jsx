@@ -6,7 +6,7 @@ import { useState } from "react";
 const defaultNotices = [
   "Buy 3+ items, get free delivery!",
   "Cash on delivery available!",
-  "Returns on sealed items only.",
+  "Easy returns on sealed items only.",
 ];
 
 export const NoticeBoard = ({ notices = defaultNotices }) => {

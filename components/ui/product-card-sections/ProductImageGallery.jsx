@@ -17,26 +17,29 @@ export default function ProductImageGallery({
   priority,
   isHovered,
 }) {
+  // Filter out any empty strings or invalid images
+  const validImages = images ? images.filter(img => img && typeof img === 'string' && img.trim() !== '') : [];
+
   const [hasMultipleImages, setHasMultipleImages] = useState(false);
 
   useEffect(() => {
-    setHasMultipleImages(images && images.length > 1);
-  }, [images]);
+    setHasMultipleImages(validImages.length > 1);
+  }, [validImages.length]);
 
   // Automatic image cycling on hover if multiple images exist
   useEffect(() => {
     let interval;
     if (isHovered && hasMultipleImages) {
       interval = setInterval(() => {
-        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+        setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
       }, 1500); // Cycle every 1.5s on hover
     } else {
       setCurrentImageIndex(0);
     }
     return () => clearInterval(interval);
-  }, [isHovered, hasMultipleImages, images?.length, setCurrentImageIndex]);
+  }, [isHovered, hasMultipleImages, validImages.length, setCurrentImageIndex]);
 
-  if (!images || images.length === 0) {
+  if (validImages.length === 0) {
     return (
       <div className="aspect-4/5 w-full bg-zinc-50 flex items-center justify-center">
         <span className="text-[10px] text-zinc-300 uppercase tracking-widest font-medium">
@@ -48,7 +51,7 @@ export default function ProductImageGallery({
 
   return (
     <div className="relative aspect-square w-full overflow-hidden bg-zinc-50">
-      {images.map((img, index) => (
+      {validImages.map((img, index) => (
         <Image
           key={`${id}-img-${index}`}
           src={img}
@@ -67,7 +70,7 @@ export default function ProductImageGallery({
       {/* Progress Indicators for Gallery */}
       {hasMultipleImages && isHovered && (
         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 px-3 z-20">
-          {images.map((_, index) => (
+          {validImages.map((_, index) => (
             <div
               key={index}
               className={`h-[1.5px] transition-all duration-500 ${

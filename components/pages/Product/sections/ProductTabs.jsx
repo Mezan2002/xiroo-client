@@ -13,7 +13,7 @@ export default function ProductTabs({ product, activeTab, setActiveTab }) {
             className={`pb-4 px-1 text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap relative ${
               activeTab === tab
                 ? "text-black"
-                : "text-gray-300 hover:text-black"
+                : "text-gray-600 hover:text-black"
             }`}
           >
             {tab}
@@ -54,9 +54,13 @@ export default function ProductTabs({ product, activeTab, setActiveTab }) {
           <div className="leading-relaxed text-gray-600 text-[13px] md:text-sm">
             <p className="mb-4 text-black font-semibold">Nationwide Delivery</p>
             <p className="mb-4">
-              We offer fast and reliable shipping across the country. Orders are typically processed and dispatched within 24 to 48 hours of confirmation.
+              We offer fast and reliable shipping across the country. Orders are
+              typically processed and dispatched within 24 to 48 hours of
+              confirmation.
             </p>
-            <p className="mb-2 text-black font-semibold">Estimated Delivery Time:</p>
+            <p className="mb-2 text-black font-semibold">
+              Estimated Delivery Time:
+            </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Inside Dhaka: 1-2 business days</li>
               <li>Outside Dhaka: 3-5 business days</li>
@@ -67,10 +71,13 @@ export default function ProductTabs({ product, activeTab, setActiveTab }) {
           <div className="leading-relaxed text-gray-600 text-[13px] md:text-sm">
             <p className="mb-4 text-black font-semibold">7-Day Easy Returns</p>
             <p className="mb-4">
-              If you are not completely satisfied with your purchase, you can return or exchange the item within 7 days of delivery.
+              If you are not completely satisfied with your purchase, you can
+              return or exchange the item within 7 days of delivery.
             </p>
             <p>
-              Please ensure the item is unworn, unwashed, and retains all original tags and packaging. For further assistance or to initiate a return, please contact our support team.
+              Please ensure the item is unworn, unwashed, and retains all
+              original tags and packaging. For further assistance or to initiate
+              a return, please contact our support team.
             </p>
           </div>
         )}
@@ -78,4 +85,3 @@ export default function ProductTabs({ product, activeTab, setActiveTab }) {
     </div>
   );
 }
-

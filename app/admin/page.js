@@ -82,7 +82,7 @@ export default function AdminDashboard() {
 
     return [...orderActivities, ...userActivities]
       .sort((a, b) => b.time - a.time)
-      .slice(0, 6);
+      .slice(0, 4);
   }, [recentOrders, recentUsers]);
 
   return (
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
             <Button
               variant="ghost"
               icon={ExternalLink}
-              onClick={() => router.push("/admin/orders")}
+              onClick={() => router.push("/admin/activities")}
               className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black"
             >
               View All

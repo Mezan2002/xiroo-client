@@ -41,8 +41,8 @@ export default function ProductReviews({ productId }) {
   const displayReviews = showAll ? allReviews : allReviews.slice(0, 6);
   const [col1, col2, col3] = buildMasonryColumns(displayReviews);
 
-  const allPhotos = allReviews.flatMap((r) =>
-    r.images || (r.image ? [r.image] : []),
+  const allPhotos = allReviews.flatMap(
+    (r) => r.images || (r.image ? [r.image] : []),
   );
 
   const selectedIndex = allReviews.findIndex(
@@ -73,7 +73,12 @@ export default function ProductReviews({ productId }) {
       );
     });
 
-  if (isLoading) return <div className="h-48 flex items-center justify-center text-zinc-400">Loading feedback...</div>;
+  if (isLoading)
+    return (
+      <div className="h-48 flex items-center justify-center text-zinc-400">
+        Loading feedback...
+      </div>
+    );
 
   return (
     <section className="py-24 px-6 md:px-14 bg-white font-montserrat">
@@ -90,11 +95,18 @@ export default function ProductReviews({ productId }) {
           <div className="flex flex-col items-start md:items-end gap-6">
             <div className="flex items-baseline gap-3">
               <span className="text-5xl font-light text-black">
-                {(allReviews.reduce((acc, r) => acc + r.rating, 0) / allReviews.length || 0).toFixed(1)}
+                {(
+                  allReviews.reduce((acc, r) => acc + r.rating, 0) /
+                    allReviews.length || 0
+                ).toFixed(1)}
               </span>
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-black">Average Rating</span>
-                <span className="text-[10px] text-zinc-400 uppercase tracking-widest">{allReviews.length} Reviews Found</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-black">
+                  Average Rating
+                </span>
+                <span className="text-[10px] text-zinc-400 uppercase tracking-widest">
+                  {allReviews.length} Reviews Found
+                </span>
               </div>
             </div>
             <Button
@@ -102,9 +114,9 @@ export default function ProductReviews({ productId }) {
               size="lg"
               icon={ArrowRight}
               onClick={() => setShowForm(true)}
-              className="border-black text-black hover:bg-black hover:text-white transition-all px-8 py-6 h-auto"
+              className="border-black text-black hover:bg-black hover:text-white transition-all px-8 py-4! h-auto"
             >
-              Express Your Opinion
+              Write your feedback
             </Button>
           </div>
         </div>
@@ -114,9 +126,15 @@ export default function ProductReviews({ productId }) {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              <div className="flex flex-col gap-6 md:gap-8">{renderCol(col1, 0)}</div>
-              <div className="flex flex-col gap-6 md:gap-8 md:pt-12">{renderCol(col2, 1)}</div>
-              <div className="flex flex-col gap-6 md:gap-8 lg:pt-24">{renderCol(col3, 2)}</div>
+              <div className="flex flex-col gap-6 md:gap-8">
+                {renderCol(col1, 0)}
+              </div>
+              <div className="flex flex-col gap-6 md:gap-8 md:pt-12">
+                {renderCol(col2, 1)}
+              </div>
+              <div className="flex flex-col gap-6 md:gap-8 lg:pt-24">
+                {renderCol(col3, 2)}
+              </div>
             </div>
 
             {!showAll && allReviews.length > 6 && (

@@ -13,6 +13,7 @@ export function CartSidebar({ isOpen, onClose }) {
     subtotal,
     discount,
     discountAmount,
+    autoBundleDiscountAmount,
     total,
     updateQuantity,
     removeItem,
@@ -26,6 +27,11 @@ export function CartSidebar({ isOpen, onClose }) {
     handleApplyCoupon,
     isApplyingCoupon,
   } = useCartSidebar(isOpen);
+
+  const totalQuantity = items.reduce(
+    (sum, item) => sum + (item.quantity || 1),
+    0,
+  );
 
   return (
     <div
@@ -64,7 +70,7 @@ export function CartSidebar({ isOpen, onClose }) {
             </div>
 
             {/* Free Shipping Banner */}
-            {items.length > 0 && <FreeShippingBanner subtotal={subtotal} />}
+            {items.length > 0 && <FreeShippingBanner items={items} />}
 
             {/* Cart Content */}
             <div className="flex-1 overflow-y-auto px-6 py-4 relative">
@@ -96,9 +102,11 @@ export function CartSidebar({ isOpen, onClose }) {
                     yet.
                   </p>
                   <Button onClick={onClose}>Shop Now</Button>
-                  <p className="text-[12px] text-gray-400 font-light mt-10">
-                    Free delivery on orders over{" "}
-                    <span className="font-semibold text-black">৳2,000</span>
+                  <p className="text-[12px] text-gray-800 mt-10">
+                    Free delivery when you buy{" "}
+                    <span className="font-semibold text-black">
+                      3 or more items
+                    </span>
                   </p>
                 </div>
               )}
@@ -110,6 +118,7 @@ export function CartSidebar({ isOpen, onClose }) {
                 subtotal={subtotal}
                 discount={discount}
                 discountAmount={discountAmount}
+                autoBundleDiscountAmount={autoBundleDiscountAmount}
                 total={total}
                 removeDiscount={removeDiscount}
                 setActiveDrawer={setActiveDrawer}

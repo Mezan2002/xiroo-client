@@ -32,11 +32,14 @@ export function useProductCard({ id, title, price, salePrice, image, images: ima
       // If we have a dedicated hover image and it's not already in the list, 
       // we might want to ensure it's the second image for the hover effect
       if (list.length > 0) {
-        return [list[0], hoverImage, ...list.slice(1)];
+        list = [list[0], hoverImage, ...list.slice(1)];
+      } else {
+        list = [hoverImage];
       }
-      return [hoverImage];
     }
-    return list;
+    
+    // Filter out empty strings or invalid items
+    return list.filter(img => img && typeof img === 'string' && img.trim() !== '');
   }, [image, imagesProp, hoverImage]);
 
   const isSaved = isInWishlist(id);

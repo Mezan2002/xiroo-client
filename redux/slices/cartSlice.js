@@ -6,6 +6,8 @@ const initialState = {
   itemCount: 0,
   discount: null,
   discountAmount: 0,
+  autoBundleDiscountAmount: 0,
+  isBundleFreeShipping: false,
   total: 0,
 };
 
@@ -19,13 +21,14 @@ const cartSlice = createSlice({
       Object.assign(state, metrics);
     },
     addToCart: (state, action) => {
-      const { product, variant, quantity = 1 } = action.payload;
+      const { product, variant, quantity = 1, bundleId } = action.payload;
       const incomingId = product._id || product.id;
 
       const existingItemIndex = state.items.findIndex(
         (item) =>
           (item._id === incomingId || item.id === incomingId) &&
-          item.variant === variant,
+          item.variant === variant &&
+          item.bundleId === bundleId
       );
 
       if (existingItemIndex > -1) {
@@ -37,6 +40,7 @@ const cartSlice = createSlice({
           _id: incomingId, // Store under _id for consistent grouping
           variant,
           quantity,
+          bundleId, // Link to an explicit bundle session if applicable
           addedAt: new Date().toISOString(),
         });
       }
@@ -45,8 +49,8 @@ const cartSlice = createSlice({
       Object.assign(state, metrics);
     },
     updateQuantity: (state, action) => {
-      const { id, variant, delta } = action.payload;
-      const item = state.items.find((i) => (i._id === id || i.id === id) && i.variant === variant);
+      const { id, variant, delta, bundleId } = action.payload;
+      const item = state.items.find((i) => (i._id === id || i.id === id) && i.variant === variant && i.bundleId === bundleId);
       if (item) {
         item.quantity = Math.max(1, item.quantity + delta);
       }
@@ -55,9 +59,9 @@ const cartSlice = createSlice({
       Object.assign(state, metrics);
     },
     removeFromCart: (state, action) => {
-      const { id, variant } = action.payload;
+      const { id, variant, bundleId } = action.payload;
       state.items = state.items.filter(
-        (i) => !((i._id === id || i.id === id) && i.variant === variant)
+        (i) => !((i._id === id || i.id === id) && i.variant === variant && i.bundleId === bundleId)
       );
       
       const metrics = calculateMetrics(state.items, state.discount);
@@ -69,6 +73,8 @@ const cartSlice = createSlice({
       state.itemCount = 0;
       state.discount = null;
       state.discountAmount = 0;
+      state.autoBundleDiscountAmount = 0;
+      state.isBundleFreeShipping = false;
       state.total = 0;
     },
     applyDiscount: (state, action) => {
@@ -85,12 +91,41 @@ const cartSlice = createSlice({
 });
 
 const calculateMetrics = (items, discount = null) => {
-  const subtotal = items.reduce((sum, item) => {
+  let subtotal = 0;
+  let itemCount = 0;
+  const bundleGroups = {};
+
+  items.forEach((item) => {
     const activePrice = item.salePrice && item.salePrice > 0 ? item.salePrice : item.price;
     const numericPrice = parseFloat(activePrice?.toString().replace(/[^0-9.]/g, "") || 0);
-    return sum + numericPrice * item.quantity;
-  }, 0);
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const itemSubtotal = numericPrice * item.quantity;
+    
+    subtotal += itemSubtotal;
+    itemCount += item.quantity;
+
+    if (item.bundleId) {
+      if (!bundleGroups[item.bundleId]) {
+        bundleGroups[item.bundleId] = {
+          quantity: 0,
+          subtotal: 0
+        };
+      }
+      bundleGroups[item.bundleId].quantity += item.quantity;
+      bundleGroups[item.bundleId].subtotal += itemSubtotal;
+    }
+  });
+
+  let autoBundleDiscountAmount = 0;
+  let isBundleFreeShipping = false;
+
+  Object.values(bundleGroups).forEach((group) => {
+    if (group.quantity >= 2) {
+      autoBundleDiscountAmount += group.subtotal * 0.10;
+    }
+    if (group.quantity >= 3) {
+      isBundleFreeShipping = true;
+    }
+  });
 
   let discountAmount = 0;
   if (discount) {
@@ -101,10 +136,18 @@ const calculateMetrics = (items, discount = null) => {
     }
   }
   
-  discountAmount = Math.min(discountAmount, subtotal);
-  const total = subtotal - discountAmount;
+  const totalDiscounts = discountAmount + autoBundleDiscountAmount;
+  const appliedDiscountAmount = Math.min(totalDiscounts, subtotal);
+  const total = subtotal - appliedDiscountAmount;
 
-  return { subtotal, itemCount, discountAmount, total };
+  return { 
+    subtotal, 
+    itemCount, 
+    discountAmount, 
+    autoBundleDiscountAmount,
+    isBundleFreeShipping,
+    total 
+  };
 };
 
 export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart, applyDiscount, removeDiscount } = cartSlice.actions;

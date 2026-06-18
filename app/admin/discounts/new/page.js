@@ -20,7 +20,7 @@ export default function NewDiscountPage() {
       value: parseFloat(data.value) || 0,
       minOrderValue: data.minRequirement === "Amount" ? parseFloat(data.minAmount) || 0 : 0,
       startDate: data.startDate || new Date().toISOString(),
-      endDate: data.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: data.endDate || null,
       usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,
       isActive: data.status === "Active",
     };

@@ -2,15 +2,18 @@
 
 /* ─────────────────────────────────────────────
    Row A — scrolls left
-   Row B — scrolls right (counter-direction)
 ───────────────────────────────────────────── */
 const ROW_A = [
-  { label: "Live Your Dream", accent: true },
+  { label: "Buy 2 or more items to get flat 10% off!", accent: true },
   { label: "Xiroo Shop", accent: false },
-  { label: "Minimal Design", accent: false },
-  { label: "Limited Edition", accent: true },
-  { label: "Free Delivery", accent: false },
-  { label: "Handcrafted Apparel", accent: false },
+  { label: "Buy 3 or more items to get free delivery!", accent: true },
+  { label: "Live your dream", accent: false },
+  { label: "Easy returns on sealed items only.", accent: true },
+  { label: "Cash on delivery available!", accent: false },
+  {
+    label: "Create your own bundle with any product to get flat discounts",
+    accent: true,
+  },
 ];
 
 const Sep = () => (
@@ -36,7 +39,7 @@ const Track = ({ items, direction = "left", speed = 32 }) => (
         {items.map(({ label, accent }, i) => (
           <div key={i} className="flex items-center">
             <span
-              className="whitespace-nowrap px-5 text-[10px] font-bold tracking-[0.38em] uppercase font-montserrat"
+              className="whitespace-nowrap px-5 text-[10px] font-medium tracking-widest uppercase font-montserrat"
               style={{
                 color: accent
                   ? "rgba(255,255,255,0.8)"
@@ -98,7 +101,6 @@ const MarqueeBanner = () => (
     <div className="overflow-hidden py-[10px] border-b border-white/4">
       <Track items={ROW_A} direction="left" speed={30} />
     </div>
-
   </div>
 );
 

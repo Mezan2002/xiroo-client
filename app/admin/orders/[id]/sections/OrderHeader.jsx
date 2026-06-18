@@ -1,7 +1,14 @@
 "use client";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import { Select } from "@/components/ui/Select";
-import { Clock, Truck, CheckCircle2, AlertCircle, Loader2, ShoppingBag } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  ShoppingBag,
+  Truck,
+} from "lucide-react";
 
 const Badge = ({ children, variant = "default", className = "" }) => {
   const variants = {
@@ -12,13 +19,19 @@ const Badge = ({ children, variant = "default", className = "" }) => {
     info: "bg-zinc-900 text-white border-zinc-900",
   };
   return (
-    <span className={`px-2 py-0.5 rounded-none text-[10px] font-bold border uppercase tracking-widest ${variants[variant]} ${className}`}>
+    <span
+      className={`px-2 py-0.5 rounded-none text-[10px] font-bold border uppercase tracking-widest ${variants[variant]} ${className}`}
+    >
       {children}
     </span>
   );
 };
 
-export default function OrderHeader({ order, isUpdatingStatus, handleStatusChange }) {
+export default function OrderHeader({
+  order,
+  isUpdatingStatus,
+  handleStatusChange,
+}) {
   const statusOptions = [
     { value: "pending", label: "Pending", icon: Clock },
     { value: "processing", label: "Processing", icon: Clock },
@@ -37,24 +50,35 @@ export default function OrderHeader({ order, isUpdatingStatus, handleStatusChang
       title={`#${order.orderId}`}
       icon={ShoppingBag}
       actions={
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-          <div className="flex items-center gap-2 sm:pr-4 sm:border-r border-zinc-100">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full">
+          <div className="flex items-center gap-2 sm:pr-4 sm:border-r border-zinc-100 shrink-0">
             <Badge
-              variant={order.status === "cancelled" ? "danger" : order.status === "delivered" ? "success" : "info"}
-              className="w-full sm:w-auto text-center"
+              variant={
+                order.status === "cancelled"
+                  ? "danger"
+                  : order.status === "delivered"
+                    ? "success"
+                    : "info"
+              }
+              className="w-full! text-center"
             >
               ORDER: {order.status}
             </Badge>
           </div>
-          <div className="flex flex-col gap-1 w-full sm:w-40">
+          <div className="flex flex-col gap-1 w-full">
             <div className="flex items-center gap-2">
-              {isUpdatingStatus && <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />}
+              {isUpdatingStatus && (
+                <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />
+              )}
               <Select
                 options={statusOptions}
                 value={order.status}
                 onChange={handleStatusChange}
-                className="w-full h-10 text-[12px] font-bold rounded-none"
-                disabled={isUpdatingStatus || ["delivered", "cancelled", "failed"].includes(order.status)}
+                className="w-full! h-10! text-[12px] font-bold rounded-none"
+                disabled={
+                  isUpdatingStatus ||
+                  ["delivered", "cancelled", "failed"].includes(order.status)
+                }
               />
             </div>
           </div>

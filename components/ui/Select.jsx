@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Premium Select Component
@@ -17,12 +18,12 @@ export function Select({
   placeholder = "Select Option",
   className = "",
   variant = "default",
-  size = "default"
+  size = "default",
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [dropUp, setDropUp] = useState(false);
   const containerRef = useRef(null);
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
 
   const checkSpace = () => {
     if (containerRef.current) {
@@ -54,7 +55,10 @@ export function Select({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -63,9 +67,10 @@ export function Select({
   }, []);
 
   const variants = {
-    default: "bg-white border border-gray-100 hover:border-black text-black",
+    default: "bg-white border border-gray-300 hover:border-black text-black",
     black: "bg-black text-white border-black hover:bg-zinc-800",
-    ghost: "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50 border-gray-100",
+    ghost:
+      "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50 border-gray-100",
   };
 
   const sizes = {
@@ -81,7 +86,7 @@ export function Select({
         onClick={() => setIsOpen(!isOpen)}
         className={`
           flex items-center justify-between w-full
-          font-bold uppercase tracking-[0.2em]
+          font-bold uppercase
           transition-all duration-300 rounded-none outline-none
           border
           ${variants[variant]}
@@ -91,24 +96,30 @@ export function Select({
       >
         <div className="flex items-center gap-3 truncate mr-2 text-left">
           {selectedOption?.icon && (
-            <selectedOption.icon size={14} strokeWidth={2} className="shrink-0" />
+            <selectedOption.icon
+              size={14}
+              strokeWidth={2}
+              className="shrink-0"
+            />
           )}
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
-        <ChevronDown 
-          size={14} 
-          className={`shrink-0 transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`} 
+        <ChevronDown
+          size={14}
+          className={`shrink-0 transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className={`
+        <div
+          className={`
           absolute left-0 right-0 z-50 bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden shadow-xl
           ${dropUp ? "bottom-full mb-px" : "top-full -mt-px"}
-        `}>
+        `}
+        >
           <div className="max-h-60 overflow-y-auto py-0">
             {options.map((option) => (
               <button
@@ -120,7 +131,7 @@ export function Select({
                 }}
                 className={`
                   flex items-center justify-between w-full px-6
-                  ${size === 'sm' ? 'py-2.5 text-[9px]' : 'py-4 text-[10px]'}
+                  ${size === "sm" ? "py-2.5 text-[9px]" : "py-4 text-[10px]"}
                   font-bold uppercase tracking-[0.2em] text-left
                   transition-all duration-200 border-b border-gray-50 last:border-none
                   ${value === option.value ? "bg-black text-white" : "text-zinc-400 hover:bg-gray-50 hover:text-black"}
@@ -130,12 +141,14 @@ export function Select({
                   {option.icon && <option.icon size={12} strokeWidth={2} />}
                   <span>{option.label}</span>
                 </div>
-                {value === option.value && <Check size={12} className="text-white" />}
+                {value === option.value && (
+                  <Check size={12} className="text-white" />
+                )}
               </button>
             ))}
             {options.length === 0 && (
               <div className="px-6 py-10 text-center">
-                <span className="text-[10px] font-bold text-zinc-200 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-zinc-200 uppercase">
                   No options registry
                 </span>
               </div>

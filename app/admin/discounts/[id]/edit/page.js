@@ -14,7 +14,7 @@ export default function EditDiscountPage() {
   const { useDiscountDetail, updateDiscount } = useDiscounts();
   const { data: response, isLoading } = useDiscountDetail(params.id);
 
-  const discount = response?.data;
+  const discount = response?.data || response;
 
   // Map backend shape back to form shape
   const initialData = discount
@@ -38,7 +38,7 @@ export default function EditDiscountPage() {
       value: parseFloat(data.value) || 0,
       minOrderValue: data.minRequirement === "Amount" ? parseFloat(data.minAmount) || 0 : 0,
       startDate: data.startDate,
-      endDate: data.endDate,
+      endDate: data.endDate || null,
       usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,
       isActive: data.status === "Active",
     };

@@ -27,7 +27,8 @@ export default function AdminDiscounts() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedDiscount, setSelectedDiscount] = useState(null);
 
-  const discounts = (response?.data || []).map((d) => ({
+  const discountsList = Array.isArray(response) ? response : (response?.data || []);
+  const discounts = discountsList.map((d) => ({
     ...d,
     id: d._id,
     code: d.code,

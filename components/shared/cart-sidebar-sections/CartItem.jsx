@@ -22,13 +22,19 @@ export default function CartItem({ item, updateQuantity, removeItem, onClose }) 
         onClick={onClose}
         className="relative w-24 h-24 bg-gray-50 overflow-hidden shrink-0 border border-gray-100 group/img"
       >
-        <Image
-          src={item.image}
-          alt={item.title}
-          fill
-          sizes="96px"
-          className="object-cover group-hover/img:scale-110 transition-transform duration-700"
-        />
+        {item.image && typeof item.image === 'string' && item.image.trim() !== '' ? (
+          <Image
+            src={item.image}
+            alt={item.title}
+            fill
+            sizes="96px"
+            className="object-cover group-hover/img:scale-110 transition-transform duration-700"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-[10px] tracking-widest uppercase">
+            No Image
+          </div>
+        )}
       </Link>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start gap-4 mb-1">
@@ -45,7 +51,14 @@ export default function CartItem({ item, updateQuantity, removeItem, onClose }) 
             ৳{price}
           </span>
         </div>
-        <p className="text-[13px] text-gray-400 mb-1">{item.variant}</p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-[13px] text-gray-400">{item.variant}</p>
+          {item.bundleId && (
+            <span className="bg-red-50 text-red-600 px-1.5 py-0.5 text-[9px] font-bold tracking-widest uppercase rounded-sm border border-red-100">
+              Bundle
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2 mb-5">
           <p className="text-[13px] text-black font-semibold">৳{price}</p>
           {item.salePrice > 0 && (
@@ -53,13 +66,13 @@ export default function CartItem({ item, updateQuantity, removeItem, onClose }) 
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4">
           <div className="flex items-center border border-gray-200">
             <Button
               variant="ghost"
               size="icon"
               showHoverIcon={false}
-              onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: -1 })}
+              onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: -1, bundleId: item.bundleId })}
               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
             >
               <Minus className="w-4 h-4 stroke-[1.5]" />
@@ -69,7 +82,7 @@ export default function CartItem({ item, updateQuantity, removeItem, onClose }) 
               variant="ghost"
               size="icon"
               showHoverIcon={false}
-              onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: 1 })}
+              onClick={() => updateQuantity({ id: item._id || item.id, variant: item.variant, delta: 1, bundleId: item.bundleId })}
               className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
             >
               <Plus className="w-4 h-4 stroke-[1.5]" />
@@ -79,7 +92,7 @@ export default function CartItem({ item, updateQuantity, removeItem, onClose }) 
             variant="ghost"
             size="icon"
             showHoverIcon={false}
-            onClick={() => removeItem({ id: item._id || item.id, variant: item.variant })}
+            onClick={() => removeItem({ id: item._id || item.id, variant: item.variant, bundleId: item.bundleId })}
             className="p-2 text-gray-400 hover:text-black transition-colors"
           >
             <Trash2 className="w-5 h-5 stroke-[1.5]" />
