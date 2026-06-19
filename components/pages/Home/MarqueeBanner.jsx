@@ -14,6 +14,10 @@ const ROW_A = [
     label: "Create your own bundle with any product to get flat discounts",
     accent: true,
   },
+  {
+    label: "Start from zero!",
+    accent: false,
+  },
 ];
 
 const Sep = () => (
