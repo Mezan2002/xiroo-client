@@ -6,22 +6,26 @@ const FEATURES = [
   {
     icon: Coins,
     title: "Cash On Delivery",
-    description: "Pay in cash upon receiving and inspecting your items. Zero risk, absolute convenience.",
+    description:
+      "Pay in cash upon receiving and inspecting your items. Zero risk, absolute convenience.",
   },
   {
     icon: RotateCcw,
     title: "Easy 7-Day Returns",
-    description: "Fit not quite right? Return or exchange any item within 7 days of delivery, hassle-free.",
+    description:
+      "Fit not quite right? Return or exchange any item within 7 days of delivery, hassle-free.",
   },
   {
     icon: ShieldCheck,
     title: "Premium Quality",
-    description: "Meticulously crafted from high-grade fabrics designed to stand the test of time.",
+    description:
+      "Meticulously crafted from high-grade fabrics designed to stand the test of time.",
   },
   {
     icon: Truck,
     title: "Nationwide Shipping",
-    description: "Fast, reliable, and fully trackable shipping directly to your doorstep across the nation.",
+    description:
+      "Fast, reliable, and fully trackable shipping directly to your doorstep across the nation.",
   },
 ];
 
@@ -53,7 +57,7 @@ export default function StoreFeatures() {
               </div>
 
               {/* Title */}
-              <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-black mb-3">
+              <h3 className="text-xs font-bold tracking-widest uppercase text-black mb-3">
                 {feature.title}
               </h3>
 

@@ -73,6 +73,8 @@ export default function DefaultSearchLayout({
                   title={product.title}
                   price={product.price}
                   salePrice={product.salePrice}
+                  image={product.images?.[0]}
+                  images={product.images}
                   variants={product.variants}
                   badge={product.badge}
                 />
