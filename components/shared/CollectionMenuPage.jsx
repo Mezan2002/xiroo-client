@@ -48,7 +48,7 @@ export default function CollectionMenuPage({ slug, title }) {
               className="group flex flex-col w-full"
             >
               {/* Raw Image Box */}
-              <div className="relative w-full aspect-3/4 bg-[#f8f8f8] overflow-hidden mb-5">
+              <div className="relative w-full aspect-4/3 bg-[#f8f8f8] overflow-hidden mb-5">
                 <Image
                   src={category.image || "/images/placeholder.png"}
                   alt={category.name}
