@@ -1,7 +1,14 @@
 "use client";
 
-export default function ProductPricing({ product, displayPrice, isSaleActive, variantPriceOverride }) {
-  const isOutOfStock = ["out-of-stock", "upcoming"].includes(product.stockStage);
+export default function ProductPricing({
+  product,
+  displayPrice,
+  isSaleActive,
+  variantPriceOverride,
+}) {
+  const isOutOfStock = ["out-of-stock", "upcoming"].includes(
+    product.stockStage,
+  );
 
   return (
     <div className="flex flex-col items-center text-center w-full mb-10 pt-4 lg:pt-8 font-mono">
@@ -22,7 +29,7 @@ export default function ProductPricing({ product, displayPrice, isSaleActive, va
             )}
           </div>
           <span className="text-[10px] md:text-[12px] text-gray-500 font-medium tracking-widest uppercase mt-2">
-            Complimentary shipping on orders over ৳2000
+            Complimentary shipping on orders over 3 products
           </span>
         </>
       ) : (
