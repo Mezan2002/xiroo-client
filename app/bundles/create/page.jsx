@@ -157,7 +157,7 @@ export default function BundleCreator() {
       </div>
 
       {/* ── Product Grid ── */}
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-12 pb-52">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-12 pb-[240px] lg:pb-52">
         {/* Row info */}
         <div className="flex items-center justify-between mb-8">
           <p className="text-sm text-gray-500">
@@ -216,9 +216,9 @@ export default function BundleCreator() {
                     </div>
                   )}
 
-                  {/* Add button — hover, qty = 0 */}
+                  {/* Add button — always visible on mobile, hover on desktop, qty = 0 */}
                   {quantityInBundle === 0 && (
-                    <div className="absolute inset-0 flex items-end pb-[86px] px-3 z-20 opacity-0 group-hover/card:opacity-100 transition-all duration-300">
+                    <div className="absolute inset-0 flex items-end pb-[86px] px-3 z-20 opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all duration-300">
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -271,7 +271,7 @@ export default function BundleCreator() {
       </div>
 
       {/* ── Sticky Footer ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
+      <div className="fixed bottom-[74px] lg:bottom-0 left-0 right-0 z-40 lg:z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] lg:shadow-none border-b border-gray-200 lg:border-none">
         {/* Progress line */}
         <div className="w-full h-[3px] bg-gray-100">
           <div
@@ -283,17 +283,17 @@ export default function BundleCreator() {
         </div>
 
         <div className="bg-white border-t border-gray-200">
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-5 flex items-center justify-between gap-6">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-16 py-4 lg:py-5 flex items-center justify-between gap-4 lg:gap-6">
             {/* Left */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4 lg:gap-8">
               {/* Count */}
               <div className="flex flex-col">
-                <span className="text-xs text-gray-500 mb-0.5">
+                <span className="text-[10px] sm:text-xs text-gray-500 mb-0.5">
                   Your Bundle
                 </span>
-                <span className="text-2xl font-extralight text-gray-900 leading-none">
+                <span className="text-xl sm:text-2xl font-extralight text-gray-900 leading-none">
                   {totalBundleQuantity}
-                  <span className="text-gray-400 text-base font-light ml-1">
+                  <span className="text-gray-400 text-sm sm:text-base font-light ml-1">
                     {totalBundleQuantity === 1 ? "item" : "items"}
                   </span>
                 </span>
@@ -336,7 +336,7 @@ export default function BundleCreator() {
             </div>
 
             {/* Right */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 lg:gap-6">
               {/* Hint */}
               {totalBundleQuantity < 3 && (
                 <p className="hidden md:block text-sm text-gray-500">
@@ -355,13 +355,13 @@ export default function BundleCreator() {
               <button
                 disabled={totalBundleQuantity === 0}
                 onClick={handleAddBundleToCart}
-                className={`flex items-center gap-2.5 px-8 py-3.5 text-sm font-semibold transition-all duration-500 ${
+                className={`flex items-center gap-2 px-4 sm:px-8 py-2.5 sm:py-3.5 text-xs sm:text-sm font-semibold transition-all duration-500 ${
                   totalBundleQuantity > 0
                     ? "bg-black text-white hover:bg-zinc-800"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {totalBundleQuantity > 0 ? "Add to Cart" : "Select Items"}
               </button>
             </div>
