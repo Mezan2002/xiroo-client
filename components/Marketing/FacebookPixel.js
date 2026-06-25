@@ -72,12 +72,24 @@ export default function FacebookPixel() {
         window.fbq("track", "PageView");
 
         // Provide a robust global wrapper
-        window.trackFacebookEvent = async (eventName, customData = {}) => {
+        window.trackFacebookEvent = async (eventName, customData = {}, userData = {}) => {
           // Generate a unique event ID for deduplication between Pixel and CAPI
           const eventId = "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 
-          // 1. Track via Browser (Pixel)
+          // 1. Track via Browser (Pixel) with Advanced Matching
           if (window.fbq) {
+            // Build advanced matching user data object
+            const advancedMatching = {};
+            if (userData.email) advancedMatching.em = userData.email;
+            if (userData.phone) advancedMatching.ph = userData.phone;
+            if (userData.firstName) advancedMatching.fn = userData.firstName;
+            if (userData.lastName) advancedMatching.ln = userData.lastName;
+            if (userData.externalId) advancedMatching.external_id = userData.externalId;
+
+            // Re-initialize pixel with user data for Advanced Matching
+            if (Object.keys(advancedMatching).length > 0) {
+              window.fbq("init", pixelId, advancedMatching);
+            }
             window.fbq("track", eventName, customData, { event_id: eventId });
           }
 
@@ -90,8 +102,12 @@ export default function FacebookPixel() {
               eventId, // Pass for deduplication
               testEventCode: testCode, // For testing in Events Manager
               userData: {
-                // Pass basic user agent info
+                email: userData.email || '',
+                phone: userData.phone || '',
+                firstName: userData.firstName || '',
+                lastName: userData.lastName || '',
                 userAgent: window.navigator.userAgent,
+                ip: userData.ip || '',
               },
             });
           } catch (error) {

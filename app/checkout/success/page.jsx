@@ -24,13 +24,22 @@ function OrderSuccessContent() {
   
   useEffect(() => {
     if (order && window.trackFacebookEvent) {
+      // Extract customer data for Advanced Matching
+      const customerData = {
+        email: order.customerEmail || order.user?.email || order.guestInfo?.email || '',
+        phone: order.customerPhone || order.user?.phoneNumber || order.guestInfo?.phone || '',
+        firstName: order.customerFirstName || order.user?.firstName || order.guestInfo?.firstName || '',
+        lastName: order.customerLastName || order.user?.lastName || order.guestInfo?.lastName || '',
+        externalId: order.user?._id || order.user || '',
+      };
+
       window.trackFacebookEvent("Purchase", {
         content_ids: order.items.map(item => item.product?._id || item.product),
         content_type: "product",
         value: order.totalPrice,
         currency: "BDT",
         num_items: order.items.length
-      });
+      }, customerData);
     }
   }, [order]);
   

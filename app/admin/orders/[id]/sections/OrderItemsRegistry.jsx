@@ -2,6 +2,12 @@
 import { Button } from "@/components/ui/Button";
 import { AlertCircle, ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+
+const AdminInvoiceDownload = dynamic(
+  () => import("@/components/admin/orders/AdminInvoiceDownload"),
+  { ssr: false }
+);
 
 const Card = ({ children, title, action, className = "" }) => (
   <div
@@ -175,6 +181,7 @@ export default function OrderItemsRegistry({ order, handleCancelOrder }) {
 
       <Card title="Registry Operations">
         <div className="space-y-6">
+          <AdminInvoiceDownload order={order} />
           <Button
             onClick={handleCancelOrder}
             disabled={order.status !== "pending"}

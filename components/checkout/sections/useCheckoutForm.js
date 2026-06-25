@@ -101,6 +101,11 @@ export const useCheckoutForm = (
           email: formData.email,
           phone: formData.phone,
         } : undefined,
+        // Always send customer snapshot data for both guest and logged-in users
+        customerFirstName: formData.firstName,
+        customerLastName: formData.lastName,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
         items: orderItems,
         totalPrice: total,
         shippingFee: shipping,
@@ -165,6 +170,6 @@ export const useCheckoutForm = (
     handleChange,
     handleDistrictChange,
     handleNext,
-    isSubmitting: placeOrder.isPending || registerMutation.isPending,
+    isSubmitting: placeOrder.isPending || placeGuestOrder.isPending || registerMutation.isPending,
   };
 };
