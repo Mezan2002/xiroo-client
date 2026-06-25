@@ -95,17 +95,12 @@ export const useCheckoutForm = (
 
       const orderPayload = {
         user: user?._id || user?.id,
-        guestInfo: !user ? {
+        guestInfo: {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-        } : undefined,
-        // Always send customer snapshot data for both guest and logged-in users
-        customerFirstName: formData.firstName,
-        customerLastName: formData.lastName,
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
+        },
         items: orderItems,
         totalPrice: total,
         shippingFee: shipping,

@@ -26,10 +26,10 @@ function OrderSuccessContent() {
     if (order && window.trackFacebookEvent) {
       // Extract customer data for Advanced Matching
       const customerData = {
-        email: order.customerEmail || order.user?.email || order.guestInfo?.email || '',
-        phone: order.customerPhone || order.user?.phoneNumber || order.guestInfo?.phone || '',
-        firstName: order.customerFirstName || order.user?.firstName || order.guestInfo?.firstName || '',
-        lastName: order.customerLastName || order.user?.lastName || order.guestInfo?.lastName || '',
+        email: order.guestInfo?.email || order.user?.email || '',
+        phone: order.guestInfo?.phone || order.user?.phoneNumber || '',
+        firstName: order.guestInfo?.firstName || order.user?.firstName || '',
+        lastName: order.guestInfo?.lastName || order.user?.lastName || '',
         externalId: order.user?._id || order.user || '',
       };
 

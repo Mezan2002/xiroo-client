@@ -28,11 +28,10 @@ const DetailSection = ({ label, value }) => (
 );
 
 export default function CustomerIdentityCard({ user, guestInfo, createdByAdmin, order }) {
-  // Priority: user data > guestInfo > snapshot fields > fallback
-  const firstName = user?.firstName || guestInfo?.firstName || order?.customerFirstName || "?";
-  const lastName = user?.lastName || guestInfo?.lastName || order?.customerLastName || "";
-  const email = user?.email || guestInfo?.email || order?.customerEmail;
-  const phoneNumber = user?.phoneNumber || guestInfo?.phone || order?.customerPhone;
+  const firstName = user?.firstName || guestInfo?.firstName || "?";
+  const lastName = user?.lastName || guestInfo?.lastName || "";
+  const email = user?.email || guestInfo?.email;
+  const phoneNumber = user?.phoneNumber || guestInfo?.phone;
 
   return (
     <Card title="Customer Identity">
