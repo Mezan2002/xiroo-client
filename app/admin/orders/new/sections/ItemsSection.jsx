@@ -521,18 +521,29 @@ export default function ItemsSection({
                     />
                   </td>
                   <td className="py-6 px-6 text-right">
-                    <input
-                      placeholder="0.00"
-                      value={item.price}
-                      onChange={(e) =>
-                        updateItem(
-                          item.id,
-                          "price",
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
-                      className="w-24 bg-transparent border-b border-zinc-100 text-right text-[13px] font-medium py-1 outline-none"
-                    />
+                    <div className="flex flex-col items-end gap-1">
+                      <input
+                        placeholder="0.00"
+                        value={item.price}
+                        onChange={(e) =>
+                          updateItem(
+                            item.id,
+                            "price",
+                            parseFloat(e.target.value) || 0,
+                          )
+                        }
+                        className={`w-24 bg-transparent border-b text-right text-[13px] font-medium py-1 outline-none ${
+                          item.originalPrice && item.price !== item.originalPrice
+                            ? "border-amber-300 text-amber-600"
+                            : "border-zinc-100"
+                        }`}
+                      />
+                      {item.originalPrice && item.price !== item.originalPrice && (
+                        <span className="text-[9px] font-medium text-zinc-400 line-through">
+                          orig: ৳{item.originalPrice}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="py-6 pl-6 text-right text-[14px] font-bold text-black">
                     ৳{(item.price * item.quantity).toLocaleString()}
@@ -600,6 +611,14 @@ export default function ItemsSection({
                   ৳{total.toLocaleString()}
                 </span>
               </div>
+              {items.some(item => item.originalPrice && item.price !== item.originalPrice) && (
+                <div className="flex items-center gap-2 pt-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
+                    Admin Price Override Active
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

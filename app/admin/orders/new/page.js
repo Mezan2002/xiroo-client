@@ -39,6 +39,7 @@ export default function NewOrderPage() {
         variant: item.variant || "Standard",
         quantity: item.quantity,
         price: item.price,
+        originalPrice: item.originalPrice,
         bundleId: item.bundleId || undefined
       })),
       totalPrice: calculateTotal(),
@@ -47,7 +48,8 @@ export default function NewOrderPage() {
       deliveryMethod: order.deliveryMethod,
       shippingFee: metrics.shipping,
       status: "pending",
-      paymentStatus: "pending"
+      paymentStatus: "pending",
+      isAdminOverride: order.items.some(item => item.originalPrice && item.price !== item.originalPrice),
     };
 
     placeOrder.mutate(payload, {

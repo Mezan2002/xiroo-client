@@ -16,12 +16,12 @@ export const useNewOrder = () => {
   });
 
   const addItem = (product, bundleId = null, variant = "Standard", quantity = 1) => {
-    // If product is provided, use its data, otherwise add a blank item
     const newItem = product ? {
       id: Date.now() + Math.random(),
       product: product._id,
       name: product.title,
       price: product.salePrice || product.price,
+      originalPrice: product.salePrice || product.price,
       quantity: quantity,
       variant: variant,
       bundleId: bundleId,
@@ -31,6 +31,7 @@ export const useNewOrder = () => {
       product: null,
       name: "",
       price: 0,
+      originalPrice: 0,
       quantity: 1,
       variant: "Standard",
       bundleId: null,
