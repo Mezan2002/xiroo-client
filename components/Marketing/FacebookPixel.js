@@ -10,12 +10,66 @@ function getCookie(name) {
   return match ? decodeURIComponent(match[2]) : "";
 }
 
+function setCookie(name, value, days = 7) {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+/**
+ * Meta best practice: Extract fbclid from URL and manually create _fbc cookie.
+ * Meta's pixel script usually does this, but this is a fallback to guarantee coverage.
+ * Format: fb.${subdomain_index}.${creation_time}.${fbclid}
+ */
+function ensureFbcFromUrl() {
+  if (typeof window === "undefined") return;
+  const existing = getCookie("_fbc");
+  if (existing) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const fbclid = params.get("fbclid");
+  if (!fbclid) return;
+
+  const subdomainIndex = window.location.hostname === "www." ? 1 : 0;
+  const creationTime = Math.floor(Date.now() / 1000);
+  const fbcValue = `fb.${subdomainIndex}.${creationTime}.${fbclid}`;
+  setCookie("_fbc", fbcValue);
+}
+
+function normalizeEmail(email) {
+  if (!email) return "";
+  return email.trim().toLowerCase();
+}
+
+function normalizePhone(phone) {
+  if (!phone) return "";
+  return phone.replace(/[\s\-\(\)]/g, "");
+}
+
+let cachedIp = "";
+
+async function fetchClientIp() {
+  if (cachedIp) return cachedIp;
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    cachedIp = data.ip || "";
+    return cachedIp;
+  } catch {
+    return "";
+  }
+}
+
 export default function FacebookPixel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Meta best practice: capture fbc from URL + IP early on landing page
+    ensureFbcFromUrl();
+    fetchClientIp();
 
     window.trackFacebookEvent = async (eventName, customData = {}) => {
       console.warn("Facebook Tracking not yet initialized for:", eventName);
@@ -77,11 +131,15 @@ export default function FacebookPixel() {
           const eventId = "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
           const fbc = getCookie("_fbc");
           const fbp = getCookie("_fbp");
+          const clientIp = cachedIp || await fetchClientIp();
+
+          const normalizedEmail = normalizeEmail(userData.email);
+          const normalizedPhone = normalizePhone(userData.phone);
 
           if (window.fbq) {
             const advancedMatching = {};
-            if (userData.email) advancedMatching.em = userData.email;
-            if (userData.phone) advancedMatching.ph = userData.phone;
+            if (normalizedEmail) advancedMatching.em = normalizedEmail;
+            if (normalizedPhone) advancedMatching.ph = normalizedPhone;
             if (userData.firstName) advancedMatching.fn = userData.firstName;
             if (userData.lastName) advancedMatching.ln = userData.lastName;
             if (userData.externalId) advancedMatching.external_id = userData.externalId;
@@ -100,12 +158,12 @@ export default function FacebookPixel() {
               eventId,
               testEventCode: testCode,
               userData: {
-                email: userData.email || '',
-                phone: userData.phone || '',
+                email: normalizedEmail,
+                phone: normalizedPhone,
                 firstName: userData.firstName || '',
                 lastName: userData.lastName || '',
                 userAgent: window.navigator.userAgent,
-                ip: userData.ip || '',
+                ip: clientIp,
                 fbc,
                 fbp,
               },
@@ -125,6 +183,17 @@ export default function FacebookPixel() {
   useEffect(() => {
     if (window.fbq) {
       window.fbq("track", "PageView");
+      try {
+        const fbc = getCookie("_fbc");
+        const fbp = getCookie("_fbp");
+        axiosInstance.post("/marketing/track", {
+          eventName: "PageView",
+          customData: { page_title: document.title },
+          eventSourceUrl: window.location.href,
+          eventId: "pv_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now(),
+          userData: { email: "", phone: "", userAgent: window.navigator.userAgent, ip: cachedIp, fbc, fbp },
+        });
+      } catch (_) {}
     }
   }, [pathname, searchParams]);
 

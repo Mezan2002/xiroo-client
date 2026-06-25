@@ -50,6 +50,7 @@ export default function ProductView({ productId }) {
         content_type: "product",
         value: product.salePrice || product.price,
         currency: "BDT",
+        num_items: 1,
       });
     }
   }, [product, dispatch]);
