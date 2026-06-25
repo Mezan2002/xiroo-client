@@ -76,8 +76,8 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
         </div>
         <div className="flex justify-between items-center text-[12px] font-medium uppercase tracking-wider text-gray-400">
           <span>Delivery Fee</span>
-          <span className="text-black italic">
-            {shipping === 0 ? "Free" : `৳${shipping.toLocaleString()}`}
+          <span className={`italic ${shipping === null ? "text-gray-300 not-italic" : "text-black"}`}>
+            {shipping === null ? "Select district" : shipping === 0 ? "Free" : `৳${shipping.toLocaleString()}`}
           </span>
         </div>
         <div className="flex justify-between items-center pt-4 lg:pt-6 border-t border-gray-100">

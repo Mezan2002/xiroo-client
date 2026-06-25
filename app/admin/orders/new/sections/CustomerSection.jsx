@@ -216,8 +216,9 @@ export default function CustomerSection({ order, setOrder }) {
   const handleDistrictChange = (val) => {
     setOrder((prev) => {
       const isInsideDhaka = val === "Dhaka";
-      const fee =
-        prev.deliveryMethod === "normal" ? 0 : isInsideDhaka ? 50 : 70;
+      const fee = prev.deliveryMethod === "normal"
+        ? (isInsideDhaka ? 80 : 150)
+        : (isInsideDhaka ? 120 : 200);
       return {
         ...prev,
         shippingFee: fee,
@@ -229,7 +230,9 @@ export default function CustomerSection({ order, setOrder }) {
   const handleDeliveryMethodChange = (methodId) => {
     setOrder((prev) => {
       const isInsideDhaka = prev.shipping?.district === "Dhaka";
-      const fee = methodId === "normal" ? 0 : isInsideDhaka ? 50 : 70;
+      const fee = methodId === "normal"
+        ? (isInsideDhaka ? 80 : 150)
+        : (isInsideDhaka ? 120 : 200);
       return {
         ...prev,
         deliveryMethod: methodId,
@@ -244,13 +247,13 @@ export default function CustomerSection({ order, setOrder }) {
     {
       id: "normal",
       label: "Normal Delivery",
-      fee: 0,
+      fee: isInsideDhaka ? 80 : 150,
       desc: isInsideDhaka ? "2-3 Days" : "3-4 Days",
     },
     {
       id: "fast",
       label: "Fast Delivery",
-      fee: isInsideDhaka ? 50 : 70,
+      fee: isInsideDhaka ? 120 : 200,
       desc: "24-48 Hours",
     },
   ];

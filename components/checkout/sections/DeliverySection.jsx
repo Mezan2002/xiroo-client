@@ -8,13 +8,13 @@ export default function DeliverySection({ deliveryMethod, setDeliveryMethod, dis
       id: "normal", 
       label: "Normal Delivery", 
       desc: isInsideDhaka ? "2-3 Days" : "3-4 Days", 
-      price: "Free" 
+      price: !district ? "Select district" : isInsideDhaka ? "৳80" : "৳150"
     },
     { 
       id: "fast", 
       label: "Fast Delivery", 
       desc: "24-48 Hours", 
-      price: isInsideDhaka ? "৳50" : "৳70" 
+      price: !district ? "Select district" : isInsideDhaka ? "৳120" : "৳200" 
     },
   ];
 

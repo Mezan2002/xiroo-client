@@ -17,12 +17,14 @@ export default function CheckoutPage() {
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
 
-  const shipping = isBundleFreeShipping 
-    ? 0 
-    : deliveryMethod === "normal"
-      ? 0
-      : (district === "Dhaka" ? 50 : 70);
-  const total = subtotal + shipping;
+  const shipping = !district
+    ? null
+    : isBundleFreeShipping 
+      ? 0 
+      : deliveryMethod === "normal"
+        ? (district === "Dhaka" ? 80 : 150)
+        : (district === "Dhaka" ? 120 : 200);
+  const total = subtotal + (shipping || 0);
   
   useEffect(() => {
     if (window.trackFacebookEvent && items) {
