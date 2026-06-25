@@ -24,7 +24,6 @@ function OrderSuccessContent() {
   
   useEffect(() => {
     if (order && window.trackFacebookEvent) {
-      // Extract customer data for Advanced Matching
       const customerData = {
         email: order.guestInfo?.email || order.user?.email || '',
         phone: order.guestInfo?.phone || order.user?.phoneNumber || '',
@@ -39,7 +38,7 @@ function OrderSuccessContent() {
         value: order.totalPrice,
         currency: "BDT",
         num_items: order.items.length
-      }, customerData);
+      }, customerData, order.facebookEventId || null);
     }
   }, [order]);
   

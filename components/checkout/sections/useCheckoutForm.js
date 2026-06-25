@@ -107,6 +107,7 @@ export const useCheckoutForm = (
         deliveryMethod: deliveryMethod,
         paymentMethod: formData.paymentMethod,
         shippingAddress: shippingAddress,
+        facebookEventId: "purchase_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now(),
       };
 
       // Case 1: Guest wants to register

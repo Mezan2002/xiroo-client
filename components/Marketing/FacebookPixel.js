@@ -127,8 +127,8 @@ export default function FacebookPixel() {
         window.fbq("init", pixelId);
         window.fbq("track", "PageView");
 
-        window.trackFacebookEvent = async (eventName, customData = {}, userData = {}) => {
-          const eventId = "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+        window.trackFacebookEvent = async (eventName, customData = {}, userData = {}, overrideEventId = null) => {
+          const eventId = overrideEventId || "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
           const fbc = getCookie("_fbc");
           const fbp = getCookie("_fbp");
           const clientIp = cachedIp || await fetchClientIp();
