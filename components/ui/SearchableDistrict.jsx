@@ -85,7 +85,7 @@ export default function SearchableDistrict({ value, onChange, placeholder = "Sel
             <Search className="w-4 h-4 text-gray-300" />
             <input
               type="text"
-              className="flex-1 outline-none text-sm font-medium lowercase tracking-tighter"
+              className="flex-1 outline-none text-sm font-medium uppercase tracking-tighter"
               placeholder="search districts..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}

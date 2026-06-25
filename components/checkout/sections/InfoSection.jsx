@@ -1,7 +1,11 @@
 "use client";
 import SearchableDistrict from "@/components/ui/SearchableDistrict";
+import LocationDropdown from "@/components/ui/LocationDropdown";
+import { BANGLADESH_LOCATIONS } from "@/lib/bangladeshLocations";
 
 export default function InfoSection({ formData, handleChange, handleDistrictChange }) {
+  const thanas = formData.district ? (BANGLADESH_LOCATIONS[formData.district] || []) : [];
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-4">
@@ -74,14 +78,12 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
             <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
               Upazila / Thana
             </label>
-            <input
-              type="text"
-              name="upazila"
-              required
+            <LocationDropdown
               value={formData.upazila}
-              onChange={handleChange}
-              placeholder="e.g. Banani"
-              className="w-full h-8 px-0 bg-transparent outline-none text-sm font-medium placeholder:text-gray-300"
+              onChange={(val) => handleChange({ target: { name: "upazila", value: val } })}
+              options={thanas}
+              placeholder={formData.district ? "Select Thana" : "Select district first"}
+              allowCustom
             />
           </div>
         </div>
