@@ -4,6 +4,12 @@ import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import axiosInstance from "@/lib/axios";
 
+function getCookie(name) {
+  if (typeof document === "undefined") return "";
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  return match ? decodeURIComponent(match[2]) : "";
+}
+
 export default function FacebookPixel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -11,7 +17,6 @@ export default function FacebookPixel() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Define a fallback stub immediately to prevent "undefined" errors
     window.trackFacebookEvent = async (eventName, customData = {}) => {
       console.warn("Facebook Tracking not yet initialized for:", eventName);
     };
@@ -22,9 +27,7 @@ export default function FacebookPixel() {
       let isEnabled = !!pixelId;
 
       try {
-        // Fetch from server if not in ENV or to get additional settings (like Test Code)
         const { data } = await axiosInstance.get("/marketing");
-        // Axios response interceptor returns response.data, which is already the settings object
         const settings = data;
         
         if (settings) {
@@ -43,7 +46,6 @@ export default function FacebookPixel() {
       }
 
       try {
-        // Standard Facebook Pixel initialization
         !(function (f, b, e, v, n, t, s) {
           if (f.fbq) return;
           n = f.fbq = function () {
@@ -71,14 +73,12 @@ export default function FacebookPixel() {
         window.fbq("init", pixelId);
         window.fbq("track", "PageView");
 
-        // Provide a robust global wrapper
         window.trackFacebookEvent = async (eventName, customData = {}, userData = {}) => {
-          // Generate a unique event ID for deduplication between Pixel and CAPI
           const eventId = "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+          const fbc = getCookie("_fbc");
+          const fbp = getCookie("_fbp");
 
-          // 1. Track via Browser (Pixel) with Advanced Matching
           if (window.fbq) {
-            // Build advanced matching user data object
             const advancedMatching = {};
             if (userData.email) advancedMatching.em = userData.email;
             if (userData.phone) advancedMatching.ph = userData.phone;
@@ -86,21 +86,19 @@ export default function FacebookPixel() {
             if (userData.lastName) advancedMatching.ln = userData.lastName;
             if (userData.externalId) advancedMatching.external_id = userData.externalId;
 
-            // Re-initialize pixel with user data for Advanced Matching
             if (Object.keys(advancedMatching).length > 0) {
               window.fbq("init", pixelId, advancedMatching);
             }
             window.fbq("track", eventName, customData, { event_id: eventId });
           }
 
-          // 2. Track via Server (CAPI)
           try {
             await axiosInstance.post("/marketing/track", {
               eventName,
               customData,
               eventSourceUrl: window.location.href,
-              eventId, // Pass for deduplication
-              testEventCode: testCode, // For testing in Events Manager
+              eventId,
+              testEventCode: testCode,
               userData: {
                 email: userData.email || '',
                 phone: userData.phone || '',
@@ -108,6 +106,8 @@ export default function FacebookPixel() {
                 lastName: userData.lastName || '',
                 userAgent: window.navigator.userAgent,
                 ip: userData.ip || '',
+                fbc,
+                fbp,
               },
             });
           } catch (error) {
