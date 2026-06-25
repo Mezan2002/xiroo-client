@@ -24,7 +24,7 @@ export default function LogisticsSection({ order, setOrder }) {
 
   const deliveryMethods = [
     { id: "normal", label: "Normal Delivery", fee: 60 },
-    { id: "fast", label: "Fast Delivery", fee: 120 }
+    { id: "fast", label: "Fast Delivery", fee: 130 }
   ];
 
   const handleShippingChange = (field, value) => {

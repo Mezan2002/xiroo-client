@@ -23,7 +23,7 @@ export default function CheckoutPage() {
       ? 0 
       : deliveryMethod === "normal"
         ? (district === "Dhaka" ? 80 : 150)
-        : (district === "Dhaka" ? 120 : 200);
+        : (district === "Dhaka" ? 130 : 200);
   const total = subtotal + (shipping || 0);
   
   useEffect(() => {

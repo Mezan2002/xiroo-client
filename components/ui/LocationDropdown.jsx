@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { ChevronDown, Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function LocationDropdown({
   value,
@@ -82,14 +83,14 @@ export default function LocationDropdown({
       >
         <span className="truncate">{value || placeholder}</span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`}
         />
       </div>
       {isOpen &&
         createPortal(
           <div
             ref={portalRef}
-            className="fixed z-[9999] bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex flex-col animate-in fade-in zoom-in-95 duration-150"
+            className="fixed z-9999 bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex flex-col animate-in fade-in zoom-in-95 duration-150"
             style={{
               left: coords.left,
               width: coords.width,
@@ -106,7 +107,9 @@ export default function LocationDropdown({
               <input
                 autoFocus
                 className="flex-1 outline-none text-sm font-medium uppercase tracking-tighter"
-                placeholder={allowCustom ? "search or type custom..." : "search..."}
+                placeholder={
+                  allowCustom ? "search or type custom..." : "search..."
+                }
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => {
@@ -134,7 +137,9 @@ export default function LocationDropdown({
                   className="px-5 py-3 text-sm font-medium cursor-pointer transition-colors hover:bg-gray-50 text-black border-t border-gray-100 flex items-center gap-2"
                 >
                   <span className="text-gray-400">Use</span>
-                  <span className="font-semibold">&quot;{search.trim()}&quot;</span>
+                  <span className="font-semibold">
+                    &quot;{search.trim()}&quot;
+                  </span>
                   <span className="text-gray-400">as custom value</span>
                 </div>
               )}
