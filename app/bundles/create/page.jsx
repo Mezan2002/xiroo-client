@@ -7,6 +7,125 @@ import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+// Individual product card with attribute/variant selection for bundle creation
+const BundleProductCard = ({ product, bundleItems, onAdd, onRemove }) => {
+  const attributeGroups = product.variants || [];
+  const [selectedVariant, setSelectedVariant] = useState(
+    attributeGroups?.[0]?.values?.[0]?.value || "Standard"
+  );
+
+  const quantityInBundle =
+    bundleItems.find(
+      (i) => i.product._id === product._id && i.variant === selectedVariant
+    )?.quantity || 0;
+
+  return (
+    <div className="relative flex flex-col group/card">
+      {/* Product card image/info */}
+      <div className="pointer-events-none">
+        <ProductCard
+          id={product._id}
+          title={product.title}
+          price={product.price}
+          salePrice={product.salePrice}
+          image={product.images?.[0]}
+          images={product.images}
+          hoverImage={product.images?.[1]}
+          variants={product.variants}
+        />
+      </div>
+
+      {/* Quantity badge */}
+      {quantityInBundle > 0 && (
+        <div className="absolute top-3 right-3 z-30 w-7 h-7 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold shadow-md">
+          {quantityInBundle}
+        </div>
+      )}
+
+      {/* Attribute selectors (size, etc.) — shown on hover on desktop, always on mobile */}
+      {attributeGroups.length > 0 && (
+        <div className="absolute inset-0 flex flex-col justify-end pb-[86px] px-3 z-20 opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all duration-300 pointer-events-none lg:pointer-events-auto">
+          {attributeGroups.map((group) => (
+            <div key={group.name} className="mb-1">
+              <div className="flex flex-wrap gap-1">
+                {group.values.map((val) => (
+                  <button
+                    key={val.value}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedVariant(val.value);
+                    }}
+                    className={`px-2 py-0.5 text-[9px] font-bold border transition-all pointer-events-auto ${
+                      selectedVariant === val.value
+                        ? "bg-black text-white border-black"
+                        : "bg-white border-zinc-300 text-zinc-600 hover:border-black"
+                    }`}
+                  >
+                    {val.value}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add button — qty = 0 */}
+      {quantityInBundle === 0 && (
+        <div
+          className={`absolute inset-0 flex items-end px-3 z-20 opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all duration-300 ${
+            attributeGroups.length > 0 ? "pb-[116px]" : "pb-[86px]"
+          }`}
+        >
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              onAdd(product, selectedVariant);
+            }}
+            className="w-full h-10 bg-black text-white text-xs font-semibold hover:bg-zinc-800 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
+          >
+            <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+            Add to Bundle
+          </button>
+        </div>
+      )}
+
+      {/* Stepper — qty > 0 */}
+      {quantityInBundle > 0 && (
+        <div
+          className={`absolute inset-0 flex items-end px-3 z-20 ${
+            attributeGroups.length > 0 ? "pb-[116px]" : "pb-[86px]"
+          }`}
+        >
+          <div className="w-full h-10 bg-black flex items-center justify-between shadow-lg">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onRemove(product, selectedVariant);
+              }}
+              className="w-10 h-full flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+            >
+              <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
+            </button>
+            <span className="text-white text-xs font-semibold">
+              {quantityInBundle} added
+            </span>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onAdd(product, selectedVariant);
+              }}
+              className="w-10 h-full flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function BundleCreator() {
   const router = useRouter();
   const { useCategoryTree } = useCategories();
@@ -16,31 +135,27 @@ export default function BundleCreator() {
   const { data: productsData, isLoading: isProductsLoading } = useAllProducts({
     limit: 1000,
   });
-  const allProducts = productsData?.data || [];
+  const allProducts = (() => {
+    const d = productsData?.data;
+    if (!d) return [];
+    if (Array.isArray(d)) return d;
+    if (Array.isArray(d.data)) return d.data;
+    return [];
+  })();
 
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [bundleItems, setBundleItems] = useState([]);
   const { addItem } = useCart();
-
-  const handleSubCategorySelect = (subCategory) => {
-    setSelectedSubCategory(subCategory);
-    setBundleItems([]);
-  };
-
-  const handleBackToCategories = () => {
-    setSelectedSubCategory(null);
-  };
 
   const handleAddProductToBundle = (product, variantName) => {
     setBundleItems((prev) => {
       const existing = prev.find(
-        (i) => i.product._id === product._id && i.variant === variantName,
+        (i) => i.product._id === product._id && i.variant === variantName
       );
       if (existing) {
         return prev.map((i) =>
           i.product._id === product._id && i.variant === variantName
             ? { ...i, quantity: i.quantity + 1 }
-            : i,
+            : i
         );
       }
       return [
@@ -53,24 +168,24 @@ export default function BundleCreator() {
   const handleRemoveProductFromBundle = (product, variantName) => {
     setBundleItems((prev) => {
       const existing = prev.find(
-        (i) => i.product._id === product._id && i.variant === variantName,
+        (i) => i.product._id === product._id && i.variant === variantName
       );
       if (existing && existing.quantity > 1) {
         return prev.map((i) =>
           i.product._id === product._id && i.variant === variantName
             ? { ...i, quantity: i.quantity - 1 }
-            : i,
+            : i
         );
       }
       return prev.filter(
-        (i) => !(i.product._id === product._id && i.variant === variantName),
+        (i) => !(i.product._id === product._id && i.variant === variantName)
       );
     });
   };
 
   const totalBundleQuantity = bundleItems.reduce(
     (sum, item) => sum + item.quantity,
-    0,
+    0
   );
 
   const handleAddBundleToCart = () => {
@@ -125,10 +240,9 @@ export default function BundleCreator() {
       {/* ── Page Header ── */}
       <div className="w-full pt-28 pb-0 px-6 lg:px-16 max-w-[1400px] mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 pb-10">
-          {/* Title */}
           <div>
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-              Mix & Match
+              Mix &amp; Match
             </p>
             <h1 className="text-5xl md:text-6xl font-extralight text-gray-900 tracking-tight leading-none">
               Build Your Bundle
@@ -158,7 +272,6 @@ export default function BundleCreator() {
 
       {/* ── Product Grid ── */}
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-12 pb-[240px] lg:pb-52">
-        {/* Row info */}
         <div className="flex items-center justify-between mb-8">
           <p className="text-sm text-gray-500">
             {selectedCategory === "All" ? "All Products" : selectedCategory}
@@ -180,92 +293,15 @@ export default function BundleCreator() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-16">
-            {availableProducts.map((product) => {
-              const defaultVariant =
-                product.variants?.[0]?.values?.[0]?.value || "Standard";
-              const quantityInBundle =
-                bundleItems.find(
-                  (i) =>
-                    i.product._id === product._id &&
-                    i.variant === defaultVariant,
-                )?.quantity || 0;
-
-              return (
-                <div
-                  key={product._id}
-                  className="relative flex flex-col group/card"
-                >
-                  {/* Product card */}
-                  <div className="pointer-events-none">
-                    <ProductCard
-                      id={product._id}
-                      title={product.title}
-                      price={product.price}
-                      salePrice={product.salePrice}
-                      image={product.images?.[0]}
-                      images={product.images}
-                      hoverImage={product.images?.[1]}
-                      variants={product.variants}
-                    />
-                  </div>
-
-                  {/* Quantity badge */}
-                  {quantityInBundle > 0 && (
-                    <div className="absolute top-3 right-3 z-30 w-7 h-7 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold shadow-md">
-                      {quantityInBundle}
-                    </div>
-                  )}
-
-                  {/* Add button — always visible on mobile, hover on desktop, qty = 0 */}
-                  {quantityInBundle === 0 && (
-                    <div className="absolute inset-0 flex items-end pb-[86px] px-3 z-20 opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all duration-300">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleAddProductToBundle(product, defaultVariant);
-                        }}
-                        className="w-full h-10 bg-black text-white text-xs font-semibold hover:bg-zinc-800 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
-                      >
-                        <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
-                        Add to Bundle
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Stepper — always visible when qty > 0 */}
-                  {quantityInBundle > 0 && (
-                    <div className="absolute inset-0 flex items-end pb-[86px] px-3 z-20">
-                      <div className="w-full h-10 bg-black flex items-center justify-between shadow-lg">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleRemoveProductFromBundle(
-                              product,
-                              defaultVariant,
-                            );
-                          }}
-                          className="w-10 h-full flex items-center justify-center text-white hover:bg-white/10 transition-colors"
-                        >
-                          <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
-                        </button>
-                        <span className="text-white text-xs font-semibold">
-                          {quantityInBundle} added
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAddProductToBundle(product, defaultVariant);
-                          }}
-                          className="w-10 h-full flex items-center justify-center text-white hover:bg-white/10 transition-colors"
-                        >
-                          <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {availableProducts.map((product) => (
+              <BundleProductCard
+                key={product._id}
+                product={product}
+                bundleItems={bundleItems}
+                onAdd={handleAddProductToBundle}
+                onRemove={handleRemoveProductFromBundle}
+              />
+            ))}
           </div>
         )}
       </div>
@@ -286,7 +322,6 @@ export default function BundleCreator() {
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-16 py-4 lg:py-5 flex items-center justify-between gap-4 lg:gap-6">
             {/* Left */}
             <div className="flex items-center gap-4 lg:gap-8">
-              {/* Count */}
               <div className="flex flex-col">
                 <span className="text-[10px] sm:text-xs text-gray-500 mb-0.5">
                   Your Bundle
@@ -299,10 +334,8 @@ export default function BundleCreator() {
                 </span>
               </div>
 
-              {/* Divider */}
               <div className="hidden sm:block w-px h-10 bg-gray-200" />
 
-              {/* Reward status */}
               <div className="hidden sm:flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
                   <div
@@ -337,7 +370,6 @@ export default function BundleCreator() {
 
             {/* Right */}
             <div className="flex items-center gap-4 lg:gap-6">
-              {/* Hint */}
               {totalBundleQuantity < 3 && (
                 <p className="hidden md:block text-sm text-gray-500">
                   {totalBundleQuantity === 0 && "Add 2 items to unlock 10% off"}
@@ -351,7 +383,6 @@ export default function BundleCreator() {
                 </p>
               )}
 
-              {/* CTA */}
               <button
                 disabled={totalBundleQuantity === 0}
                 onClick={handleAddBundleToCart}

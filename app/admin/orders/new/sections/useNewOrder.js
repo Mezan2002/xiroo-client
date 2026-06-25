@@ -4,29 +4,37 @@ import { useState } from "react";
 export const useNewOrder = () => {
   const [order, setOrder] = useState({
     customer: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     items: [],
-    shipping: { address: "", area: "", city: "Dhaka", postcode: "" },
+    shipping: { address: "", district: "", thana: "", postcode: "" },
     paymentMethod: "cod",
     deliveryMethod: "normal",
-    shippingFee: 60
+    shippingFee: 0
   });
 
-  const addItem = (product) => {
+  const addItem = (product, bundleId = null, variant = "Standard", quantity = 1) => {
     // If product is provided, use its data, otherwise add a blank item
     const newItem = product ? {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       product: product._id,
       name: product.title,
       price: product.salePrice || product.price,
-      quantity: 1
+      quantity: quantity,
+      variant: variant,
+      bundleId: bundleId,
+      image: product.images?.[0] || ""
     } : {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       product: null,
       name: "",
       price: 0,
-      quantity: 1
+      quantity: 1,
+      variant: "Standard",
+      bundleId: null,
+      image: ""
     };
 
     setOrder(prev => ({
@@ -49,8 +57,52 @@ export const useNewOrder = () => {
     }));
   };
 
-  const calculateSubtotal = () => order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const calculateTotal = () => calculateSubtotal() + (Number(order.shippingFee) || 0);
+  const calculateMetrics = () => {
+    let rawSubtotal = 0;
+    const bundleGroups = {};
 
-  return { order, setOrder, addItem, removeItem, updateItem, calculateSubtotal, calculateTotal };
+    order.items.forEach((item) => {
+      const itemSubtotal = item.price * item.quantity;
+      rawSubtotal += itemSubtotal;
+
+      if (item.bundleId) {
+        if (!bundleGroups[item.bundleId]) {
+          bundleGroups[item.bundleId] = { quantity: 0, subtotal: 0 };
+        }
+        bundleGroups[item.bundleId].quantity += item.quantity;
+        bundleGroups[item.bundleId].subtotal += itemSubtotal;
+      }
+    });
+
+    let autoBundleDiscountAmount = 0;
+    let isBundleFreeShipping = false;
+
+    Object.values(bundleGroups).forEach((group) => {
+      if (group.quantity >= 2) {
+        autoBundleDiscountAmount += group.subtotal * 0.10;
+      }
+      if (group.quantity >= 3) {
+        isBundleFreeShipping = true;
+      }
+    });
+
+    const subtotal = rawSubtotal - autoBundleDiscountAmount;
+    const shipping = isBundleFreeShipping ? 0 : (Number(order.shippingFee) || 0);
+    const total = subtotal + shipping;
+
+    return { rawSubtotal, subtotal, autoBundleDiscountAmount, isBundleFreeShipping, shipping, total };
+  };
+
+  const metrics = calculateMetrics();
+
+  return { 
+    order, 
+    setOrder, 
+    addItem, 
+    removeItem, 
+    updateItem, 
+    calculateSubtotal: () => metrics.subtotal, 
+    calculateTotal: () => metrics.total,
+    metrics
+  };
 };

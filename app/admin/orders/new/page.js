@@ -8,14 +8,13 @@ import { useOrders } from "@/hooks/api/useOrders";
 import { useToast } from "@/hooks/useToast";
 import CustomerSection from "./sections/CustomerSection";
 import ItemsSection from "./sections/ItemsSection";
-import LogisticsSection from "./sections/LogisticsSection";
 import { useNewOrder } from "./sections/useNewOrder";
 
 export default function NewOrderPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { placeOrder } = useOrders();
-  const { order, setOrder, addItem, removeItem, updateItem, calculateSubtotal, calculateTotal } = useNewOrder();
+  const { order, setOrder, addItem, removeItem, updateItem, calculateTotal, metrics } = useNewOrder();
 
   const handleCreateOrder = async () => {
     // Validation
@@ -30,21 +29,23 @@ export default function NewOrderPage() {
 
     const payload = {
       guestInfo: {
-        firstName: order.customer.split(" ")[0],
-        lastName: order.customer.split(" ").slice(1).join(" "),
-        email: order.email,
+        firstName: order.firstName || order.customer.split(" ")[0],
+        lastName: order.lastName || order.customer.split(" ").slice(1).join(" "),
+        email: order.email || undefined,
         phone: order.phone
       },
       items: order.items.map(item => ({
         product: item.product,
+        variant: item.variant || "Standard",
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        bundleId: item.bundleId || undefined
       })),
       totalPrice: calculateTotal(),
-      shippingAddress: `${order.shipping.address}, ${order.shipping.area}, ${order.shipping.city}`,
+      shippingAddress: `${order.shipping.address}, ${order.shipping.thana}, ${order.shipping.district}${order.shipping.postcode ? ` - ${order.shipping.postcode}` : ""}`,
       paymentMethod: order.paymentMethod,
       deliveryMethod: order.deliveryMethod,
-      shippingFee: order.shippingFee,
+      shippingFee: metrics.shipping,
       status: "pending",
       paymentStatus: "pending"
     };
@@ -85,13 +86,12 @@ export default function NewOrderPage() {
         <ItemsSection 
           items={order.items} addItem={addItem} 
           removeItem={removeItem} updateItem={updateItem}
-          subtotal={calculateSubtotal()}
-          shippingFee={order.shippingFee}
-          total={calculateTotal()}
+          subtotal={metrics.subtotal}
+          shippingFee={metrics.shipping}
+          total={metrics.total}
           setOrder={setOrder}
+          metrics={metrics}
         />
-
-        <LogisticsSection order={order} setOrder={setOrder} />
 
         <section className="pt-32 border-t border-zinc-50 flex justify-end items-center gap-4">
           <Button 

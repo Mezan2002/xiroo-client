@@ -44,6 +44,7 @@ export default function CheckoutForm({
           <DeliverySection
             deliveryMethod={deliveryMethod}
             setDeliveryMethod={setDeliveryMethod}
+            district={formData.district}
           />
         )}
 

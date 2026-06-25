@@ -20,11 +20,32 @@ const Card = ({ children, title, action, className = "" }) => (
 );
 
 export default function OrderItemsRegistry({ order, handleCancelOrder }) {
-  const subtotal = order.items.reduce(
+  const rawSubtotal = order.items.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
-  const delivery = order.totalPrice - subtotal;
+
+  const bundleGroups = {};
+  order.items.forEach((item) => {
+    const itemSubtotal = item.price * item.quantity;
+    if (item.bundleId) {
+      if (!bundleGroups[item.bundleId]) {
+        bundleGroups[item.bundleId] = { quantity: 0, subtotal: 0 };
+      }
+      bundleGroups[item.bundleId].quantity += item.quantity;
+      bundleGroups[item.bundleId].subtotal += itemSubtotal;
+    }
+  });
+
+  let autoBundleDiscountAmount = 0;
+  Object.values(bundleGroups).forEach((group) => {
+    if (group.quantity >= 2) {
+      autoBundleDiscountAmount += group.subtotal * 0.10;
+    }
+  });
+
+  const subtotal = rawSubtotal - autoBundleDiscountAmount;
+  const delivery = order.shippingFee !== undefined ? order.shippingFee : (order.totalPrice - subtotal);
 
   return (
     <div className="space-y-8 md:space-y-10">
@@ -119,9 +140,19 @@ export default function OrderItemsRegistry({ order, handleCancelOrder }) {
                 Registry Subtotal
               </span>
               <span className="text-zinc-900 font-bold font-mono">
-                ৳{subtotal.toLocaleString()}
+                ৳{rawSubtotal.toLocaleString()}
               </span>
             </div>
+            {autoBundleDiscountAmount > 0 && (
+              <div className="flex justify-between items-center text-[13px] text-green-600">
+                <span className="font-medium">
+                  Bundle Discount (10%)
+                </span>
+                <span className="font-bold font-mono">
+                  -৳{autoBundleDiscountAmount.toLocaleString()}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between items-center text-[13px]">
               <span className="text-zinc-500 font-medium">
                 Logistics Allocation

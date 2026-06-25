@@ -92,7 +92,7 @@ export default function OrderDetailsPage() {
         </div>
 
         <div className="col-span-1 md:col-span-12 lg:col-span-4 space-y-8 md:space-y-10">
-          <CustomerIdentityCard user={order.user} guestInfo={order.guestInfo} />
+          <CustomerIdentityCard user={order.user} guestInfo={order.guestInfo} createdByAdmin={order.createdByAdmin} />
           <ShippingDestinationCard shippingAddress={order.shippingAddress} />
           <CourierLogisticsCard
             deliveryInfo={order.deliveryInfo}

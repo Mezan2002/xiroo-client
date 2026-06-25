@@ -17,8 +17,11 @@ export default function CheckoutPage() {
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
 
-  const baseShipping = district === "Dhaka" ? 80 : district ? 150 : 0;
-  const shipping = isBundleFreeShipping ? 0 : baseShipping + (deliveryMethod === "fast" ? 50 : 0);
+  const shipping = isBundleFreeShipping 
+    ? 0 
+    : deliveryMethod === "normal"
+      ? 0
+      : (district === "Dhaka" ? 50 : 70);
   const total = subtotal + shipping;
   
   useEffect(() => {
