@@ -117,6 +117,26 @@ const ProductSearchDropdown = ({ onSelect, onClose }) => {
   );
 };
 
+const getVariantCombinations = (attributeGroups, selectedVariants) => {
+  const selectedArrays = attributeGroups
+    .map((group) => {
+      const vals = selectedVariants[group.name];
+      if (!vals || vals.length === 0) return [null];
+      return vals;
+    })
+    .filter((arr) => arr.length > 0);
+
+  if (selectedArrays.length === 0) return [];
+
+  return selectedArrays.reduce(
+    (acc, curr) =>
+      acc.flatMap((combo) =>
+        curr.map((val) => (combo ? `${combo} / ${val}` : val))
+      ),
+    [""]
+  );
+};
+
 const ProductBundleCard = ({
   product,
   attributeGroups,
@@ -124,20 +144,46 @@ const ProductBundleCard = ({
   onAdd,
   onRemove,
 }) => {
-  const [selectedVariant, setSelectedVariant] = useState(
-    attributeGroups?.[0]?.values?.[0]?.value || "Standard",
-  );
+  const [selectedVariants, setSelectedVariants] = useState({});
 
-  const quantityInBundle =
+  const toggleVariant = (groupName, value) => {
+    setSelectedVariants((prev) => {
+      const current = prev[groupName] || [];
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      return { ...prev, [groupName]: next };
+    });
+  };
+
+  const combinations = getVariantCombinations(attributeGroups, selectedVariants);
+  const hasVariants = attributeGroups.length > 0;
+  const hasSelections = combinations.length > 0;
+
+  const totalQuantityInBundle = bundleItems
+    .filter((i) => i.product._id === product._id)
+    .reduce((sum, i) => sum + i.quantity, 0);
+
+  const getComboQuantity = (variantStr) =>
     bundleItems.find(
-      (i) => i.product._id === product._id && i.variant === selectedVariant,
+      (i) => i.product._id === product._id && i.variant === variantStr
     )?.quantity || 0;
+
+  const handleAddAll = () => {
+    if (!hasSelections) return;
+    combinations.forEach((combo) => onAdd(product, combo));
+  };
 
   return (
     <div className="bg-white p-4 border border-zinc-100 flex flex-col gap-3">
       <div className="aspect-square bg-zinc-50 relative">
         {product.images?.[0] && (
           <Image src={product.images[0]} alt="" fill className="object-cover" />
+        )}
+        {totalQuantityInBundle > 0 && (
+          <div className="absolute top-2 right-2 z-10 w-5 h-5 bg-black text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+            {totalQuantityInBundle}
+          </div>
         )}
       </div>
       <div>
@@ -152,38 +198,103 @@ const ProductBundleCard = ({
         <div key={group.name}>
           <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
             {group.name}
+            {(selectedVariants[group.name] || []).length === 0 && (
+              <span className="text-red-400 ml-1">Required</span>
+            )}
           </p>
           <div className="flex flex-wrap gap-1">
-            {group.values.map((val) => (
-              <button
-                key={val.value}
-                onClick={() => setSelectedVariant(val.value)}
-                className={`px-2 py-1 text-[10px] font-bold border transition-all ${selectedVariant === val.value ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-500 hover:border-black"}`}
-              >
-                {val.value}
-              </button>
-            ))}
+            {group.values.map((val) => {
+              const isSelected = (
+                selectedVariants[group.name] || []
+              ).includes(val.value);
+              return (
+                <button
+                  key={val.value}
+                  onClick={() => toggleVariant(group.name, val.value)}
+                  className={`px-2 py-1 text-[10px] font-bold border transition-all ${
+                    isSelected
+                      ? "bg-black text-white border-black"
+                      : "border-zinc-200 text-zinc-500 hover:border-black"
+                  }`}
+                >
+                  {val.value}
+                </button>
+              );
+            })}
           </div>
         </div>
       ))}
-      {quantityInBundle === 0 ? (
+      {hasSelections && (
+        <div className="flex flex-col gap-1">
+          {combinations.map((combo) => {
+            const qty = getComboQuantity(combo);
+            return (
+              <div
+                key={combo}
+                className="flex items-center justify-between bg-zinc-50 border border-zinc-100 px-2 py-1.5"
+              >
+                <span className="text-[10px] font-bold text-black">
+                  {combo}
+                </span>
+                {qty === 0 ? (
+                  <button
+                    onClick={() => onAdd(product, combo)}
+                    className="text-[9px] font-bold text-zinc-400 hover:text-black uppercase tracking-widest"
+                  >
+                    Add
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => onRemove(product, combo)}
+                      className="w-5 h-5 flex items-center justify-center bg-white border border-zinc-200 hover:border-black transition-colors text-[10px]"
+                    >
+                      -
+                    </button>
+                    <span className="text-[11px] font-bold text-black w-4 text-center">
+                      {qty}
+                    </span>
+                    <button
+                      onClick={() => onAdd(product, combo)}
+                      className="w-5 h-5 flex items-center justify-center bg-white border border-zinc-200 hover:border-black transition-colors text-[10px]"
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {totalQuantityInBundle === 0 ? (
         <button
-          onClick={() => onAdd(product, selectedVariant)}
-          className="w-full h-8 bg-black text-white text-[11px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors"
+          onClick={handleAddAll}
+          disabled={!hasSelections}
+          className={`w-full h-8 text-[11px] font-bold uppercase tracking-widest transition-colors ${
+            hasSelections
+              ? "bg-black text-white hover:bg-zinc-800"
+              : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+          }`}
         >
-          Add
+          {hasVariants && !hasSelections ? "Select Variants" : "Add"}
         </button>
       ) : (
         <div className="flex items-center justify-between h-8 bg-zinc-100 px-2">
           <button
-            onClick={() => onRemove(product, selectedVariant)}
+            onClick={() => {
+              const lastCombo = combinations.find(
+                (c) => getComboQuantity(c) > 0
+              );
+              if (lastCombo) onRemove(product, lastCombo);
+            }}
             className="w-6 h-6 flex items-center justify-center bg-white hover:bg-zinc-200 transition-colors"
           >
             -
           </button>
-          <span className="text-[12px] font-bold">{quantityInBundle}</span>
+          <span className="text-[12px] font-bold">{totalQuantityInBundle}</span>
           <button
-            onClick={() => onAdd(product, selectedVariant)}
+            onClick={handleAddAll}
             className="w-6 h-6 flex items-center justify-center bg-white hover:bg-zinc-200 transition-colors"
           >
             +

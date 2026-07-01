@@ -1,127 +1,222 @@
 "use client";
-import ProductCard from "@/components/ui/ProductCard";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useProducts } from "@/hooks/api/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-// Individual product card with attribute/variant selection for bundle creation
+// Generate cartesian product of selected variant values
+const getVariantCombinations = (attributeGroups, selectedVariants) => {
+  const selectedArrays = attributeGroups
+    .map((group) => {
+      const vals = selectedVariants[group.name];
+      if (!vals || vals.length === 0) return [null];
+      return vals;
+    })
+    .filter((arr) => arr.length > 0);
+
+  if (selectedArrays.length === 0) return [];
+
+  return selectedArrays.reduce(
+    (acc, curr) =>
+      acc.flatMap((combo) =>
+        curr.map((val) => (combo ? `${combo} / ${val}` : val))
+      ),
+    [""]
+  );
+};
+
+// Individual product card with multi-variant selection for bundle creation
 const BundleProductCard = ({ product, bundleItems, onAdd, onRemove }) => {
   const attributeGroups = product.variants || [];
-  const [selectedVariant, setSelectedVariant] = useState(
-    attributeGroups?.[0]?.values?.[0]?.value || "Standard"
-  );
+  const [selectedVariants, setSelectedVariants] = useState({});
 
-  const quantityInBundle =
+  const toggleVariant = (groupName, value) => {
+    setSelectedVariants((prev) => {
+      const current = prev[groupName] || [];
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      return { ...prev, [groupName]: next };
+    });
+  };
+
+  const combinations = getVariantCombinations(attributeGroups, selectedVariants);
+  const hasVariants = attributeGroups.length > 0;
+  const hasSelections = combinations.length > 0;
+
+  const totalQuantityInBundle = bundleItems
+    .filter((i) => i.product._id === product._id)
+    .reduce((sum, i) => sum + i.quantity, 0);
+
+  const getComboQuantity = (variantStr) =>
     bundleItems.find(
-      (i) => i.product._id === product._id && i.variant === selectedVariant
+      (i) => i.product._id === product._id && i.variant === variantStr
     )?.quantity || 0;
 
+  const handleAddAll = (e) => {
+    e.preventDefault();
+    if (!hasSelections) return;
+    combinations.forEach((combo) => onAdd(product, combo));
+  };
+
   return (
-    <div className="relative flex flex-col group/card">
-      {/* Product card image/info */}
-      <div className="pointer-events-none">
-        <ProductCard
-          id={product._id}
-          title={product.title}
-          price={product.price}
-          salePrice={product.salePrice}
-          image={product.images?.[0]}
-          images={product.images}
-          hoverImage={product.images?.[1]}
-          variants={product.variants}
-        />
+    <div className="bg-white border border-zinc-100 flex flex-col">
+      {/* Product Image */}
+      <div className="aspect-square bg-zinc-50 relative">
+        {product.images?.[0] && (
+          <Image
+            src={product.images[0]}
+            alt={product.title}
+            fill
+            className="object-cover"
+          />
+        )}
+        {totalQuantityInBundle > 0 && (
+          <div className="absolute top-3 right-3 z-10 w-7 h-7 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold shadow-md">
+            {totalQuantityInBundle}
+          </div>
+        )}
       </div>
 
-      {/* Quantity badge */}
-      {quantityInBundle > 0 && (
-        <div className="absolute top-3 right-3 z-30 w-7 h-7 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold shadow-md">
-          {quantityInBundle}
-        </div>
-      )}
+      {/* Product Info */}
+      <div className="p-4 pb-3">
+        <p className="text-[13px] font-bold text-black line-clamp-1">
+          {product.title}
+        </p>
+        <p className="text-[11px] text-zinc-400 font-medium">
+          ৳{product.salePrice || product.price}
+        </p>
+      </div>
 
-      {/* Attribute selectors (size, etc.) — shown on hover on desktop, always on mobile */}
-      {attributeGroups.length > 0 && (
-        <div className="absolute inset-0 flex flex-col justify-end pb-[86px] px-3 z-20 opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all duration-300 pointer-events-none lg:pointer-events-auto">
+      {/* Variant Groups */}
+      {hasVariants && (
+        <div className="px-4 pb-3 flex flex-col gap-2.5">
           {attributeGroups.map((group) => (
-            <div key={group.name} className="mb-1">
+            <div key={group.name}>
+              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
+                Select {group.name}
+                {(selectedVariants[group.name] || []).length === 0 && (
+                  <span className="text-red-400 ml-1">Required</span>
+                )}
+              </p>
               <div className="flex flex-wrap gap-1">
-                {group.values.map((val) => (
-                  <button
-                    key={val.value}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedVariant(val.value);
-                    }}
-                    className={`px-2 py-0.5 text-[9px] font-bold border transition-all pointer-events-auto ${
-                      selectedVariant === val.value
-                        ? "bg-black text-white border-black"
-                        : "bg-white border-zinc-300 text-zinc-600 hover:border-black"
-                    }`}
-                  >
-                    {val.value}
-                  </button>
-                ))}
+                {group.values.map((val) => {
+                  const isSelected = (
+                    selectedVariants[group.name] || []
+                  ).includes(val.value);
+                  return (
+                    <button
+                      key={val.value}
+                      onClick={() => toggleVariant(group.name, val.value)}
+                      className={`px-2 py-1 text-[10px] font-bold border transition-all ${
+                        isSelected
+                          ? "bg-black text-white border-black"
+                          : "border-zinc-200 text-zinc-500 hover:border-black"
+                      }`}
+                    >
+                      {val.value}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Add button — qty = 0 */}
-      {quantityInBundle === 0 && (
-        <div
-          className={`absolute inset-0 flex items-end px-3 z-20 opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all duration-300 ${
-            attributeGroups.length > 0 ? "pb-[116px]" : "pb-[86px]"
-          }`}
-        >
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              onAdd(product, selectedVariant);
-            }}
-            className="w-full h-10 bg-black text-white text-xs font-semibold hover:bg-zinc-800 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
-          >
-            <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
-            Add to Bundle
-          </button>
-        </div>
-      )}
-
-      {/* Stepper — qty > 0 */}
-      {quantityInBundle > 0 && (
-        <div
-          className={`absolute inset-0 flex items-end px-3 z-20 ${
-            attributeGroups.length > 0 ? "pb-[116px]" : "pb-[86px]"
-          }`}
-        >
-          <div className="w-full h-10 bg-black flex items-center justify-between shadow-lg">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                onRemove(product, selectedVariant);
-              }}
-              className="w-10 h-full flex items-center justify-center text-white hover:bg-white/10 transition-colors"
-            >
-              <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
-            </button>
-            <span className="text-white text-xs font-semibold">
-              {quantityInBundle} added
-            </span>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                onAdd(product, selectedVariant);
-              }}
-              className="w-10 h-full flex items-center justify-center text-white hover:bg-white/10 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
-            </button>
+      {/* Selected Combinations */}
+      {hasSelections && (
+        <div className="px-4 pb-3">
+          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">
+            Selected Variants
+          </p>
+          <div className="flex flex-col gap-1.5">
+            {combinations.map((combo) => {
+              const qty = getComboQuantity(combo);
+              return (
+                <div
+                  key={combo}
+                  className="flex items-center justify-between bg-zinc-50 border border-zinc-100 px-2 py-1.5"
+                >
+                  <span className="text-[10px] font-bold text-black">
+                    {combo}
+                  </span>
+                  {qty === 0 ? (
+                    <button
+                      onClick={() => onAdd(product, combo)}
+                      className="text-[9px] font-bold text-zinc-400 hover:text-black uppercase tracking-widest"
+                    >
+                      Add
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => onRemove(product, combo)}
+                        className="w-5 h-5 flex items-center justify-center bg-white border border-zinc-200 hover:border-black transition-colors"
+                      >
+                        <Minus className="w-2.5 h-2.5" />
+                      </button>
+                      <span className="text-[11px] font-bold text-black w-4 text-center">
+                        {qty}
+                      </span>
+                      <button
+                        onClick={() => onAdd(product, combo)}
+                        className="w-5 h-5 flex items-center justify-center bg-white border border-zinc-200 hover:border-black transition-colors"
+                      >
+                        <Plus className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
+
+      {/* Add All Button */}
+      <div className="px-4 pb-4 mt-auto">
+        {totalQuantityInBundle === 0 ? (
+          <button
+            onClick={handleAddAll}
+            disabled={!hasSelections}
+            className={`w-full h-8 text-[11px] font-bold uppercase tracking-widest transition-colors ${
+              hasSelections
+                ? "bg-black text-white hover:bg-zinc-800"
+                : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+            }`}
+          >
+            {hasVariants && !hasSelections ? "Select Variants" : "Add to Bundle"}
+          </button>
+        ) : (
+          <div className="flex items-center justify-between h-8 bg-zinc-100 px-2">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                const lastCombo = combinations.find(
+                  (c) => getComboQuantity(c) > 0
+                );
+                if (lastCombo) onRemove(product, lastCombo);
+              }}
+              className="w-6 h-6 flex items-center justify-center bg-white hover:bg-zinc-200 transition-colors"
+            >
+              <Minus className="w-3 h-3" />
+            </button>
+            <span className="text-[12px] font-bold">
+              {totalQuantityInBundle} added
+            </span>
+            <button
+              onClick={handleAddAll}
+              className="w-6 h-6 flex items-center justify-center bg-white hover:bg-zinc-200 transition-colors"
+            >
+              <Plus className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
