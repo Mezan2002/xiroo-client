@@ -1,54 +1,84 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 
-/**
- * NavLinks — Client-only component.
- * Dynamically imported with ssr:false so it is NEVER included in server HTML.
- * This eliminates hydration mismatches caused by localStorage-populated menus
- * not existing on the server but existing on the client.
- */
+function NavLinkItem({ item, index, activeMenu, setActiveMenu }) {
+  const isActive = activeMenu === item.id;
+
+  return (
+    <div
+      className="flex items-center h-full cursor-pointer"
+      onMouseEnter={() => setActiveMenu(item.id)}
+    >
+      <motion.div
+        className="w-max"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
+      >
+        <Link
+          href={`/${item.id}`}
+          className={`text-[11px] font-semibold uppercase tracking-widest w-max transition-opacity py-1 ${
+            isActive ? "opacity-70" : "hover:opacity-70"
+          }`}
+        >
+          {item.label}
+        </Link>
+      </motion.div>
+    </div>
+  );
+}
+
+function StaticNavLink({ href, label, index, setActiveMenu }) {
+  return (
+    <div
+      className="flex items-center h-full cursor-pointer"
+      onMouseEnter={() => setActiveMenu(null)}
+    >
+      <motion.div
+        className="w-max"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
+      >
+        <Link
+          href={href}
+          className="text-[11px] font-semibold uppercase tracking-widest w-max transition-opacity py-1 hover:opacity-70"
+        >
+          {label}
+        </Link>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function NavLinks({ navItems, activeMenu, setActiveMenu }) {
+  const totalItems = navItems.length + 2;
+
   return (
     <>
-      {navItems.map((item) => (
-        <div
+      {navItems.map((item, index) => (
+        <NavLinkItem
           key={item.id}
-          className="flex items-center h-full cursor-pointer"
-          onMouseEnter={() => setActiveMenu(item.id)}
-        >
-          <Link
-            href={`/${item.id}`}
-            className={`text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max ${
-              activeMenu === item.id ? "opacity-70" : "hover:opacity-70"
-            }`}
-          >
-            {item.label}
-          </Link>
-        </div>
+          item={item}
+          index={index}
+          activeMenu={activeMenu}
+          setActiveMenu={setActiveMenu}
+        />
       ))}
-      <div 
-        className="flex items-center h-full cursor-pointer"
-        onMouseEnter={() => setActiveMenu(null)}
-      >
-        <Link
-          href="/bundles/create"
-          className="text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max hover:opacity-70"
-        >
-          CREATE BUNDLE
-        </Link>
-      </div>
-      <div 
-        className="flex items-center h-full cursor-pointer"
-        onMouseEnter={() => setActiveMenu(null)}
-      >
-        <Link
-          href="/track-order"
-          className="text-[11px] font-semibold transition-opacity uppercase tracking-widest w-max hover:opacity-70"
-        >
-          TRACK ORDER
-        </Link>
-      </div>
+      <StaticNavLink
+        href="/bundles/create"
+        label="CREATE BUNDLE"
+        index={totalItems - 2}
+        setActiveMenu={setActiveMenu}
+      />
+      <StaticNavLink
+        href="/track-order"
+        label="TRACK ORDER"
+        index={totalItems - 1}
+        setActiveMenu={setActiveMenu}
+      />
     </>
   );
 }
