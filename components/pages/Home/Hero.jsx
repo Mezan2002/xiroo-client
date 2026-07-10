@@ -8,27 +8,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const SLIDES = [
   {
     id: 1,
-    image: "/images/hero-11.png",
+    image: "/images/Hero111.png",
     text1: "RAW",
     text2: "FORM",
     backdrop: "LIVE",
-    accent: "rgba(99,102,241,0.15)",
   },
   {
     id: 2,
-    image: "/images/hero-22.png",
+    image: "/images/Hero222.png",
     text1: "PURE",
     text2: "EDGE",
     backdrop: "YOUR",
-    accent: "rgba(249,115,22,0.15)",
   },
   {
     id: 3,
-    image: "/images/hero-33.png",
+    image: "/images/Hero3333.png",
     text1: "NOIR",
     text2: "FLUX",
     backdrop: "DREAM",
-    accent: "rgba(16,185,129,0.15)",
   },
 ];
 
@@ -70,11 +67,12 @@ const Hero = () => {
         background: "black",
       }}
     >
-      {/* ── Background Gradient (Changes with slide) ── */}
+      {/* ── Background Gradient (Glowing black) ── */}
       <div
-        className="absolute inset-0 transition-all duration-1000 ease-in-out"
+        className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse 90% 70% at 50% 30%, ${slide.accent} 0%, #0a0a12 60%, #000000 100%)`,
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 40%, #1a1a1a 0%, #0d0d0d 30%, #050505 60%, #000000 100%)",
         }}
       />
 
@@ -93,7 +91,7 @@ const Hero = () => {
         key={`mannequin-${currentIndex}`}
         className="absolute inset-0 z-20 flex items-end justify-center pointer-events-none animate-in fade-in slide-in-from-bottom-20 duration-1000"
       >
-        <div className="relative w-[85vw] md:w-[70vw] lg:w-[55vw] max-w-[1000px] h-[90%] lg:h-[80%]">
+        <div className="relative w-[85vw] md:w-[70vw] lg:w-[55vw] max-w-250 h-[90%] lg:h-[80%]">
           <Image
             src={slide.image}
             alt="Xiroo Mannequin"
