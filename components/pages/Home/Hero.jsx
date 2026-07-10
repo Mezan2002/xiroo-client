@@ -27,6 +27,20 @@ const SLIDES = [
     text2: "FLUX",
     backdrop: "DREAM",
   },
+  {
+    id: 4,
+    image: "/images/Hero44.png",
+    text1: "BOLD",
+    text2: "CORE",
+    backdrop: "WEAR",
+  },
+  {
+    id: 5,
+    image: "/images/Hero555.png",
+    text1: "VIVID",
+    text2: "BEAM",
+    backdrop: "XIROO",
+  },
 ];
 
 const Hero = () => {
@@ -149,7 +163,7 @@ const Hero = () => {
             animation:
               "slide-from-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
-            WebkitTextStroke: "1px rgba(255,255,255,0.4)",
+            WebkitTextStroke: "5px rgba(255,255,255,0.4)",
           }}
         >
           {slide.text1}
@@ -161,7 +175,7 @@ const Hero = () => {
             animation:
               "slide-from-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
-            WebkitTextStroke: "1px rgba(255,255,255,0.4)",
+            WebkitTextStroke: "5px rgba(255,255,255,0.4)",
           }}
         >
           {slide.text2}
@@ -213,12 +227,44 @@ const Hero = () => {
               setCurrentIndex((currentIndex + 1) % SLIDES.length);
               resetTimer();
             }}
-            className="group flex items-center justify-center w-9 h-9 border border-white/15 hover:border-white/50 transition-colors duration-300 shrink-0"
+            className="group relative flex items-center justify-center w-9 h-9 shrink-0"
             aria-label="Next slide"
           >
+            <svg
+              className="absolute inset-0 w-9 h-9 -rotate-90 pointer-events-none"
+              viewBox="0 0 36 36"
+            >
+              <rect
+                x="0.5"
+                y="0.5"
+                width="35"
+                height="35"
+                rx="0"
+                fill="none"
+                stroke="rgba(255,255,255,0.15)"
+                strokeWidth="1"
+              />
+              <rect
+                key={`timer-${currentIndex}`}
+                x="0.5"
+                y="0.5"
+                width="35"
+                height="35"
+                rx="0"
+                fill="none"
+                stroke="rgba(255,255,255,0.6)"
+                strokeWidth="1"
+                strokeDasharray="140"
+                strokeDashoffset="140"
+                strokeLinecap="butt"
+                style={{
+                  animation: "timer-fill-rect 6s linear forwards",
+                }}
+              />
+            </svg>
             <ArrowRight
               size={11}
-              className="text-white/40 group-hover:text-white transition-colors duration-300"
+              className="relative text-white/40 group-hover:text-white transition-colors duration-300"
             />
           </button>
         </div>

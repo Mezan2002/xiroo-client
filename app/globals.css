@@ -72,3 +72,12 @@ body {
     opacity: 1;
   }
 }
+
+@keyframes timer-fill-rect {
+  0% {
+    stroke-dashoffset: 140;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
