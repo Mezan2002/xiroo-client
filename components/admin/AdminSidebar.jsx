@@ -1,5 +1,5 @@
 "use client";
-import { BarChart3, Bell, ChevronDown, Hash, Inbox, Layers, LayoutGrid, LineChart, Mail, MessageSquare, Package, Palette, Search, Settings, Shield, ShoppingBag, Tag, Users, X } from "lucide-react";
+import { BarChart3, Bell, ChevronDown, Hash, Inbox, Layers, LayoutGrid, LineChart, Mail, MessageSquare, Package, Palette, Quote, Search, Settings, Shield, ShoppingBag, Share2, Tag, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useAdminSidebar } from "./sidebar-sections/useAdminSidebar";
 
@@ -9,6 +9,8 @@ const NAV_ITEMS = [
   { label: "Categories", href: "/admin/categories", icon: LayoutGrid },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { label: "Reviews", href: "/admin/reviews", icon: MessageSquare },
+  { label: "Testimonials", href: "/admin/testimonials", icon: Quote },
+  { label: "Social Feed", href: "/admin/social-posts", icon: Share2 },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Loyalty Matrix", href: "/admin/loyalty", icon: Shield },
   { label: "Discounts", href: "/admin/discounts", icon: Tag },

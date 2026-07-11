@@ -1,4 +1,4 @@
-import { JetBrains_Mono, Montserrat, Libre_Barcode_39 } from "next/font/google";
+import { JetBrains_Mono, Libre_Barcode_39, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -18,14 +18,15 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Xiroo",
-  description: "Xiroo Shop",
+  title: "XIROO | HOME",
+  description: "XIROO SHOP. LIVE YOUR DREAM!",
   icons: {
     icon: "/favicon.png",
   },
 };
 
 import AppInitializer from "@/components/AppInitializer";
+import FacebookPixel from "@/components/Marketing/FacebookPixel";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import ConditionalLayout from "@/components/shared/ConditionalLayout";
@@ -33,7 +34,6 @@ import RouteGuard from "@/components/shared/RouteGuard";
 import { SocketProvider } from "@/context/SocketContext";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import FacebookPixel from "@/components/Marketing/FacebookPixel";
 
 const ToastContainer = dynamic(
   () => import("@/components/shared/ToastContainer"),
@@ -43,9 +43,9 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${mono.variable} ${barcodeFont.variable} antialiased`}
+      className={`${montserrat.variable} ${mono.variable} ${barcodeFont.variable} antialiased overflow-x-hidden`}
     >
-      <body className="min-h-screen selection:bg-black selection:text-white">
+      <body className="min-h-screen selection:bg-black selection:text-white overflow-x-hidden">
         <ReduxProvider>
           <QueryProvider>
             <SocketProvider>

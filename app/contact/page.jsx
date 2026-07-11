@@ -35,8 +35,8 @@ export default function ContactPage() {
               Get in Touch
             </h2>
             <p className="text-[14px] text-gray-500 leading-relaxed max-w-[400px]">
-              Whether you have an architectural inquiry or need logistics support, 
-              our dedicated team is ready to synchronize with you.
+              Whether you have an architectural inquiry or need logistics
+              support, our dedicated team is ready to synchronize with you.
             </p>
           </div>
 
@@ -46,9 +46,12 @@ export default function ContactPage() {
                 <MapPin size={18} strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-black mb-1">Our Studio</h3>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-black mb-1">
+                  Our Studio
+                </h3>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  Gulshan 1, Dhaka, Bangladesh<br />
+                  Mirpur 11, Dhaka, Bangladesh
+                  <br />
                   Central Business District
                 </p>
               </div>
@@ -59,10 +62,13 @@ export default function ContactPage() {
                 <Mail size={18} strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-black mb-1">Digital Identity</h3>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-black mb-1">
+                  Digital Identity
+                </h3>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  support@xirooshop.com<br />
-                  press@xirooshop.com
+                  support@xirooshop.com
+                  <br />
+                  xiroo.shop.official@gmail.com
                 </p>
               </div>
             </div>
@@ -72,10 +78,13 @@ export default function ContactPage() {
                 <Phone size={18} strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-black mb-1">Voice Protocol</h3>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-black mb-1">
+                  Voice Protocol
+                </h3>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  +880 1700 000 000<br />
-                  Mon - Fri: 10AM - 6PM
+                  +880-1868-922-588
+                  <br />
+                  24/7 Available
                 </p>
               </div>
             </div>
@@ -87,18 +96,22 @@ export default function ContactPage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">First Name</label>
-                <input 
-                  type="text" 
+                <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                  First Name
+                </label>
+                <input
+                  type="text"
                   required
                   placeholder="IDENTITY"
                   className="w-full bg-transparent border-b border-zinc-200 py-3 outline-none focus:border-black transition-colors text-[13px] uppercase tracking-wider"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Email Address</label>
-                <input 
-                  type="email" 
+                <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                  Email Address
+                </label>
+                <input
+                  type="email"
                   required
                   placeholder="EMAIL@DOMAIN.COM"
                   className="w-full bg-transparent border-b border-zinc-200 py-3 outline-none focus:border-black transition-colors text-[13px] uppercase tracking-wider"
@@ -107,9 +120,11 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Subject</label>
-              <input 
-                type="text" 
+              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                Subject
+              </label>
+              <input
+                type="text"
                 required
                 placeholder="NATURE OF INQUIRY"
                 className="w-full bg-transparent border-b border-zinc-200 py-3 outline-none focus:border-black transition-colors text-[13px] uppercase tracking-wider"
@@ -117,23 +132,32 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Message</label>
-              <textarea 
-                rows="4" 
+              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                Message
+              </label>
+              <textarea
+                rows="4"
                 required
                 placeholder="HOW CAN WE ASSIST?"
                 className="w-full bg-transparent border-b border-zinc-200 py-3 outline-none focus:border-black transition-colors text-[13px] uppercase tracking-wider resize-none"
               ></textarea>
             </div>
 
-            <Button 
-              type="submit" 
-              variant="primary" 
+            <Button
+              type="submit"
+              variant="primary"
               className="w-full group"
               disabled={isSubmitting}
             >
-              <span className="mr-2">{isSubmitting ? "SYNCHRONIZING..." : "SEND PROTOCOL"}</span>
-              {!isSubmitting && <Send size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+              <span className="mr-2">
+                {isSubmitting ? "SYNCHRONIZING..." : "SEND PROTOCOL"}
+              </span>
+              {!isSubmitting && (
+                <Send
+                  size={14}
+                  className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                />
+              )}
             </Button>
           </form>
         </div>

@@ -56,9 +56,30 @@ export default function Footer() {
                 </h4>
               </FadeIn>
               <div className="flex flex-col gap-5">
-                <FadeIn delay={0.25}><Link href="/collections" className="text-[11px] text-white/50 hover:text-white transition-colors">Collections</Link></FadeIn>
-                <FadeIn delay={0.3}><Link href="/new-in" className="text-[11px] text-white/50 hover:text-white transition-colors">New In</Link></FadeIn>
-                <FadeIn delay={0.35}><Link href="/hot-sale" className="text-[11px] text-white/50 hover:text-white transition-colors">Hot Sale</Link></FadeIn>
+                <FadeIn delay={0.25}>
+                  <Link
+                    href="/collections"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Collections
+                  </Link>
+                </FadeIn>
+                <FadeIn delay={0.3}>
+                  <Link
+                    href="/bundles/create"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Create Bundle
+                  </Link>
+                </FadeIn>
+                <FadeIn delay={0.35}>
+                  <Link
+                    href="/track-order"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Track Order
+                  </Link>
+                </FadeIn>
               </div>
             </div>
 
@@ -70,9 +91,30 @@ export default function Footer() {
                 </h4>
               </FadeIn>
               <div className="flex flex-col gap-5">
-                <FadeIn delay={0.25}><Link href="/about" className="text-[11px] text-white/50 hover:text-white transition-colors">Our Story</Link></FadeIn>
-                <FadeIn delay={0.3}><Link href="/contact" className="text-[11px] text-white/50 hover:text-white transition-colors">Contact Us</Link></FadeIn>
-                <FadeIn delay={0.35}><Link href="/faq" className="text-[11px] text-white/50 hover:text-white transition-colors">FAQ</Link></FadeIn>
+                <FadeIn delay={0.25}>
+                  <Link
+                    href="/about-us"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Our Story
+                  </Link>
+                </FadeIn>
+                <FadeIn delay={0.3}>
+                  <Link
+                    href="/contact"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Contact Us
+                  </Link>
+                </FadeIn>
+                <FadeIn delay={0.35}>
+                  <Link
+                    href="/faq"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    FAQ
+                  </Link>
+                </FadeIn>
               </div>
             </div>
 
@@ -84,9 +126,30 @@ export default function Footer() {
                 </h4>
               </FadeIn>
               <div className="flex flex-col gap-5">
-                <FadeIn delay={0.25}><Link href="/account/orders" className="text-[11px] text-white/50 hover:text-white transition-colors">Track Orders</Link></FadeIn>
-                <FadeIn delay={0.3}><Link href="/account/profile" className="text-[11px] text-white/50 hover:text-white transition-colors">Profile Settings</Link></FadeIn>
-                <FadeIn delay={0.35}><Link href="/login" className="text-[11px] text-white/50 hover:text-white transition-colors">Login / Register</Link></FadeIn>
+                <FadeIn delay={0.25}>
+                  <Link
+                    href="/account/orders"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Track Orders
+                  </Link>
+                </FadeIn>
+                <FadeIn delay={0.3}>
+                  <Link
+                    href="/account/profile"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Profile Settings
+                  </Link>
+                </FadeIn>
+                <FadeIn delay={0.35}>
+                  <Link
+                    href="/login"
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Login / Register
+                  </Link>
+                </FadeIn>
               </div>
             </div>
           </div>
@@ -102,23 +165,66 @@ export default function Footer() {
 
           <FadeIn delay={0.3}>
             <div className="flex items-center gap-8">
-              <Link href="/shipping" className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors">Shipping</Link>
-              <Link href="/return-policy" className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors">Returns</Link>
-              <Link href="/privacy" className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors">Terms & Conditions</Link>
+              <Link
+                href="/shipping"
+                className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
+              >
+                Shipping
+              </Link>
+              <Link
+                href="/return-policy"
+                className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
+              >
+                Returns
+              </Link>
+              <Link
+                href="/privacy"
+                className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href="/terms"
+                className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
+              >
+                Terms & Conditions
+              </Link>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.4}>
             <div className="flex items-center gap-6">
-              <Link href="https://www.facebook.com/xirooshop/" target="_blank" className="text-white/40 hover:text-white transition-colors" aria-label="Facebook">
+              <Link
+                href="https://www.facebook.com/xirooshop/"
+                target="_blank"
+                className="text-white/40 hover:text-white transition-colors"
+                aria-label="Facebook"
+              >
                 <Facebook size={16} strokeWidth={1.5} />
               </Link>
-              <Link href="https://www.instagram.com/xirooshop/" target="_blank" className="text-white/40 hover:text-white transition-colors" aria-label="Instagram">
+              <Link
+                href="https://www.instagram.com/xirooshop/"
+                target="_blank"
+                className="text-white/40 hover:text-white transition-colors"
+                aria-label="Instagram"
+              >
                 <Instagram size={16} strokeWidth={1.5} />
               </Link>
-              <Link href="https://www.tiktok.com/@xirooshop" target="_blank" className="text-white/40 hover:text-white transition-colors" aria-label="TikTok">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-[16px] h-[16px]">
+              <Link
+                href="https://www.tiktok.com/@xirooshop"
+                target="_blank"
+                className="text-white/40 hover:text-white transition-colors"
+                aria-label="TikTok"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-[16px] h-[16px]"
+                >
                   <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
                 </svg>
               </Link>

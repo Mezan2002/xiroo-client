@@ -152,7 +152,7 @@ const Hero = () => {
       </div>
 
       {/* ── Foreground Stroke Texts (z-25) ── */}
-      <div
+      {/* <div
         key={`text-stroke-${currentIndex}`}
         className="absolute inset-0 z-25 flex flex-col md:flex-row items-center justify-center gap-0 md:gap-8 lg:gap-12 pointer-events-none overflow-hidden -translate-y-8 md:-translate-y-6 lg:-translate-y-10"
       >
@@ -163,7 +163,8 @@ const Hero = () => {
             animation:
               "slide-from-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
-            WebkitTextStroke: "5px rgba(255,255,255,0.4)",
+            WebkitTextStroke: "2px rgba(255,255,255,0.4)",
+            paintOrder: "stroke fill",
           }}
         >
           {slide.text1}
@@ -175,12 +176,13 @@ const Hero = () => {
             animation:
               "slide-from-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             animationDelay: "0.2s",
-            WebkitTextStroke: "5px rgba(255,255,255,0.4)",
+            WebkitTextStroke: "2px rgba(255,255,255,0.4)",
+            paintOrder: "stroke fill",
           }}
         >
           {slide.text2}
         </h3>
-      </div>
+      </div> */}
 
       {/* ── Bottom Bar ── */}
       <div className="absolute bottom-6 lg:bottom-10 left-0 right-0 px-6 lg:px-14 z-30 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">

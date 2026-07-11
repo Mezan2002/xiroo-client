@@ -24,6 +24,7 @@ export default function AuthLayout({ children, showEditorialBorder = true }) {
                 alt="Xiroo Shop Logo"
                 width={130}
                 height={130}
+                style={{ height: "auto" }}
                 className="brightness-0"
               />
             </Link>
