@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
+import CustomerStats from "./CustomerStats";
 
-export default function PaymentSection({ user, formData, handleChange }) {
+export default function PaymentSection({ user, formData, handleChange, customerStats }) {
   const methods = [
     { id: "cod", label: "Cash on Delivery", active: true },
     { id: "card", label: "Credit Card (Coming Soon)", active: false },
@@ -10,6 +11,9 @@ export default function PaymentSection({ user, formData, handleChange }) {
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-700">
+
+      {/* Customer Stats (if returning customer) */}
+      {customerStats && <CustomerStats customerStats={customerStats} />}
 
       {/* Payment Method */}
       <div className="space-y-4">

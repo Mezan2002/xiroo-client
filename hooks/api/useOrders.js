@@ -97,8 +97,8 @@ export const useOrders = () => {
   });
 
   const dispatchCourier = useMutation({
-    mutationFn: async ({ id, provider, trackingId }) => {
-      const response = await axiosInstance.post(`/orders/${id}/dispatch`, { provider, trackingId });
+    mutationFn: async ({ id, provider, trackingId, cityId, zoneId }) => {
+      const response = await axiosInstance.post(`/orders/${id}/dispatch`, { provider, trackingId, cityId, zoneId });
       return response;
     },
     onSuccess: (data, { id }) => {
@@ -129,6 +129,39 @@ export const useOrders = () => {
     },
   });
 
+  const requestAdvancePayment = useMutation({
+    mutationFn: async ({ id, amount, reason }) => {
+      const response = await axiosInstance.post(`/orders/${id}/advance-payment/request`, { amount, reason });
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  const confirmAdvancePayment = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.post(`/orders/${id}/advance-payment/confirm`);
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  const waiveAdvancePayment = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.post(`/orders/${id}/advance-payment/waive`);
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
   return {
     placeOrder,
     placeGuestOrder,
@@ -140,5 +173,8 @@ export const useOrders = () => {
     dispatchCourier,
     cancelOrder,
     deleteOrder,
+    requestAdvancePayment,
+    confirmAdvancePayment,
+    waiveAdvancePayment,
   };
 };

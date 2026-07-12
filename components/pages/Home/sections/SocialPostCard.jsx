@@ -33,14 +33,21 @@ const platformColors = {
   tiktok: "bg-gray-900",
 };
 
-const aspectRatios = ["aspect-[9/16]", "aspect-[3/4]", "aspect-[4/5]", "aspect-square"];
+export default function SocialPostCard({ post }) {
+  const handleClick = () => {
+    const link = post.postLink || post.url;
+    if (link) {
+      window.open(link, "_blank", "noopener,noreferrer");
+    }
+  };
 
-export default function SocialPostCard({ post, index = 0 }) {
-  const isFacebook = post.platform === "facebook";
-  const aspectClass = isFacebook ? "" : aspectRatios[index % aspectRatios.length];
+  const hasLink = post.postLink || post.url;
 
   return (
-    <div className="group relative bg-white border border-gray-200 overflow-hidden mb-4">
+    <div
+      onClick={handleClick}
+      className={`relative overflow-hidden mb-4 bg-gray-100 ${hasLink ? "cursor-pointer" : ""}`}
+    >
       {/* Pin indicator */}
       {post.isPinned && (
         <div className="absolute top-3 left-3 z-10 flex items-center gap-1 bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
@@ -52,16 +59,14 @@ export default function SocialPostCard({ post, index = 0 }) {
       {/* Platform badge */}
       <div
         className={`absolute top-3 right-3 z-10 p-1.5 rounded-full text-white ${
-          platformColors[post.platform]
+          platformColors[post.platform] || "bg-gray-500"
         }`}
       >
         {platformIcons[post.platform]}
       </div>
 
-      {/* Video/Image embed */}
-      <div className={`w-full ${aspectClass}`}>
-        <VideoEmbed post={post} />
-      </div>
+      {/* Media */}
+      <VideoEmbed post={post} />
     </div>
   );
 }

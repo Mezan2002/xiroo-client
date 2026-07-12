@@ -1,30 +1,22 @@
 "use client";
-import { Truck } from "lucide-react";
-
-const Card = ({ children, title, action, className = "" }) => (
-  <div className={`bg-white border border-zinc-200 rounded-none overflow-hidden ${className}`}>
-    {(title || action) && (
-      <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
-        <h3 className="text-[13px] font-bold text-zinc-900 tracking-tight">{title}</h3>
-        {action}
-      </div>
-    )}
-    <div className="p-6">{children}</div>
-  </div>
-);
+import { MapPin } from "lucide-react";
 
 export default function ShippingDestinationCard({ shippingAddress }) {
   return (
-    <Card title="Shipping Destination">
-      <div className="space-y-6">
-        <div className="p-6 bg-zinc-900 text-white rounded-none border border-zinc-800 shadow-xl">
-          <Truck size={18} className="mb-4 text-zinc-400" strokeWidth={1} />
-          <p className="text-[13px] font-bold tracking-tight leading-relaxed uppercase">{shippingAddress}</p>
-        </div>
-        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-center px-4">
-          Verified Logistics Access Point
-        </p>
+    <div className="bg-white border border-zinc-200 overflow-hidden">
+      <div className="px-6 py-4 border-b border-zinc-100">
+        <h3 className="text-[13px] font-bold text-zinc-900 tracking-tight">Shipping Address</h3>
       </div>
-    </Card>
+      <div className="p-6">
+        <div className="p-4 bg-zinc-50 border border-zinc-100">
+          <div className="flex items-start gap-3">
+            <MapPin size={16} className="text-zinc-400 mt-0.5 shrink-0" strokeWidth={1.5} />
+            <p className="text-[12px] font-bold text-zinc-900 tracking-tight leading-relaxed uppercase">
+              {shippingAddress || "No address provided"}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

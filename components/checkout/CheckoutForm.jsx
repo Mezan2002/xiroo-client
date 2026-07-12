@@ -24,6 +24,7 @@ export default function CheckoutForm({
     handleChange,
     handleDistrictChange,
     handleNext,
+    customerStats,
     isSubmitting,
   } = useCheckoutForm(step, setStep, setProductDistrict, items, total, shipping, deliveryMethod);
 
@@ -37,6 +38,7 @@ export default function CheckoutForm({
             formData={formData}
             handleChange={handleChange}
             handleDistrictChange={handleDistrictChange}
+            customerStats={customerStats}
           />
         )}
 
@@ -53,6 +55,7 @@ export default function CheckoutForm({
             user={user}
             formData={formData}
             handleChange={handleChange}
+            customerStats={customerStats}
           />
         )}
 

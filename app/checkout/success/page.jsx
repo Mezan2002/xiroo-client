@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Check, CheckCircle2, Copy, Download, Lock, Loader2 } from "lucide-react";
+import { Check, CheckCircle2, Copy, Download, Lock, Loader2, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -146,6 +146,55 @@ function OrderSuccessContent() {
                   Please copy your Order ID <strong className="text-black select-all ml-1">{order.orderId || order._id}</strong>. <br/>
                   You can paste it on the <Link href="/track-order" className="text-black font-medium underline decoration-black/20 hover:decoration-black underline-offset-4 transition-all">Track Order</Link> page to monitor your status.
                 </p>
+              </div>
+            )}
+
+            {/* Advance Payment Notice */}
+            {order.advancePayment?.required && order.advancePayment?.status === "pending" && (
+              <div className="p-6 bg-amber-50 border border-amber-200 space-y-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <h3 className="text-[13px] font-bold text-amber-800 uppercase tracking-wider">
+                      Advance Payment Required
+                    </h3>
+                    <p className="text-[12px] text-amber-700 leading-relaxed">
+                      Your order requires an advance payment of <strong className="text-amber-900">৳{order.advancePayment.amount?.toLocaleString()}</strong> before processing.
+                    </p>
+                    <p className="text-[11px] text-amber-600">
+                      Reason: {order.advancePayment.reason || "Customer reliability check"}
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-white border border-amber-100 p-4 space-y-3">
+                  <p className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">How to Pay</p>
+                  <ol className="space-y-2 text-[11px] text-amber-700">
+                    <li className="flex gap-2">
+                      <span className="shrink-0 w-4 h-4 bg-amber-600 text-white text-[9px] font-bold flex items-center justify-center">1</span>
+                      <span>Transfer <strong>৳{order.advancePayment.amount}</strong> via bKash / Nagad</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="shrink-0 w-4 h-4 bg-amber-600 text-white text-[9px] font-bold flex items-center justify-center">2</span>
+                      <span>Send screenshot to WhatsApp or email with Order ID</span>
+                    </li>
+                  </ol>
+                </div>
+                <div className="flex gap-3">
+                  <a
+                    href="https://wa.me/8801XXXXXXXXX"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 px-4 py-2.5 bg-[#25D366] hover:bg-[#128C7E] text-white text-[10px] font-bold uppercase tracking-wider text-center transition-colors"
+                  >
+                    Pay via WhatsApp
+                  </a>
+                  <a
+                    href={`mailto:support@xiroo.shop?subject=Advance Payment - Order ${order.orderId}`}
+                    className="flex-1 px-4 py-2.5 border border-amber-300 hover:bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider text-center transition-colors"
+                  >
+                    Pay via Email
+                  </a>
+                </div>
               </div>
             )}
 

@@ -1,15 +1,17 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import { BANGLADESH_LOCATIONS, DISTRICTS } from "@/lib/bangladeshLocations";
+import { searchCustomerByPhone, searchCustomerSuggestions } from "@/hooks/api/useCustomers";
 import {
   Check,
   ChevronDown,
+  Loader2,
   Mail,
   MapPin,
   Phone,
   Search,
   Truck,
   User,
+  UserCheck,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -202,6 +204,13 @@ const LocationDropdown = ({
 };
 
 export default function CustomerSection({ order, setOrder }) {
+  const [customerLoading, setCustomerLoading] = useState(false);
+  const [customerFound, setCustomerFound] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
+  const debounceTimerRef = useRef(null);
+  const suggestionsRef = useRef(null);
   const thanas = order.shipping?.district
     ? BANGLADESH_LOCATIONS[order.shipping.district] || []
     : [];
@@ -239,6 +248,121 @@ export default function CustomerSection({ order, setOrder }) {
         shippingFee: fee,
       };
     });
+  };
+
+  const handlePhoneChange = (value) => {
+    setOrder((prev) => ({ ...prev, phone: value }));
+    setCustomerFound(false);
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    const cleaned = value.replace(/[^0-9]/g, "");
+    if (cleaned.length < 3) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setSuggestionLoading(true);
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const results = await searchCustomerSuggestions(value);
+        setSuggestions(results);
+        setShowSuggestions(results.length > 0);
+      } catch {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setSuggestionLoading(false);
+      }
+    }, 400);
+  };
+
+  const handleSelectSuggestion = (suggestion) => {
+    const defaultAddress = suggestion.defaultAddress;
+    const district = defaultAddress?.city || "";
+    const thana = defaultAddress?.state || "";
+    const addressLine = [defaultAddress?.addressLine1, defaultAddress?.addressLine2].filter(Boolean).join(", ");
+    const postcode = defaultAddress?.postalCode || "";
+
+    setOrder((prev) => ({
+      ...prev,
+      phone: suggestion.phone,
+      firstName: suggestion.firstName || prev.firstName,
+      lastName: suggestion.lastName || prev.lastName,
+      email: suggestion.email || prev.email,
+      customer: `${suggestion.firstName || ""} ${suggestion.lastName || ""}`.trim(),
+      ...(district && {
+        shipping: {
+          ...prev.shipping,
+          district,
+          thana,
+          address: addressLine,
+          postcode,
+        },
+      }),
+    }));
+    setCustomerFound(true);
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handlePhoneBlur = async (phone) => {
+    const cleaned = phone?.replace(/[^0-9]/g, "").slice(-11);
+    if (!cleaned || cleaned.length < 11) {
+      setCustomerFound(false);
+      return;
+    }
+
+    setCustomerLoading(true);
+    try {
+      const result = await searchCustomerByPhone(cleaned);
+      const customer = result;
+      if (!customer) {
+        setCustomerFound(false);
+        return;
+      }
+
+      const defaultAddress = customer.addresses?.find((a) => a.isDefault) || customer.addresses?.[0];
+      const district = defaultAddress?.city || "";
+      const thana = defaultAddress?.state || "";
+      const addressLine = [defaultAddress?.addressLine1, defaultAddress?.addressLine2].filter(Boolean).join(", ");
+      const postcode = defaultAddress?.postalCode || "";
+
+      setOrder((prev) => ({
+        ...prev,
+        firstName: customer.firstName || prev.firstName,
+        lastName: customer.lastName || prev.lastName,
+        email: customer.emails?.[0] || prev.email,
+        customer: `${customer.firstName || ""} ${customer.lastName || ""}`.trim(),
+        ...(district && {
+          shipping: {
+            ...prev.shipping,
+            district,
+            thana,
+            address: addressLine,
+            postcode,
+          },
+        }),
+      }));
+      setCustomerFound(true);
+    } catch {
+      setCustomerFound(false);
+    } finally {
+      setCustomerLoading(false);
+    }
   };
 
   const isInsideDhaka = order.shipping?.district === "Dhaka";
@@ -319,19 +443,59 @@ export default function CustomerSection({ order, setOrder }) {
           </div>
           <div className="space-y-3">
             <Label>Phone Number</Label>
-            <div className="relative group">
+            <div className="relative group" ref={suggestionsRef}>
               <input
                 type="tel"
                 placeholder="017XXXXXXXX"
                 value={order.phone}
-                className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-xl font-light py-4 placeholder:text-zinc-200"
-                onChange={(e) => setOrder({ ...order, phone: e.target.value })}
+                className="w-full bg-transparent border-b border-zinc-200 focus:border-black outline-none transition-all text-xl font-light py-4 placeholder:text-zinc-200 pr-10"
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                onBlur={(e) => handlePhoneBlur(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               />
-              <Phone
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-black"
-                size={18}
-              />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                {suggestionLoading || customerLoading ? (
+                  <Loader2 size={18} className="text-zinc-300 animate-spin" />
+                ) : customerFound ? (
+                  <UserCheck size={18} className="text-green-500" />
+                ) : (
+                  <Phone size={18} className="text-zinc-300 group-focus-within:text-black" />
+                )}
+              </div>
+
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute z-50 left-0 right-0 mt-2 bg-white border border-zinc-100 shadow-[0_20px_50px_rgba(0,0,0,0.12)] max-h-64 overflow-y-auto">
+                  {suggestions.map((s, i) => (
+                    <div
+                      key={i}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSelectSuggestion(s);
+                      }}
+                      className="px-5 py-3 cursor-pointer hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-black">
+                            {s.firstName} {s.lastName}
+                          </p>
+                          <p className="text-xs text-zinc-400 mt-0.5">{s.phone}</p>
+                        </div>
+                        {s.email && (
+                          <span className="text-[10px] text-zinc-300">{s.email}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+            {customerFound && (
+              <p className="text-[10px] text-green-600 font-medium flex items-center gap-1 mt-1">
+                <UserCheck size={10} />
+                Customer found — fields auto-filled
+              </p>
+            )}
           </div>
           <div className="space-y-3">
             <Label optional>Email Address</Label>

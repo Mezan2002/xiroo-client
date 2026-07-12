@@ -1,19 +1,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Video } from "lucide-react";
 import useSocialPosts from "@/hooks/api/useSocialPosts";
 import { Button } from "@/components/ui/Button";
+import { MediaUploader } from "@/components/shared/MediaUploader";
 
 const PLATFORMS = [
   { value: "instagram", label: "Instagram" },
   { value: "facebook", label: "Facebook" },
   { value: "youtube", label: "YouTube" },
   { value: "tiktok", label: "TikTok" },
-];
-
-const CONTENT_TYPES = [
-  { value: "video", label: "Video" },
-  { value: "image", label: "Image" },
 ];
 
 export default function SocialPostForm({ initialData }) {
@@ -25,7 +21,8 @@ export default function SocialPostForm({ initialData }) {
   const [formData, setFormData] = useState({
     title: "",
     platform: "instagram",
-    url: "",
+    mediaUrl: "",
+    postLink: "",
     type: "video",
     isPinned: false,
     isActive: true,
@@ -38,11 +35,12 @@ export default function SocialPostForm({ initialData }) {
     if (initialData) {
       setFormData({
         title: initialData.title || "",
-        platform: initialData.platform,
-        url: initialData.url,
-        type: initialData.type,
-        isPinned: initialData.isPinned,
-        isActive: initialData.isActive,
+        platform: initialData.platform || "instagram",
+        mediaUrl: initialData.mediaUrl || "",
+        postLink: initialData.postLink || "",
+        type: initialData.type || "video",
+        isPinned: initialData.isPinned || false,
+        isActive: initialData.isActive ?? true,
         order: initialData.order || 0,
       });
     }
@@ -58,14 +56,18 @@ export default function SocialPostForm({ initialData }) {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.url.trim()) {
-      newErrors.url = "URL is required";
+    if (!formData.mediaUrl.trim()) {
+      newErrors.mediaUrl = "Please upload a video or image";
     }
 
-    try {
-      new URL(formData.url);
-    } catch {
-      newErrors.url = "Please enter a valid URL";
+    if (!formData.postLink.trim()) {
+      newErrors.postLink = "Post link is required";
+    } else {
+      try {
+        new URL(formData.postLink);
+      } catch {
+        newErrors.postLink = "Please enter a valid URL";
+      }
     }
 
     setErrors(newErrors);
@@ -74,7 +76,6 @@ export default function SocialPostForm({ initialData }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validate()) return;
 
     try {
@@ -111,64 +112,100 @@ export default function SocialPostForm({ initialData }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
+          {/* Media Type Toggle */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Media Type *
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => handleChange("type", "video")}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                  formData.type === "video"
+                    ? "border-black bg-black text-white"
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                }`}
+              >
+                <Video size={18} />
+                <span className="text-sm font-medium">Video</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleChange("type", "image")}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                  formData.type === "image"
+                    ? "border-black bg-black text-white"
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                }`}
+              >
+                <ImageIcon size={18} />
+                <span className="text-sm font-medium">Image</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Media Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Upload {formData.type === "video" ? "Video" : "Image"} *
+            </label>
+            <MediaUploader
+              type={formData.type}
+              initialValue={formData.mediaUrl}
+              onUploadSuccess={(url) => handleChange("mediaUrl", url)}
+              onUploadError={(msg) => setErrors((prev) => ({ ...prev, mediaUrl: msg }))}
+              onRemove={() => handleChange("mediaUrl", "")}
+            />
+            {errors.mediaUrl && (
+              <p className="text-red-500 text-sm mt-1">{errors.mediaUrl}</p>
+            )}
+            {formData.mediaUrl && (
+              <p className="text-green-600 text-sm mt-1">✓ Media uploaded</p>
+            )}
+          </div>
+
+          {/* Post Link */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Post URL *
+              Post Link *
             </label>
             <input
               type="url"
-              value={formData.url}
-              onChange={(e) => handleChange("url", e.target.value)}
+              value={formData.postLink}
+              onChange={(e) => handleChange("postLink", e.target.value)}
               placeholder="https://www.instagram.com/reel/..."
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black ${
-                errors.url ? "border-red-500" : "border-gray-300"
+                errors.postLink ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.url && (
-              <p className="text-red-500 text-sm mt-1">{errors.url}</p>
+            {errors.postLink && (
+              <p className="text-red-500 text-sm mt-1">{errors.postLink}</p>
             )}
             <p className="text-sm text-gray-500 mt-1">
-              Paste the URL from Instagram, YouTube, TikTok, or Facebook. The
-              platform and embed URL will be detected automatically.
+              Link to the original post. Users will be redirected here when they click.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Platform
-              </label>
-              <select
-                value={formData.platform}
-                onChange={(e) => handleChange("platform", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              >
-                {PLATFORMS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Content Type
-              </label>
-              <select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              >
-                {CONTENT_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Platform */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Platform
+            </label>
+            <select
+              value={formData.platform}
+              onChange={(e) => handleChange("platform", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            >
+              {PLATFORMS.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
           </div>
 
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Title (optional)
@@ -182,6 +219,7 @@ export default function SocialPostForm({ initialData }) {
             />
           </div>
 
+          {/* Order, Pin, Active */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -190,9 +228,7 @@ export default function SocialPostForm({ initialData }) {
               <input
                 type="number"
                 value={formData.order}
-                onChange={(e) =>
-                  handleChange("order", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => handleChange("order", parseInt(e.target.value) || 0)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
@@ -205,9 +241,7 @@ export default function SocialPostForm({ initialData }) {
                   onChange={(e) => handleChange("isPinned", e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300"
                 />
-                <span className="text-sm font-medium text-gray-700">
-                  Pin to top
-                </span>
+                <span className="text-sm font-medium text-gray-700">Pin</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
@@ -217,9 +251,7 @@ export default function SocialPostForm({ initialData }) {
                   onChange={(e) => handleChange("isActive", e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300"
                 />
-                <span className="text-sm font-medium text-gray-700">
-                  Active
-                </span>
+                <span className="text-sm font-medium text-gray-700">Active</span>
               </label>
             </div>
           </div>
@@ -235,9 +267,7 @@ export default function SocialPostForm({ initialData }) {
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {initialData ? "Update Post" : "Create Post"}
         </Button>
       </div>

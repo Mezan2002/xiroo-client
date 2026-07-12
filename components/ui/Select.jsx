@@ -3,19 +3,11 @@
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Premium Select Component
- * @param {Array} options - [{ value, label, icon: Icon }]
- * @param {string} value - Current value
- * @param {function} onChange - Change handler
- * @param {string} placeholder - Placeholder text
- * @param {string} className - Additional trigger classes
- */
 export function Select({
   options = [],
   value,
   onChange,
-  placeholder = "Select Option",
+  placeholder = "Select",
   className = "",
   variant = "default",
   size = "default",
@@ -28,16 +20,9 @@ export function Select({
   const checkSpace = () => {
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-
-      // Drop up only if space below is too small AND there's more space above
-      if (spaceBelow < 260 && spaceAbove > spaceBelow) {
-        setDropUp(true);
-      } else {
-        setDropUp(false);
-      }
+      setDropUp(spaceBelow < 260 && spaceAbove > spaceBelow);
     }
   };
 
@@ -54,11 +39,8 @@ export function Select({
   }, [isOpen]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target)
-      ) {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
         setIsOpen(false);
       }
     };
@@ -67,48 +49,43 @@ export function Select({
   }, []);
 
   const variants = {
-    default: "bg-white border border-gray-300 hover:border-black text-black",
-    black: "bg-black text-white border-black hover:bg-zinc-800",
-    ghost:
-      "bg-transparent text-zinc-400 hover:text-black hover:bg-zinc-50 border-gray-100",
+    default: "bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-700",
+    black: "bg-zinc-900 text-white border border-zinc-900 hover:bg-zinc-800",
+    ghost: "bg-transparent text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent",
   };
 
   const sizes = {
-    default: "h-14 px-6 text-[10px]",
-    sm: "h-10 px-4 text-[9px]",
+    default: "h-12 px-4 text-[12px]",
+    sm: "h-10 px-4 text-[12px]",
   };
 
   return (
-    <div ref={containerRef} className="relative inline-block w-full">
+    <div ref={containerRef} className="relative w-full">
       {/* Trigger */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center justify-between w-full
-          font-bold uppercase
-          transition-all duration-300 rounded-none outline-none
-          border
+          flex items-center justify-between gap-2 w-full
+          font-semibold
+          transition-all duration-150 rounded-lg outline-none
           ${variants[variant]}
           ${sizes[size]}
           ${className}
         `}
       >
-        <div className="flex items-center gap-3 truncate mr-2 text-left">
+        <div className="flex items-center gap-2 truncate text-left">
           {selectedOption?.icon && (
-            <selectedOption.icon
-              size={14}
-              strokeWidth={2}
-              className="shrink-0"
-            />
+            <selectedOption.icon size={13} strokeWidth={2} className="shrink-0 text-zinc-400" />
           )}
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
         <ChevronDown
-          size={14}
-          className={`shrink-0 transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`}
+          size={12}
+          strokeWidth={2.5}
+          className={`shrink-0 text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -116,41 +93,50 @@ export function Select({
       {isOpen && (
         <div
           className={`
-          absolute left-0 right-0 z-50 bg-white border border-black animate-in fade-in zoom-in-95 duration-200 rounded-none overflow-hidden shadow-xl
-          ${dropUp ? "bottom-full mb-px" : "top-full -mt-px"}
-        `}
+            absolute left-0 right-0 z-50 bg-white rounded-xl
+            border border-zinc-200/80
+            shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1),0_2px_6px_-2px_rgba(0,0,0,0.06)]
+            animate-in fade-in zoom-in-95 duration-150
+            overflow-hidden
+            ${dropUp ? "bottom-full mb-2" : "top-full mt-2"}
+          `}
         >
-          <div className="max-h-60 overflow-y-auto py-0">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  onChange(option.value);
-                  setIsOpen(false);
-                }}
-                className={`
-                  flex items-center justify-between w-full px-6
-                  ${size === "sm" ? "py-2.5 text-[9px]" : "py-4 text-[10px]"}
-                  font-bold uppercase tracking-[0.2em] text-left
-                  transition-all duration-200 border-b border-gray-50 last:border-none
-                  ${value === option.value ? "bg-black text-white" : "text-zinc-400 hover:bg-gray-50 hover:text-black"}
-                `}
-              >
-                <div className="flex items-center gap-3">
-                  {option.icon && <option.icon size={12} strokeWidth={2} />}
-                  <span>{option.label}</span>
-                </div>
-                {value === option.value && (
-                  <Check size={12} className="text-white" />
-                )}
-              </button>
-            ))}
+          <div className="max-h-72 overflow-y-auto p-2">
+            {options.map((option) => {
+              const isSelected = value === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={`
+                    flex items-center gap-3 w-full px-4 py-3 rounded-lg
+                    text-[12px]
+                    font-medium text-left transition-colors duration-100
+                    ${isSelected
+                      ? "bg-zinc-900 text-white"
+                      : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                    }
+                  `}
+                >
+                  {option.icon && (
+                    <option.icon
+                      size={14}
+                      strokeWidth={2}
+                      className={`shrink-0 ${isSelected ? "text-zinc-400" : "text-zinc-300"}`}
+                    />
+                  )}
+                  <span className="flex-1">{option.label}</span>
+                  {isSelected && <Check size={13} strokeWidth={2.5} className="text-white shrink-0" />}
+                </button>
+              );
+            })}
             {options.length === 0 && (
-              <div className="px-6 py-10 text-center">
-                <span className="text-[10px] font-bold text-zinc-200 uppercase">
-                  No options registry
-                </span>
+              <div className="px-3 py-8 text-center">
+                <span className="text-[10px] font-medium text-zinc-300">No options</span>
               </div>
             )}
           </div>

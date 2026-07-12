@@ -7,6 +7,7 @@ import { use } from "react";
 import OrderDetailHero from "./sections/OrderDetailHero";
 import OrderItemList from "./sections/OrderItemList";
 import OrderSummarySidebar from "./sections/OrderSummarySidebar";
+import CustomerAdvancePayment from "./sections/CustomerAdvancePayment";
 import { useOrderDetailLogic } from "./sections/useOrderDetailLogic";
 
 export default function OrderDetailsPage({ params: paramsPromise }) {
@@ -46,6 +47,9 @@ export default function OrderDetailsPage({ params: paramsPromise }) {
       </div>
 
       <OrderDetailHero orderData={orderData} />
+
+      {/* Advance Payment Notice */}
+      <CustomerAdvancePayment advancePayment={order.advancePayment} orderId={order.orderId} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <OrderItemList items={orderData.items} />

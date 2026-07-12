@@ -2,8 +2,9 @@
 import SearchableDistrict from "@/components/ui/SearchableDistrict";
 import LocationDropdown from "@/components/ui/LocationDropdown";
 import { BANGLADESH_LOCATIONS } from "@/lib/bangladeshLocations";
+import { CheckCircle } from "lucide-react";
 
-export default function InfoSection({ formData, handleChange, handleDistrictChange }) {
+export default function InfoSection({ formData, handleChange, handleDistrictChange, customerStats }) {
   const thanas = formData.district ? (BANGLADESH_LOCATIONS[formData.district] || []) : [];
 
   return (
@@ -98,15 +99,25 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
             placeholder="Postal Code"
             className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
           />
-          <input
-            type="tel"
-            name="phone"
-            required
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Phone Number (e.g. 017...)"
-            className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
-          />
+          <div className="relative">
+            <input
+              type="tel"
+              name="phone"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Phone Number (e.g. 017...)"
+              className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
+            />
+            {customerStats && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-green-50 border border-green-200 px-2 py-1 rounded">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                <span className="text-[10px] font-medium text-green-700 uppercase tracking-wider">
+                  Returning Customer
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

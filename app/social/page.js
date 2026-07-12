@@ -32,7 +32,7 @@ export default function SocialPage() {
           Stay Connected
         </p>
         <p className="text-xs tracking-widest text-gray-400">
-          Follow us on your favorite platform for the latest drops and behind-the-scenes content.
+          Follow us on Instagram for the latest drops and behind-the-scenes content.
         </p>
       </div>
     </div>

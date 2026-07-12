@@ -4,6 +4,7 @@ import { useUser } from "@/hooks/api/useUser";
 import { Bell, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import AdminSidebar from "./AdminSidebar";
 import SearchModal from "./SearchModal";
 
@@ -69,7 +70,7 @@ export default function AdminShell({ children }) {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-56">
         {/* Mobile Top Bar */}
         <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-14 bg-[#F7F7F5] border-b border-[#EDECE9] shrink-0">
           <button
@@ -80,13 +81,8 @@ export default function AdminShell({ children }) {
             <Menu size={20} />
           </button>
 
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-black text-white flex items-center justify-center font-bold text-[11px]">
-              X
-            </div>
-            <span className="text-[13px] font-bold text-[#37352F]">
-              Xiroo Admin
-            </span>
+          <div className="flex items-center">
+            <Image src="/images/logo.png" alt="Xiroo" width={80} height={24} className="object-contain" />
           </div>
 
           <button

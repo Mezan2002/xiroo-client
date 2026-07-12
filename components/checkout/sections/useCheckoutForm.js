@@ -6,7 +6,8 @@ import { useAuth } from "@/hooks/api/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useCustomers } from "@/hooks/api/useCustomers";
 
 export const useCheckoutForm = (
   step,
@@ -23,6 +24,7 @@ export const useCheckoutForm = (
   const { toast } = useToast();
   const { placeOrder, placeGuestOrder } = useOrders();
   const { registerMutation } = useAuth();
+  const { searchCustomerByPhone } = useCustomers();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,6 +40,10 @@ export const useCheckoutForm = (
     shouldRegister: false,
     password: "",
   });
+
+  const [customerStats, setCustomerStats] = useState(null);
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const phoneLookupTimeout = useRef(null);
 
   // Pre-fill form if user is logged in
   useEffect(() => {
@@ -66,12 +72,60 @@ export const useCheckoutForm = (
     }
   }, [user, setProductDistrict]);
 
+  // Phone lookup with debounce
+  const lookupCustomer = useCallback(async (phone) => {
+    if (!phone || phone.length < 11) {
+      setCustomerStats(null);
+      return;
+    }
+
+    setIsLookingUp(true);
+    try {
+      const result = await searchCustomerByPhone(phone);
+      if (result) {
+        setCustomerStats(result);
+        // Auto-fill if customer found and fields are empty
+        setFormData((prev) => ({
+          ...prev,
+          firstName: prev.firstName || result.firstName || "",
+          lastName: prev.lastName || result.lastName || "",
+          email: prev.email || result.emails?.[0] || "",
+          address: prev.address || result.addresses?.[0]?.addressLine1 || "",
+          district: prev.district || result.addresses?.[0]?.state || "",
+          upazila: prev.upazila || result.addresses?.[0]?.city || "",
+          postalCode: prev.postalCode || result.addresses?.[0]?.postalCode || "",
+        }));
+        // Update district for shipping calculation
+        const district = result.addresses?.[0]?.state;
+        if (district && setProductDistrict) {
+          setProductDistrict(district);
+        }
+      } else {
+        setCustomerStats(null);
+      }
+    } catch (err) {
+      setCustomerStats(null);
+    } finally {
+      setIsLookingUp(false);
+    }
+  }, [searchCustomerByPhone, setProductDistrict]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    // Trigger phone lookup on phone change
+    if (name === "phone") {
+      if (phoneLookupTimeout.current) {
+        clearTimeout(phoneLookupTimeout.current);
+      }
+      phoneLookupTimeout.current = setTimeout(() => {
+        lookupCustomer(value);
+      }, 500);
+    }
   };
 
   const handleDistrictChange = (val) => {
@@ -166,6 +220,8 @@ export const useCheckoutForm = (
     handleChange,
     handleDistrictChange,
     handleNext,
+    customerStats,
+    isLookingUp,
     isSubmitting: placeOrder.isPending || placeGuestOrder.isPending || registerMutation.isPending,
   };
 };
