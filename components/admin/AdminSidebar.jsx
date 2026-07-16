@@ -24,6 +24,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useAdminSidebar } from "./sidebar-sections/useAdminSidebar";
 
@@ -41,7 +42,11 @@ const NAV_GROUPS = [
     label: "Logistics",
     items: [
       { label: "Courier Check", href: "/admin/courier-check", icon: Truck },
-      { label: "Fraud Review", href: "/admin/fraud-review", icon: AlertTriangle },
+      {
+        label: "Fraud Review",
+        href: "/admin/fraud-review",
+        icon: AlertTriangle,
+      },
     ],
   },
   {
@@ -85,8 +90,16 @@ export default function AdminSidebar({ isOpen, onClose }) {
       >
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5 flex-1 px-2 py-2">
-            <img src="/images/logo.png" alt="Xiroo" className="h-7 w-auto object-contain" />
-            <span className="text-[11px] font-bold text-[#91918E] uppercase tracking-wider">Admin</span>
+            <Image
+              width={100}
+              height={100}
+              src="/images/logo.png"
+              alt="Xiroo"
+              className=" h-7 w-auto object-contain"
+            />
+            <span className="text-[11px] font-bold text-[#91918E] uppercase tracking-wider">
+              Admin
+            </span>
           </div>
           <button
             onClick={onClose}
@@ -100,15 +113,37 @@ export default function AdminSidebar({ isOpen, onClose }) {
         <div className="px-3 space-y-px">
           {[
             { icon: Search, label: "Search", onClick: handleOpenSearch },
-            { icon: Inbox, label: "Inbox", href: "/admin/inbox", badge: inboxUnread },
-            { icon: Bell, label: "Notifications", href: "/admin/notifications", badge: notificationUnread },
+            {
+              icon: Inbox,
+              label: "Inbox",
+              href: "/admin/inbox",
+              badge: inboxUnread,
+            },
+            {
+              icon: Bell,
+              label: "Notifications",
+              href: "/admin/notifications",
+              badge: notificationUnread,
+            },
             { label: "Dashboard", href: "/admin", icon: BarChart3 },
           ].map((item, idx) => {
             const Icon = item.icon;
-            const isActive = item.href && (item.href === "/admin" ? pathname === "/admin" : pathname === item.href || pathname?.startsWith(item.href + "/"));
+            const isActive =
+              item.href &&
+              (item.href === "/admin"
+                ? pathname === "/admin"
+                : pathname === item.href ||
+                  pathname?.startsWith(item.href + "/"));
             const content = (
               <>
-                <Icon size={16} className={isActive ? "text-[#37352F]" : "text-[#37352F80] group-hover:text-[#37352F]"} />
+                <Icon
+                  size={16}
+                  className={
+                    isActive
+                      ? "text-[#37352F]"
+                      : "text-[#37352F80] group-hover:text-[#37352F]"
+                  }
+                />
                 <span className="flex-1 text-left">{item.label}</span>
                 {item.badge > 0 && (
                   <span className="text-[10px] font-bold bg-[#37352F] text-white px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
@@ -159,7 +194,9 @@ export default function AdminSidebar({ isOpen, onClose }) {
                     >
                       <item.icon
                         size={15}
-                        className={isActive ? "text-[#37352F]" : "text-[#37352F80]"}
+                        className={
+                          isActive ? "text-[#37352F]" : "text-[#37352F80]"
+                        }
                       />
                       <span>{item.label}</span>
                     </Link>
