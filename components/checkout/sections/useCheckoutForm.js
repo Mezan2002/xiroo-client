@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
+import { saveCustomerContext } from "@/components/Marketing/FacebookPixel";
 
 export const useCheckoutForm = (
   step,
@@ -112,10 +113,22 @@ export const useCheckoutForm = (
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      saveCustomerContext({
+        email: updated.email,
+        phone: updated.phone,
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        city: updated.upazila,
+        state: updated.district,
+        zip: updated.postalCode,
+      });
+      return updated;
+    });
 
     // Trigger phone lookup on phone change
     if (name === "phone") {
@@ -129,7 +142,11 @@ export const useCheckoutForm = (
   };
 
   const handleDistrictChange = (val) => {
-    setFormData((prev) => ({ ...prev, district: val }));
+    setFormData((prev) => {
+      const updated = { ...prev, district: val };
+      saveCustomerContext({ state: val });
+      return updated;
+    });
     if (setProductDistrict) setProductDistrict(val);
   };
 
