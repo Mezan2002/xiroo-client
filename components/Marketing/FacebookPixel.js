@@ -40,26 +40,6 @@ export function saveCustomerContext(userData) {
   } catch (_) {}
 }
 
-/**
- * Meta best practice: Extract fbclid from URL and manually create _fbc cookie.
- * Meta's pixel script usually does this, but this is a fallback to guarantee coverage.
- * Format: fb.${subdomain_index}.${creation_time}.${fbclid}
- */
-function ensureFbcFromUrl() {
-  if (typeof window === "undefined") return;
-  const existing = getCookie("_fbc");
-  if (existing) return;
-
-  const params = new URLSearchParams(window.location.search);
-  const fbclid = params.get("fbclid");
-  if (!fbclid) return;
-
-  const subdomainIndex = window.location.hostname === "www." ? 1 : 0;
-  const creationTime = Math.floor(Date.now() / 1000);
-  const fbcValue = `fb.${subdomainIndex}.${creationTime}.${fbclid}`;
-  setCookie("_fbc", fbcValue);
-}
-
 function normalizeEmail(email) {
   if (!email) return "";
   return email.trim().toLowerCase();
@@ -106,8 +86,7 @@ export default function FacebookPixel() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Meta best practice: capture fbc from URL + IP early on landing page
-    ensureFbcFromUrl();
+    // Cache client IP early for CAPI events
     fetchClientIp();
 
     window.trackFacebookEvent = async (eventName, customData = {}, userData = {}, overrideEventId = null) => {
