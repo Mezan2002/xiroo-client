@@ -189,14 +189,6 @@ export const useProductActions = (product) => {
         currency: "BDT",
         num_items: quantity,
       });
-      window.trackFacebookEvent("InitiateCheckout", {
-        content_name: product.title,
-        content_ids: [product._id],
-        content_type: "product",
-        value: displayPrice * quantity,
-        currency: "BDT",
-        num_items: quantity,
-      });
     }
 
     router.push("/checkout");

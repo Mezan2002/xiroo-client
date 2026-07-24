@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useOrders } from "@/hooks/api/useOrders";
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 import ReceiptTemplate from "@/components/checkout/ReceiptTemplate";
 
 const ReceiptFeatures = dynamic(() => import("@/components/checkout/ReceiptFeatures"), { ssr: false });
@@ -19,11 +20,16 @@ function OrderSuccessContent() {
   const orderId = searchParams.get("id");
   const { useOrderDetail } = useOrders();
   const { data: order, isLoading } = useOrderDetail(orderId);
+  const { settings: storeSettings } = useStoreSettings();
   const receiptRef = useRef(null);
   const pdfRef = useRef(null);
+  const purchaseFiredRef = useRef(false);
+  const whatsapp = storeSettings?.contact?.whatsapp || "8801XXXXXXXXX";
+  const supportEmail = storeSettings?.contact?.supportEmail || "support@xiroo.shop";
   
   useEffect(() => {
-    if (order && window.trackFacebookEvent) {
+    if (order && window.trackFacebookEvent && !purchaseFiredRef.current) {
+      purchaseFiredRef.current = true;
       const customerData = {
         email: order.guestInfo?.email || order.user?.email || '',
         phone: order.guestInfo?.phone || order.user?.phoneNumber || '',
@@ -77,6 +83,8 @@ function OrderSuccessContent() {
   // Calculate Breakdown using authoritative order data
   const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const delivery = order.shippingFee || (order.totalPrice - subtotal);
+  const discount = order.discount || null;
+  const discountAmount = discount?.amount ? Math.round(discount.amount * 100) / 100 : 0;
 
   // Group items by product ID and variant
   const groupedItems = order.items.reduce((acc, item) => {
@@ -181,7 +189,7 @@ function OrderSuccessContent() {
                 </div>
                 <div className="flex gap-3">
                   <a
-                    href="https://wa.me/8801XXXXXXXXX"
+                    href={`https://wa.me/${whatsapp}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 px-4 py-2.5 bg-[#25D366] hover:bg-[#128C7E] text-white text-[10px] font-bold uppercase tracking-wider text-center transition-colors"
@@ -189,7 +197,7 @@ function OrderSuccessContent() {
                     Pay via WhatsApp
                   </a>
                   <a
-                    href={`mailto:support@xiroo.shop?subject=Advance Payment - Order ${order.orderId}`}
+                    href={`mailto:${supportEmail}?subject=Advance Payment - Order ${order.orderId}`}
                     className="flex-1 px-4 py-2.5 border border-amber-300 hover:bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider text-center transition-colors"
                   >
                     Pay via Email
@@ -262,6 +270,8 @@ function OrderSuccessContent() {
               order={order} 
               subtotal={subtotal} 
               delivery={delivery} 
+              discount={discount}
+              discountAmount={discountAmount}
               receiptRef={pdfRef} 
             />
 
@@ -310,6 +320,16 @@ function OrderSuccessContent() {
                 <span>Subtotal</span>
                 <span className="text-black">৳{subtotal}</span>
               </div>
+              {discount && (
+                <div className="flex justify-between items-center text-[11px] font-medium uppercase tracking-wider">
+                  <span className="text-gray-500">
+                    Discount ({discount.code})
+                  </span>
+                  <span className="text-emerald-600">
+                    {discount.type === 'free_shipping' ? 'Free Shipping' : `-৳${discountAmount.toFixed(2)}`}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between items-center text-[11px] font-medium uppercase tracking-wider text-gray-500">
                 <span>Delivery</span>
                 <span className="text-black">৳{delivery}</span>
