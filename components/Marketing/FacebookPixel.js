@@ -67,6 +67,16 @@ function saveUserContext(data) {
   } catch {}
 }
 
+// ─── Public Exports (used by other modules) ────────────────────────────────
+
+export function getCachedUserData() {
+  return getUserContext();
+}
+
+export function saveCustomerContext(data) {
+  return saveUserContext(data);
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function FacebookPixel() {
@@ -249,7 +259,7 @@ export default function FacebookPixel() {
       };
 
       pixelInitialized.current = true;
-      console.log("[FB Pixel] Initialized:", activePid);
+      console.log("[FB Pixel] Initialized:", pixelId);
     };
 
     initPixel();
