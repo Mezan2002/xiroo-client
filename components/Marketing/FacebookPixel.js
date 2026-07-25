@@ -46,7 +46,7 @@ async function fetchClientIp() {
 function getUserContext() {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem("xiroo_user_context");
+    const raw = localStorage.getItem("xiroo_user_context") || getCookie("_xiroo_user_context");
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -242,6 +242,10 @@ export default function FacebookPixel() {
           if (mergedUser.lastName) capiUserData.lastName = mergedUser.lastName;
           if (mergedUser.externalId)
             capiUserData.externalId = mergedUser.externalId;
+          if (mergedUser.city) capiUserData.city = mergedUser.city;
+          if (mergedUser.state) capiUserData.state = mergedUser.state;
+          if (mergedUser.zip) capiUserData.zip = mergedUser.zip;
+          if (mergedUser.country) capiUserData.country = mergedUser.country;
           if (fbc) capiUserData.fbc = fbc;
           if (fbp) capiUserData.fbp = fbp;
 

@@ -146,6 +146,11 @@ export const useProductActions = (product) => {
         value: displayPrice * quantity,
         currency: "BDT",
         num_items: quantity,
+      }, {
+        email: user?.email,
+        phone: user?.phone,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
       });
     }
   };
@@ -188,6 +193,11 @@ export const useProductActions = (product) => {
         value: displayPrice * quantity,
         currency: "BDT",
         num_items: quantity,
+      }, {
+        email: user?.email,
+        phone: user?.phone,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
       });
     }
 

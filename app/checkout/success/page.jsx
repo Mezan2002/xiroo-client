@@ -30,12 +30,27 @@ function OrderSuccessContent() {
   useEffect(() => {
     if (order && window.trackFacebookEvent && !purchaseFiredRef.current) {
       purchaseFiredRef.current = true;
+
+      const email = order.guestInfo?.email || order.user?.email || '';
+      const phone = order.guestInfo?.phone || order.user?.phoneNumber || order.user?.phone || '';
+      const firstName = order.guestInfo?.firstName || order.user?.firstName || '';
+      const lastName = order.guestInfo?.lastName || order.user?.lastName || '';
+      const userId = order.user?._id || order.user || '';
+
+      const addressParts = order.shippingAddress?.split(',').map((s) => s.trim()) || [];
+      const city = addressParts[1] || '';
+      const state = addressParts[2] || '';
+      const zip = addressParts[3]?.replace(/[^0-9-]/g, '') || '';
+
       const customerData = {
-        email: order.guestInfo?.email || order.user?.email || '',
-        phone: order.guestInfo?.phone || order.user?.phoneNumber || '',
-        firstName: order.guestInfo?.firstName || order.user?.firstName || '',
-        lastName: order.guestInfo?.lastName || order.user?.lastName || '',
-        externalId: order.user?._id || order.user || '',
+        email,
+        phone,
+        firstName,
+        lastName,
+        externalId: userId || email,
+        city,
+        state,
+        zip,
       };
 
       window.trackFacebookEvent("Purchase", {

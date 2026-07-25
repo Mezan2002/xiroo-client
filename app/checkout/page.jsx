@@ -1,37 +1,49 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { ChevronLeft, Lock } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import { ChevronLeft, Lock } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
+import { useDeliveryFee } from "@/hooks/api/useDeliverySettings";
+import { useDiscounts } from "@/hooks/api/useDiscounts";
 import { useUser } from "@/hooks/api/useUser";
 import { useCart } from "@/hooks/useCart";
-import { useDiscounts } from "@/hooks/api/useDiscounts";
-import { useDeliveryFee } from "@/hooks/api/useDeliverySettings";
 import { useToast } from "@/hooks/useToast";
 
 export default function CheckoutPage() {
   const { user, isLoading } = useUser();
-  const { items, subtotal, discount, discountAmount, isBundleFreeShipping, note, setNote, applyDiscount, removeDiscount } = useCart();
+  const {
+    items,
+    subtotal,
+    discount,
+    discountAmount,
+    isBundleFreeShipping,
+    note,
+    setNote,
+    applyDiscount,
+    removeDiscount,
+  } = useCart();
   const { validateDiscount } = useDiscounts();
   const { toast } = useToast();
   const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
 
-  const { data: deliveryFeeData, isLoading: feeLoading } = useDeliveryFee(district);
+  const { data: deliveryFeeData, isLoading: feeLoading } =
+    useDeliveryFee(district);
 
   const shipping = !district
     ? null
     : isBundleFreeShipping || discount?.type === "free_shipping"
       ? 0
       : deliveryFeeData
-        ? deliveryMethod === "fast" ? deliveryFeeData.fast : deliveryFeeData.normal
+        ? deliveryMethod === "fast"
+          ? deliveryFeeData.fast
+          : deliveryFeeData.normal
         : null;
-  
+
   const discountedSubtotal = subtotal - (discountAmount || 0);
   const total = discountedSubtotal + (shipping || 0);
 
@@ -44,27 +56,46 @@ export default function CheckoutPage() {
           if (onSuccess) onSuccess();
         },
         onError: (err) => {
-          toast.error(err?.response?.data?.message || err.message || "Invalid coupon");
+          toast.error(
+            err?.response?.data?.message || err.message || "Invalid coupon",
+          );
         },
-      }
+      },
     );
   };
 
   const handleRemoveCoupon = () => {
     removeDiscount();
   };
-  
+
   useEffect(() => {
     if (window.trackFacebookEvent && items) {
-      window.trackFacebookEvent("InitiateCheckout", {
-        content_ids: items.map(item => item?.product?.id || item?.product?._id || item?.id || item?._id).filter(Boolean),
-        content_type: "product",
-        value: total,
-        currency: "BDT",
-        num_items: items.length
-      });
+      window.trackFacebookEvent(
+        "InitiateCheckout",
+        {
+          content_ids: items
+            .map(
+              (item) =>
+                item?.product?.id ||
+                item?.product?._id ||
+                item?.id ||
+                item?._id,
+            )
+            .filter(Boolean),
+          content_type: "product",
+          value: total,
+          currency: "BDT",
+          num_items: items.length,
+        },
+        {
+          email: user?.email,
+          phone: user?.phone,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+        },
+      );
     }
-  }, []);
+  }, [items, total, user?.email, user?.firstName, user?.lastName, user?.phone]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -76,7 +107,9 @@ export default function CheckoutPage() {
           </Link>
           <div className="flex items-center gap-2 text-gray-400">
             <Lock className="w-4 h-4" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">Secure Checkout</span>
+            <span className="text-[10px] font-medium uppercase tracking-wider">
+              Secure Checkout
+            </span>
           </div>
         </div>
       </header>
@@ -85,8 +118,8 @@ export default function CheckoutPage() {
         <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-10 lg:gap-16 xl:gap-24">
           {/* Left Column: Form */}
           <div className="lg:col-span-7">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               onClick={(e) => {
                 // If we're on mobile and the cart is a sidebar, maybe just go back?
                 // For now, simplicity.
@@ -94,12 +127,14 @@ export default function CheckoutPage() {
               className="inline-flex items-center gap-2 text-gray-400 hover:text-black transition-colors mb-8 md:mb-10 group"
             >
               <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-[11px] font-medium uppercase tracking-wider">Return to store</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider">
+                Return to store
+              </span>
             </Link>
 
-            <CheckoutForm 
-              step={step} 
-              setStep={setStep} 
+            <CheckoutForm
+              step={step}
+              setStep={setStep}
               setProductDistrict={setDistrict}
               deliveryMethod={deliveryMethod}
               setDeliveryMethod={setDeliveryMethod}
@@ -118,10 +153,10 @@ export default function CheckoutPage() {
           {/* Right Column: Summary */}
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-10">
-              <OrderSummary 
-                items={items} 
-                subtotal={subtotal} 
-                shipping={shipping} 
+              <OrderSummary
+                items={items}
+                subtotal={subtotal}
+                shipping={shipping}
                 total={total}
                 discount={discount}
                 discountAmount={discountAmount}
@@ -138,9 +173,21 @@ export default function CheckoutPage() {
       <footer className="border-t border-gray-100 py-10 mt-20">
         <div className="container mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-8 text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-            <Link href="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-black transition-colors">Terms of Service</Link>
-            <Link href="/shipping" className="hover:text-black transition-colors">Shipping Policy</Link>
+            <Link
+              href="/privacy"
+              className="hover:text-black transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-black transition-colors">
+              Terms of Service
+            </Link>
+            <Link
+              href="/shipping"
+              className="hover:text-black transition-colors"
+            >
+              Shipping Policy
+            </Link>
           </div>
         </div>
       </footer>
