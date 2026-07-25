@@ -272,14 +272,28 @@ export default function FacebookPixel() {
     // Browser PageView
     window.fbq("track", "PageView");
 
-    // CAPI PageView (no event_id — browser already handles dedup for PageView)
+    // CAPI PageView — include user data when available for better Event Match Quality
     const fbc = getCookie("_fbc");
     const fbp = getCookie("_fbp");
+    const cachedUser = getUserContext();
+    const pageUser = { ...cachedUser, ...loggedInUserData };
 
     const capiUserData = {
       userAgent: window.navigator.userAgent,
       ip: cachedIp,
     };
+
+    const nEmail = normalizeEmail(pageUser.email);
+    const nPhone = normalizePhone(pageUser.phone);
+    if (nEmail) capiUserData.email = nEmail;
+    if (nPhone) capiUserData.phone = nPhone;
+    if (pageUser.firstName) capiUserData.firstName = pageUser.firstName;
+    if (pageUser.lastName) capiUserData.lastName = pageUser.lastName;
+    if (pageUser.externalId) capiUserData.externalId = pageUser.externalId;
+    if (pageUser.city) capiUserData.city = pageUser.city;
+    if (pageUser.state) capiUserData.state = pageUser.state;
+    if (pageUser.zip) capiUserData.zip = pageUser.zip;
+    if (pageUser.country) capiUserData.country = pageUser.country;
     if (fbc) capiUserData.fbc = fbc;
     if (fbp) capiUserData.fbp = fbp;
 
