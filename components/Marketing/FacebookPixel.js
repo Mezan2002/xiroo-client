@@ -1,43 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import axiosInstance from "@/lib/axios";
 import { useUser } from "@/hooks/api/useUser";
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
 function getCookie(name) {
   if (typeof document === "undefined") return "";
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  const match = document.cookie.match(
+    new RegExp("(^| )" + name + "=([^;]+)")
+  );
   return match ? decodeURIComponent(match[2]) : "";
-}
-
-function setCookie(name, value, days = 7) {
-  if (typeof document === "undefined") return;
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
-}
-
-export function getCachedUserData() {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem("xiroo_user_context") || getCookie("_xiroo_user_context");
-    if (raw) return JSON.parse(raw);
-  } catch (_) {}
-  return {};
-}
-
-export function saveCustomerContext(userData) {
-  if (typeof window === "undefined" || !userData) return;
-  try {
-    const existing = getCachedUserData();
-    const merged = { ...existing, ...userData };
-    const cleaned = Object.fromEntries(Object.entries(merged).filter(([_, v]) => !!v));
-    if (Object.keys(cleaned).length > 0) {
-      const json = JSON.stringify(cleaned);
-      localStorage.setItem("xiroo_user_context", json);
-      setCookie("_xiroo_user_context", json, 30);
-    }
-  } catch (_) {}
 }
 
 function normalizeEmail(email) {
@@ -47,8 +22,10 @@ function normalizeEmail(email) {
 
 function normalizePhone(phone) {
   if (!phone) return "";
-  return phone.replace(/[\s\-\(\)]/g, "");
+  return phone.replace(/[\s\-\(\)\+]/g, "");
 }
+
+// ─── IP Cache ───────────────────────────────────────────────────────────────
 
 let cachedIp = "";
 
@@ -64,10 +41,43 @@ async function fetchClientIp() {
   }
 }
 
+// ─── User Context ───────────────────────────────────────────────────────────
+
+function getUserContext() {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem("xiroo_user_context");
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUserContext(data) {
+  if (typeof window === "undefined" || !data) return;
+  try {
+    const existing = getUserContext();
+    const merged = { ...existing, ...data };
+    const cleaned = Object.fromEntries(
+      Object.entries(merged).filter(([_, v]) => !!v)
+    );
+    if (Object.keys(cleaned).length > 0) {
+      localStorage.setItem("xiroo_user_context", JSON.stringify(cleaned));
+    }
+  } catch {}
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
+
 export default function FacebookPixel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
+
+  // Refs to avoid stale closures
+  const pixelInitialized = useRef(false);
+  const pixelIdRef = useRef(null);
+  const testCodeRef = useRef("");
 
   const loggedInUserData = user
     ? {
@@ -76,48 +86,43 @@ export default function FacebookPixel() {
         firstName: user.firstName || user.name?.split(" ")[0] || "",
         lastName: user.lastName || user.name?.split(" ").slice(1).join(" ") || "",
         externalId: user._id || user.id || "",
-        city: user.addresses?.[0]?.city || "",
-        state: user.addresses?.[0]?.state || "",
-        zip: user.addresses?.[0]?.postalCode || "",
-        country: user.addresses?.[0]?.country || "",
       }
     : {};
 
+  // ── Initialize pixel ONCE ───────────────────────────────────────────────
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    // Cache client IP early for CAPI events
-    fetchClientIp();
-
-    window.trackFacebookEvent = async (eventName, customData = {}, userData = {}, overrideEventId = null) => {
-      console.warn("Facebook Tracking not yet initialized for:", eventName);
-    };
+    if (typeof window === "undefined" || pixelInitialized.current) return;
 
     const initPixel = async () => {
-      let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+      // 1. Resolve pixel ID
+      let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID || "";
       let testCode = "";
       let isEnabled = !!pixelId;
 
       try {
-        const { data } = await axiosInstance.get("/marketing");
-        const settings = data;
-        
+        const resp = await axiosInstance.get("/marketing");
+        const settings = resp?.data;
         if (settings) {
           if (!pixelId) {
-            pixelId = settings.pixelId;
+            pixelId = settings.pixelId || "";
             isEnabled = settings.isEnabled;
           }
           testCode = settings.testEventCode || "";
         }
-      } catch (error) {
-        console.warn("Failed to fetch marketing settings from server, falling back to client env:", error);
+      } catch (err) {
+        console.warn("[FB Pixel] Failed to fetch settings:", err);
       }
 
       if (!pixelId || !isEnabled) {
+        console.warn("[FB Pixel] Pixel disabled or no pixel ID");
         return;
       }
 
-      try {
+      pixelIdRef.current = pixelId;
+      testCodeRef.current = testCode;
+
+      // 2. Load fbevents.js
+      if (!window.fbq) {
         !(function (f, b, e, v, n, t, s) {
           if (f.fbq) return;
           n = f.fbq = function () {
@@ -139,118 +144,143 @@ export default function FacebookPixel() {
           window,
           document,
           "script",
-          "https://connect.facebook.net/en_US/fbevents.js",
+          "https://connect.facebook.net/en_US/fbevents.js"
         );
+      }
 
-        const initialUser = {
-          ...getCachedUserData(),
-          ...loggedInUserData,
-        };
+      // 3. Init with advanced matching (once)
+      const initialUser = { ...getUserContext(), ...loggedInUserData };
+      const advancedMatching = {};
+      if (initialUser.email)
+        advancedMatching.em = normalizeEmail(initialUser.email);
+      if (initialUser.phone)
+        advancedMatching.ph = normalizePhone(initialUser.phone);
+      if (initialUser.firstName)
+        advancedMatching.fn = initialUser.firstName.trim().toLowerCase();
+      if (initialUser.lastName)
+        advancedMatching.ln = initialUser.lastName.trim().toLowerCase();
+      if (initialUser.externalId)
+        advancedMatching.external_id = String(initialUser.externalId);
 
-        const initialAdvanced = {};
-        if (initialUser.email) initialAdvanced.em = normalizeEmail(initialUser.email);
-        if (initialUser.phone) initialAdvanced.ph = normalizePhone(initialUser.phone);
-        if (initialUser.firstName) initialAdvanced.fn = initialUser.firstName.trim().toLowerCase();
-        if (initialUser.lastName) initialAdvanced.ln = initialUser.lastName.trim().toLowerCase();
-        if (initialUser.externalId) initialAdvanced.external_id = String(initialUser.externalId);
+      if (Object.keys(advancedMatching).length > 0) {
+        window.fbq("init", pixelId, advancedMatching);
+      } else {
+        window.fbq("init", pixelId);
+      }
 
-        if (Object.keys(initialAdvanced).length > 0) {
-          window.fbq("init", pixelId, initialAdvanced);
-        } else {
-          window.fbq("init", pixelId);
+      // 4. Initial PageView
+      window.fbq("track", "PageView");
+
+      // 5. Expose global tracking function
+      window.trackFacebookEvent = async (
+        eventName,
+        customData = {},
+        userData = {},
+        overrideEventId = null
+      ) => {
+        const activePid = pixelIdRef.current;
+        if (!activePid || !window.fbq) return;
+
+        const cachedUser = getUserContext();
+        const hasExplicitUserData = Object.keys(userData).length > 0;
+        const mergedUser = hasExplicitUserData
+          ? { ...loggedInUserData, ...userData }
+          : { ...cachedUser, ...loggedInUserData };
+
+        if (hasExplicitUserData) {
+          saveUserContext(userData);
         }
 
-        window.fbq("track", "PageView");
+        // Generate unique event ID for deduplication
+        const eventId =
+          overrideEventId ||
+          "evt_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 
-        window.trackFacebookEvent = async (eventName, customData = {}, userData = {}, overrideEventId = null) => {
-          const cachedUser = getCachedUserData();
-          const hasExplicitUserData = Object.keys(userData).length > 0;
-          const activeUser = hasExplicitUserData
-            ? { ...loggedInUserData, ...userData }
-            : { ...cachedUser, ...loggedInUserData };
+        const fbc = getCookie("_fbc");
+        const fbp = getCookie("_fbp");
+        const clientIp = cachedIp || (await fetchClientIp());
 
-          if (hasExplicitUserData) {
-            saveCustomerContext(userData);
-          }
+        const nEmail = normalizeEmail(mergedUser.email);
+        const nPhone = normalizePhone(mergedUser.phone);
 
-          const eventId = overrideEventId || "event_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
-          const fbc = getCookie("_fbc");
-          const fbp = getCookie("_fbp");
-          const clientIp = cachedIp || await fetchClientIp();
+        // Fire browser pixel with eventID for deduplication
+        const advancedMatching = {};
+        if (nEmail) advancedMatching.em = nEmail;
+        if (nPhone) advancedMatching.ph = nPhone;
+        if (mergedUser.firstName)
+          advancedMatching.fn = mergedUser.firstName.trim().toLowerCase();
+        if (mergedUser.lastName)
+          advancedMatching.ln = mergedUser.lastName.trim().toLowerCase();
+        if (mergedUser.externalId)
+          advancedMatching.external_id = String(mergedUser.externalId);
 
-          const normalizedEmail = normalizeEmail(activeUser.email);
-          const normalizedPhone = normalizePhone(activeUser.phone);
+        if (Object.keys(advancedMatching).length > 0) {
+          window.fbq("init", activePid, advancedMatching);
+        }
+        window.fbq("track", eventName, customData, { eventID: eventId });
 
-          if (window.fbq) {
-            const advancedMatching = {};
-            if (normalizedEmail) advancedMatching.em = normalizedEmail;
-            if (normalizedPhone) advancedMatching.ph = normalizedPhone;
-            if (activeUser.firstName) advancedMatching.fn = activeUser.firstName.trim().toLowerCase();
-            if (activeUser.lastName) advancedMatching.ln = activeUser.lastName.trim().toLowerCase();
-            if (activeUser.externalId) advancedMatching.external_id = String(activeUser.externalId);
+        // Send CAPI relay (server-side event)
+        try {
+          const capiUserData = {
+            userAgent: window.navigator.userAgent,
+            ip: clientIp,
+          };
+          // Only include PII if we have actual values
+          if (nEmail) capiUserData.email = nEmail;
+          if (nPhone) capiUserData.phone = nPhone;
+          if (mergedUser.firstName) capiUserData.firstName = mergedUser.firstName;
+          if (mergedUser.lastName) capiUserData.lastName = mergedUser.lastName;
+          if (mergedUser.externalId)
+            capiUserData.externalId = mergedUser.externalId;
+          if (fbc) capiUserData.fbc = fbc;
+          if (fbp) capiUserData.fbp = fbp;
 
-            if (Object.keys(advancedMatching).length > 0) {
-              window.fbq("init", pixelId, advancedMatching);
-            }
-            window.fbq("track", eventName, customData, { eventID: eventId });
-          }
+          await axiosInstance.post("/marketing/track", {
+            eventName,
+            customData,
+            eventSourceUrl: window.location.href,
+            eventId,
+            testEventCode: testCodeRef.current,
+            userData: capiUserData,
+          });
+        } catch (err) {
+          console.error(`[FB Pixel] CAPI ${eventName} failed:`, err);
+        }
+      };
 
-          try {
-            const capiUserData = {
-              userAgent: window.navigator.userAgent,
-              ip: clientIp,
-              fbc,
-              fbp,
-            };
-            if (normalizedEmail) capiUserData.email = normalizedEmail;
-            if (normalizedPhone) capiUserData.phone = normalizedPhone;
-            if (activeUser.firstName) capiUserData.firstName = activeUser.firstName;
-            if (activeUser.lastName) capiUserData.lastName = activeUser.lastName;
-            if (activeUser.externalId) capiUserData.externalId = activeUser.externalId;
-            if (activeUser.city) capiUserData.city = activeUser.city;
-            if (activeUser.state) capiUserData.state = activeUser.state;
-            if (activeUser.zip) capiUserData.zip = activeUser.zip;
-            if (activeUser.country) capiUserData.country = activeUser.country;
-
-            await axiosInstance.post("/marketing/track", {
-              eventName,
-              customData,
-              eventSourceUrl: window.location.href,
-              eventId,
-              testEventCode: testCode,
-              userData: capiUserData,
-            });
-          } catch (error) {
-            console.error("Failed to track CAPI event:", error);
-          }
-        };
-      } catch (error) {
-        console.error("Failed to initialize Facebook Pixel script:", error);
-      }
+      pixelInitialized.current = true;
+      console.log("[FB Pixel] Initialized:", activePid);
     };
 
     initPixel();
   }, [user]);
 
+  // ── PageView on route change ────────────────────────────────────────────
   useEffect(() => {
-    if (window.fbq) {
-      window.fbq("track", "PageView");
-      try {
-        const fbc = getCookie("_fbc");
-        const fbp = getCookie("_fbp");
-        axiosInstance.post("/marketing/track", {
-          eventName: "PageView",
-          customData: { page_title: document.title },
-          eventSourceUrl: window.location.href,
-          userData: {
-            userAgent: window.navigator.userAgent,
-            ip: cachedIp,
-            fbc,
-            fbp,
-          },
-        });
-      } catch (_) {}
-    }
+    if (!window.fbq || !pixelIdRef.current) return;
+
+    // Browser PageView
+    window.fbq("track", "PageView");
+
+    // CAPI PageView (no event_id — browser already handles dedup for PageView)
+    const fbc = getCookie("_fbc");
+    const fbp = getCookie("_fbp");
+
+    const capiUserData = {
+      userAgent: window.navigator.userAgent,
+      ip: cachedIp,
+    };
+    if (fbc) capiUserData.fbc = fbc;
+    if (fbp) capiUserData.fbp = fbp;
+
+    axiosInstance
+      .post("/marketing/track", {
+        eventName: "PageView",
+        customData: { page_title: document.title },
+        eventSourceUrl: window.location.href,
+        userData: capiUserData,
+      })
+      .catch(() => {});
   }, [pathname, searchParams, user]);
 
   return null;
