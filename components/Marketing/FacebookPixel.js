@@ -164,13 +164,12 @@ export default function FacebookPixel() {
 
         window.trackFacebookEvent = async (eventName, customData = {}, userData = {}, overrideEventId = null) => {
           const cachedUser = getCachedUserData();
-          const activeUser = {
-            ...cachedUser,
-            ...loggedInUserData,
-            ...userData,
-          };
+          const hasExplicitUserData = Object.keys(userData).length > 0;
+          const activeUser = hasExplicitUserData
+            ? { ...loggedInUserData, ...userData }
+            : { ...cachedUser, ...loggedInUserData };
 
-          if (Object.keys(userData).length > 0) {
+          if (hasExplicitUserData) {
             saveCustomerContext(userData);
           }
 
@@ -189,39 +188,37 @@ export default function FacebookPixel() {
             if (activeUser.firstName) advancedMatching.fn = activeUser.firstName.trim().toLowerCase();
             if (activeUser.lastName) advancedMatching.ln = activeUser.lastName.trim().toLowerCase();
             if (activeUser.externalId) advancedMatching.external_id = String(activeUser.externalId);
-            if (activeUser.city) advancedMatching.ct = activeUser.city.trim().toLowerCase().replace(/[\s\-\.]/g, "");
-            if (activeUser.state) advancedMatching.st = activeUser.state.trim().toLowerCase();
-            if (activeUser.zip) advancedMatching.zp = String(activeUser.zip).trim();
-            if (activeUser.country) advancedMatching.country = activeUser.country.trim().toLowerCase();
 
             if (Object.keys(advancedMatching).length > 0) {
               window.fbq("init", pixelId, advancedMatching);
             }
-            window.fbq("track", eventName, customData, { event_id: eventId });
+            window.fbq("track", eventName, customData, { eventID: eventId });
           }
 
           try {
+            const capiUserData = {
+              userAgent: window.navigator.userAgent,
+              ip: clientIp,
+              fbc,
+              fbp,
+            };
+            if (normalizedEmail) capiUserData.email = normalizedEmail;
+            if (normalizedPhone) capiUserData.phone = normalizedPhone;
+            if (activeUser.firstName) capiUserData.firstName = activeUser.firstName;
+            if (activeUser.lastName) capiUserData.lastName = activeUser.lastName;
+            if (activeUser.externalId) capiUserData.externalId = activeUser.externalId;
+            if (activeUser.city) capiUserData.city = activeUser.city;
+            if (activeUser.state) capiUserData.state = activeUser.state;
+            if (activeUser.zip) capiUserData.zip = activeUser.zip;
+            if (activeUser.country) capiUserData.country = activeUser.country;
+
             await axiosInstance.post("/marketing/track", {
               eventName,
               customData,
               eventSourceUrl: window.location.href,
               eventId,
               testEventCode: testCode,
-              userData: {
-                email: normalizedEmail,
-                phone: normalizedPhone,
-                firstName: activeUser.firstName || '',
-                lastName: activeUser.lastName || '',
-                externalId: activeUser.externalId || '',
-                city: activeUser.city || '',
-                state: activeUser.state || '',
-                zip: activeUser.zip || '',
-                country: activeUser.country || '',
-                userAgent: window.navigator.userAgent,
-                ip: clientIp,
-                fbc,
-                fbp,
-              },
+              userData: capiUserData,
             });
           } catch (error) {
             console.error("Failed to track CAPI event:", error);
@@ -239,27 +236,13 @@ export default function FacebookPixel() {
     if (window.fbq) {
       window.fbq("track", "PageView");
       try {
-        const activeUser = {
-          ...getCachedUserData(),
-          ...loggedInUserData,
-        };
         const fbc = getCookie("_fbc");
         const fbp = getCookie("_fbp");
         axiosInstance.post("/marketing/track", {
           eventName: "PageView",
           customData: { page_title: document.title },
           eventSourceUrl: window.location.href,
-          eventId: "pv_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now(),
           userData: {
-            email: normalizeEmail(activeUser.email),
-            phone: normalizePhone(activeUser.phone),
-            firstName: activeUser.firstName || '',
-            lastName: activeUser.lastName || '',
-            externalId: activeUser.externalId || '',
-            city: activeUser.city || '',
-            state: activeUser.state || '',
-            zip: activeUser.zip || '',
-            country: activeUser.country || '',
             userAgent: window.navigator.userAgent,
             ip: cachedIp,
             fbc,
