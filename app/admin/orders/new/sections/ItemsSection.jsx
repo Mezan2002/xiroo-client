@@ -16,6 +16,125 @@ const SectionHeader = ({ label, title, action }) => (
   </div>
 );
 
+const VariantSelector = ({ product, onSelect, onBack }) => {
+  const [selectedVariants, setSelectedVariants] = useState({});
+
+  const toggleVariant = (groupName, value) => {
+    setSelectedVariants((prev) => {
+      const current = prev[groupName] || [];
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      return { ...prev, [groupName]: next };
+    });
+  };
+
+  const combinations = getVariantCombinations(product.variants || [], selectedVariants);
+  const hasVariants = (product.variants || []).length > 0;
+
+  const handleConfirm = () => {
+    if (hasVariants && combinations.length > 0) {
+      onSelect(product, combinations[0]);
+    } else {
+      onSelect(product, "Standard");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[200] bg-black/50 flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-white w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-black tracking-tight">
+              Select Variant
+            </h2>
+            <p className="text-xs text-zinc-400 mt-1 uppercase tracking-widest">
+              {product.title}
+            </p>
+          </div>
+          <button
+            onClick={onBack}
+            className="w-8 h-8 flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 transition-colors text-black rounded-full font-bold"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div className="p-6">
+          {hasVariants ? (
+            <div className="space-y-4">
+              {(product.variants || []).map((group) => (
+                <div key={group.name}>
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">
+                    {group.name}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {(group.values || []).map((val) => {
+                      const isSelected = (
+                        selectedVariants[group.name] || []
+                      ).includes(val.value);
+                      return (
+                        <button
+                          key={val.value}
+                          onClick={() => toggleVariant(group.name, val.value)}
+                          className={`px-3 py-1.5 text-[11px] font-bold border transition-all ${
+                            isSelected
+                              ? "bg-black text-white border-black"
+                              : "border-zinc-200 text-zinc-500 hover:border-black"
+                          }`}
+                        >
+                          {val.value}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+              {combinations.length > 0 && (
+                <div className="pt-3 border-t border-zinc-100">
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">
+                    Selected Combination
+                  </p>
+                  <div className="flex items-center gap-2">
+                    {combinations.map((combo, i) => (
+                      <span
+                        key={combo}
+                        className="text-[11px] font-bold text-black bg-zinc-50 border border-zinc-100 px-2 py-1"
+                      >
+                        {combo}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-400 italic">
+              This product has no variants. Click confirm to add as standard.
+            </p>
+          )}
+        </div>
+
+        <div className="p-6 border-t border-zinc-100 flex justify-end gap-3">
+          <button
+            onClick={onBack}
+            className="h-10 px-6 text-[11px] font-bold uppercase tracking-widest text-zinc-400 hover:text-black transition-colors"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={hasVariants && combinations.length === 0}
+            className="h-10 px-8 bg-black text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors disabled:opacity-50"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProductSearchDropdown = ({ onSelect, onClose }) => {
   const [query, setQuery] = useState("");
   const { useSearchProducts, useAllProducts } = useProducts();
@@ -468,6 +587,8 @@ export default function ItemsSection({
 }) {
   const [activeSearchId, setActiveSearchId] = useState(null);
   const [isBundleModalOpen, setIsBundleModalOpen] = useState(false);
+  const [variantSelectingProduct, setVariantSelectingProduct] = useState(null);
+  const [variantSelectingItemId, setVariantSelectingItemId] = useState(null);
 
   const { useAllProducts } = useProducts();
   const { data: productsData } = useAllProducts({ limit: 1000 });
@@ -480,16 +601,34 @@ export default function ItemsSection({
   })();
 
   const handleProductSelect = (id, product) => {
+    setActiveSearchId(null);
+    const hasVariants = product.variants && product.variants.length > 0;
+    if (hasVariants) {
+      setVariantSelectingProduct(product);
+      setVariantSelectingItemId(id);
+    } else {
+      updateItem(id, "product", product._id);
+      updateItem(id, "name", product.title);
+      updateItem(id, "price", product.salePrice || product.price);
+      updateItem(id, "variant", "Standard");
+      updateItem(id, "image", product.images?.[0] || "");
+    }
+  };
+
+  const handleVariantConfirm = (product, variant) => {
+    const id = variantSelectingItemId;
     updateItem(id, "product", product._id);
     updateItem(id, "name", product.title);
     updateItem(id, "price", product.salePrice || product.price);
-    updateItem(
-      id,
-      "variant",
-      product.variants?.[0]?.values?.[0]?.value || "Standard",
-    );
+    updateItem(id, "variant", variant);
     updateItem(id, "image", product.images?.[0] || "");
-    setActiveSearchId(null);
+    setVariantSelectingProduct(null);
+    setVariantSelectingItemId(null);
+  };
+
+  const handleVariantBack = () => {
+    setVariantSelectingProduct(null);
+    setVariantSelectingItemId(null);
   };
 
   const handleBundleConfirm = (bundleItems) => {
@@ -739,6 +878,14 @@ export default function ItemsSection({
         <BundleCreatorModal
           onClose={() => setIsBundleModalOpen(false)}
           onConfirm={handleBundleConfirm}
+        />
+      )}
+
+      {variantSelectingProduct && (
+        <VariantSelector
+          product={variantSelectingProduct}
+          onSelect={handleVariantConfirm}
+          onBack={handleVariantBack}
         />
       )}
     </section>
