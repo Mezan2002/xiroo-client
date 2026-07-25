@@ -10,7 +10,6 @@ export const useCartSidebar = (isOpen) => {
   const { toast } = useToast();
 
   const [activeDrawer, setActiveDrawer] = useState(null);
-  const [note, setNote] = useState("");
   const [coupon, setCoupon] = useState("");
 
   useEffect(() => {
@@ -29,8 +28,8 @@ export const useCartSidebar = (isOpen) => {
     validateDiscount.mutate(
       { code: coupon, currentOrderValue: cart.subtotal || 0 },
       {
-        onSuccess: (res) => {
-          cart.applyDiscount(res.data);
+        onSuccess: (discountData) => {
+          cart.applyDiscount(discountData);
           setActiveDrawer(null);
           setCoupon("");
         },
@@ -45,8 +44,6 @@ export const useCartSidebar = (isOpen) => {
     ...cart,
     activeDrawer,
     setActiveDrawer,
-    note,
-    setNote,
     coupon,
     setCoupon,
     handleApplyCoupon,

@@ -1,15 +1,14 @@
+"use client";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import React from "react";
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 
-/**
- * Senior Dev Component: PolicyPage
- * A premium, typography-focused layout for legal and information pages.
- * Designed with the "Studio" aesthetic: minimalist, high-contrast, and spacious.
- */
 export default function PolicyPage({ title, lastUpdated, children }) {
+  const { settings } = useStoreSettings();
+  const supportEmail = settings?.contact?.supportEmail || "support@xirooshop.com";
+
   return (
     <div className="w-full min-h-screen bg-white pt-32 pb-24 px-6 lg:px-12 max-w-[1600px] mx-auto font-montserrat">
-      {/* Page Header */}
       <div className="max-w-[800px] mx-auto mb-20">
         <div className="flex flex-col gap-6 items-center text-center">
           <Breadcrumb />
@@ -26,7 +25,6 @@ export default function PolicyPage({ title, lastUpdated, children }) {
         </div>
       </div>
 
-      {/* Content Container */}
       <div className="max-w-[800px] mx-auto">
         <div className="prose prose-sm md:prose-base prose-zinc max-w-none 
           prose-headings:uppercase prose-headings:tracking-[0.15em] prose-headings:font-bold prose-headings:text-black
@@ -39,16 +37,15 @@ export default function PolicyPage({ title, lastUpdated, children }) {
         </div>
       </div>
       
-      {/* Trust Footer Hook */}
       <div className="max-w-[800px] mx-auto mt-24 pt-12 border-t border-gray-100 flex flex-col items-center text-center">
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-black mb-4">
           Questions regarding our policies?
         </p>
         <a 
-          href="mailto:support@xirooshop.com" 
+          href={`mailto:${supportEmail}`} 
           className="text-xs tracking-widest text-gray-400 hover:text-black transition-colors underline underline-offset-4 decoration-gray-200"
         >
-          support@xirooshop.com
+          {supportEmail}
         </a>
       </div>
     </div>

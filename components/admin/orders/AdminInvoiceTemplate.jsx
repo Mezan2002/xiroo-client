@@ -1,7 +1,11 @@
 "use client";
 import React from "react";
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 
 export default function AdminInvoiceTemplate({ order, invoiceRef }) {
+  const { settings: storeSettings } = useStoreSettings();
+  const supportEmail = storeSettings?.contact?.supportEmail || "support@xirooshop.com";
+  const phone = storeSettings?.contact?.phone || "+880 1XXX-XXXXXX";
   if (!order) return null;
 
   const date = new Date(order.createdAt).toLocaleDateString("en-US", {
@@ -297,7 +301,7 @@ export default function AdminInvoiceTemplate({ order, invoiceRef }) {
               Account Manager
             </p>
             <p style={{ fontSize: "10px", color: "#666", margin: "0 0 3px" }}>Xiroo Operations</p>
-            <p style={{ fontSize: "10px", color: "#666", margin: 0 }}>support@xirooshop.com</p>
+            <p style={{ fontSize: "10px", color: "#666", margin: 0 }}>{supportEmail}</p>
           </div>
         </div>
 
@@ -307,7 +311,7 @@ export default function AdminInvoiceTemplate({ order, invoiceRef }) {
             Questions?
           </p>
           <p style={{ fontSize: "10px", color: "#666", margin: 0 }}>
-            Email us at support@xirooshop.com or call us at +880 1XXX-XXXXXX
+            Email us at {supportEmail} or call us at {phone}
           </p>
         </div>
 
@@ -325,7 +329,7 @@ export default function AdminInvoiceTemplate({ order, invoiceRef }) {
             Dhaka, Bangladesh &middot; xirooshop.com
           </p>
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-            <span style={{ fontSize: "9px", color: "#aaa" }}>support@xirooshop.com</span>
+            <span style={{ fontSize: "9px", color: "#aaa" }}>{supportEmail}</span>
             <span style={{ fontSize: "9px", color: "#aaa" }}>facebook</span>
             <span style={{ fontSize: "9px", color: "#aaa" }}>instagram</span>
           </div>

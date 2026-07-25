@@ -4,12 +4,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Search, Package, Clock, Truck, CheckCircle2, AlertCircle } from "lucide-react";
 import { useOrders } from "@/hooks/api/useOrders";
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function TrackOrderPage() {
   const [orderIdInput, setOrderIdInput] = useState("");
   const [searchId, setSearchId] = useState("");
+  const { settings: storeSettings } = useStoreSettings();
+  const whatsapp = storeSettings?.contact?.whatsapp || "8801XXXXXXXXX";
+  const supportEmail = storeSettings?.contact?.supportEmail || "support@xiroo.shop";
 
   const { useOrderDetail } = useOrders();
   const { data: order, isLoading, error } = useOrderDetail(searchId, {
@@ -272,7 +276,7 @@ export default function TrackOrderPage() {
                 </div>
                 <div className="flex gap-3">
                   <a
-                    href="https://wa.me/8801XXXXXXXXX"
+                    href={`https://wa.me/${whatsapp}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 px-4 py-2.5 bg-[#25D366] hover:bg-[#128C7E] text-white text-[10px] font-bold uppercase tracking-wider text-center transition-colors"
@@ -280,7 +284,7 @@ export default function TrackOrderPage() {
                     Pay via WhatsApp
                   </a>
                   <a
-                    href={`mailto:support@xiroo.shop?subject=Advance Payment - Order ${order.orderId}`}
+                    href={`mailto:${supportEmail}?subject=Advance Payment - Order ${order.orderId}`}
                     className="flex-1 px-4 py-2.5 border border-amber-300 hover:bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider text-center transition-colors"
                   >
                     Pay via Email

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -9,22 +9,50 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 
 import { useUser } from "@/hooks/api/useUser";
 import { useCart } from "@/hooks/useCart";
+import { useDiscounts } from "@/hooks/api/useDiscounts";
+import { useDeliveryFee } from "@/hooks/api/useDeliverySettings";
+import { useToast } from "@/hooks/useToast";
 
 export default function CheckoutPage() {
   const { user, isLoading } = useUser();
-  const { items, subtotal, isBundleFreeShipping } = useCart();
+  const { items, subtotal, discount, discountAmount, isBundleFreeShipping, note, setNote, applyDiscount, removeDiscount } = useCart();
+  const { validateDiscount } = useDiscounts();
+  const { toast } = useToast();
   const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
 
+  const { data: deliveryFeeData, isLoading: feeLoading } = useDeliveryFee(district);
+
   const shipping = !district
     ? null
-    : isBundleFreeShipping 
-      ? 0 
-      : deliveryMethod === "normal"
-        ? (district === "Dhaka" ? 80 : 150)
-        : (district === "Dhaka" ? 130 : 200);
-  const total = subtotal + (shipping || 0);
+    : isBundleFreeShipping || discount?.type === "free_shipping"
+      ? 0
+      : deliveryFeeData
+        ? deliveryMethod === "fast" ? deliveryFeeData.fast : deliveryFeeData.normal
+        : null;
+  
+  const discountedSubtotal = subtotal - (discountAmount || 0);
+  const total = discountedSubtotal + (shipping || 0);
+
+  const handleApplyCoupon = (code, onSuccess) => {
+    validateDiscount.mutate(
+      { code, currentOrderValue: subtotal || 0 },
+      {
+        onSuccess: (discountData) => {
+          applyDiscount(discountData);
+          if (onSuccess) onSuccess();
+        },
+        onError: (err) => {
+          toast.error(err?.response?.data?.message || err.message || "Invalid coupon");
+        },
+      }
+    );
+  };
+
+  const handleRemoveCoupon = () => {
+    removeDiscount();
+  };
   
   useEffect(() => {
     if (window.trackFacebookEvent && items) {
@@ -79,6 +107,11 @@ export default function CheckoutPage() {
               subtotal={subtotal}
               shipping={shipping}
               total={total}
+              discount={discount}
+              discountAmount={discountAmount}
+              note={note}
+              setNote={setNote}
+              deliveryFeeData={deliveryFeeData}
             />
           </div>
 
@@ -89,7 +122,12 @@ export default function CheckoutPage() {
                 items={items} 
                 subtotal={subtotal} 
                 shipping={shipping} 
-                total={total} 
+                total={total}
+                discount={discount}
+                discountAmount={discountAmount}
+                onApplyCoupon={handleApplyCoupon}
+                onRemoveCoupon={handleRemoveCoupon}
+                isApplyingCoupon={validateDiscount.isPending}
               />
             </div>
           </div>

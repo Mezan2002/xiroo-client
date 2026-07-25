@@ -122,6 +122,12 @@ export default function OrderDetailsPage() {
                 <span className="text-zinc-400 font-medium">Subtotal</span>
                 <span className="text-zinc-700 font-bold font-mono">৳{rawSubtotal.toLocaleString()}</span>
               </div>
+              {order.discount && (
+                <div className="flex justify-between text-[11px] text-green-600">
+                  <span className="font-medium">Coupon ({order.discount.code})</span>
+                  <span className="font-bold font-mono">-৳{(order.discount.amount || 0).toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between text-[11px]">
                 <span className="text-zinc-400 font-medium">Shipping</span>
                 <span className="text-zinc-700 font-bold font-mono">৳{delivery.toLocaleString()}</span>
@@ -131,6 +137,16 @@ export default function OrderDetailsPage() {
                 <span className="text-[16px] font-black text-zinc-900 font-mono">৳{order.totalPrice.toLocaleString()}</span>
               </div>
             </div>
+
+            {/* Order Note */}
+            {order.note && (
+              <div className="px-5 py-4 bg-amber-50 border-t border-zinc-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest shrink-0">Note</span>
+                  <p className="text-[12px] text-amber-800 font-medium leading-relaxed">{order.note}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Customer Identity */}

@@ -31,16 +31,27 @@ export default function AdminOrders() {
     { 
       key: "customerName", 
       label: "Customer", 
-      render: (row) => (
-        <div className="flex flex-col gap-1">
-          <span className="text-[13px] font-bold text-zinc-900">{row.customerName}</span>
-          <span className={`text-[8px] font-black w-fit px-1.5 py-0.5 rounded-none uppercase tracking-[0.15em] border ${
-            row.user ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-zinc-50 text-zinc-500 border-zinc-100'
-          }`}>
-            {row.user ? 'Regular' : 'Guest'}
-          </span>
-        </div>
-      )
+      render: (row) => {
+        const isUser = !!row.user;
+        const isAdminCreated = !!row.createdByAdmin;
+        const isAdminUser = row.user?.role === 'admin';
+        return (
+          <div className="flex flex-col gap-1">
+            <span className="text-[13px] font-bold text-zinc-900">{row.customerName}</span>
+            <span className={`text-[8px] font-black w-fit px-1.5 py-0.5 rounded-none uppercase tracking-[0.15em] border ${
+              isAdminUser ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+              isUser ? 'bg-blue-50 text-blue-700 border-blue-100' :
+              isAdminCreated ? 'bg-violet-50 text-violet-700 border-violet-100' :
+              'bg-zinc-50 text-zinc-500 border-zinc-100'
+            }`}>
+              {isAdminUser ? 'Admin' :
+               isUser ? 'Regular' :
+               isAdminCreated ? 'Admin Created' :
+               'Guest'}
+            </span>
+          </div>
+        );
+      }
     },
     { 
       key: "deliveryMethod", 

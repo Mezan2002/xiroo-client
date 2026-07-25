@@ -9,6 +9,7 @@ const initialState = {
   autoBundleDiscountAmount: 0,
   isBundleFreeShipping: false,
   total: 0,
+  note: "",
 };
 
 const cartSlice = createSlice({
@@ -76,6 +77,10 @@ const cartSlice = createSlice({
       state.autoBundleDiscountAmount = 0;
       state.isBundleFreeShipping = false;
       state.total = 0;
+      state.note = "";
+    },
+    setNote: (state, action) => {
+      state.note = action.payload;
     },
     applyDiscount: (state, action) => {
       state.discount = action.payload;
@@ -134,6 +139,7 @@ const calculateMetrics = (items, discount = null) => {
     } else if (discount.type === "fixed") {
       discountAmount = discount.value;
     }
+    // free_shipping: no monetary discount amount, handled at checkout shipping
   }
   
   const totalDiscounts = discountAmount + autoBundleDiscountAmount;
@@ -150,5 +156,5 @@ const calculateMetrics = (items, discount = null) => {
   };
 };
 
-export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart, applyDiscount, removeDiscount } = cartSlice.actions;
+export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart, setNote, applyDiscount, removeDiscount } = cartSlice.actions;
 export default cartSlice.reducer;

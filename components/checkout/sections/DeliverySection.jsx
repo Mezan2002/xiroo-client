@@ -1,20 +1,22 @@
 "use client";
 
-export default function DeliverySection({ deliveryMethod, setDeliveryMethod, district }) {
-  const isInsideDhaka = district === "Dhaka";
+export default function DeliverySection({ deliveryMethod, setDeliveryMethod, district, deliveryFeeData }) {
+  const normalFee = deliveryFeeData?.normal ?? null;
+  const fastFee = deliveryFeeData?.fast ?? null;
+  const estimatedDays = deliveryFeeData?.estimatedDays || {};
 
   const methods = [
     { 
       id: "normal", 
       label: "Normal Delivery", 
-      desc: isInsideDhaka ? "2-3 Days" : "3-4 Days", 
-      price: !district ? "Select district" : isInsideDhaka ? "৳80" : "৳150"
+      desc: estimatedDays.normal || (district === "Dhaka" ? "2-3 Days" : "3-4 Days"), 
+      price: !district ? "Select district" : normalFee !== null ? `৳${normalFee}` : "Loading..."
     },
     { 
       id: "fast", 
       label: "Fast Delivery", 
-      desc: "24-48 Hours", 
-      price: !district ? "Select district" : isInsideDhaka ? "৳120" : "৳200" 
+      desc: estimatedDays.fast || "24-48 Hours", 
+      price: !district ? "Select district" : fastFee !== null ? `৳${fastFee}` : "Loading..."
     },
   ];
 

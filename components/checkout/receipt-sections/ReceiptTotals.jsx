@@ -1,6 +1,7 @@
 import React from "react";
 
-export default function ReceiptTotals({ subtotal, delivery, totalPrice }) {
+export default function ReceiptTotals({ subtotal, delivery, discount, discountAmount, totalPrice }) {
+  const roundedDiscount = discountAmount ? Math.round(discountAmount * 100) / 100 : 0;
   return (
     <div
       style={{
@@ -28,6 +29,23 @@ export default function ReceiptTotals({ subtotal, delivery, totalPrice }) {
         </p>
         <p style={{ fontSize: "12px", fontWeight: "900" }}>৳{subtotal}</p>
       </div>
+      {discount && (
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <p
+            style={{
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: "#2a9d4e",
+              textTransform: "uppercase",
+            }}
+          >
+            Discount ({discount.code})
+          </p>
+          <p style={{ fontSize: "12px", fontWeight: "900", color: "#2a9d4e" }}>
+            {discount.type === 'free_shipping' ? 'Free Shipping' : `-৳${roundedDiscount.toFixed(2)}`}
+          </p>
+        </div>
+      )}
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <p
           style={{

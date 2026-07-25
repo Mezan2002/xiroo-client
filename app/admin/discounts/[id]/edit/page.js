@@ -20,7 +20,7 @@ export default function EditDiscountPage() {
   const initialData = discount
     ? {
         code: discount.code,
-        type: discount.type === "percentage" ? "Percentage" : "Fixed Amount",
+        type: discount.type === "percentage" ? "Percentage" : discount.type === "free_shipping" ? "Free Shipping" : "Fixed Amount",
         value: String(discount.value),
         minRequirement: discount.minOrderValue > 0 ? "Amount" : "None",
         minAmount: discount.minOrderValue ? String(discount.minOrderValue) : "",
@@ -34,7 +34,7 @@ export default function EditDiscountPage() {
   const handleSubmit = (data) => {
     const payload = {
       code: data.code.toUpperCase(),
-      type: data.type === "Percentage" ? "percentage" : "fixed",
+      type: data.type === "Percentage" ? "percentage" : data.type === "Free Shipping" ? "free_shipping" : "fixed",
       value: parseFloat(data.value) || 0,
       minOrderValue: data.minRequirement === "Amount" ? parseFloat(data.minAmount) || 0 : 0,
       startDate: data.startDate,

@@ -10,6 +10,8 @@ export default function ReceiptTemplate({
   order,
   subtotal,
   delivery,
+  discount,
+  discountAmount,
   receiptRef,
 }) {
   if (!order) return null;
@@ -53,6 +55,8 @@ export default function ReceiptTemplate({
         <ReceiptTotals 
           subtotal={subtotal} 
           delivery={delivery} 
+          discount={discount}
+          discountAmount={discountAmount}
           totalPrice={order.totalPrice} 
         />
 

@@ -122,7 +122,7 @@ export default function DesktopNavbar({
             </Button>
             {mounted && itemCount > 0 && (
               <motion.span
-                className="absolute -top-1 -right-1.5 flex size-3.5 items-center justify-center rounded-full bg-black text-[7px] font-medium text-white ring-1 ring-white"
+                className="absolute -top-1 -right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold text-white"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 500, damping: 25 }}

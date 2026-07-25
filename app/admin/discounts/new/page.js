@@ -16,7 +16,7 @@ export default function NewDiscountPage() {
     // Map frontend form values to backend schema
     const payload = {
       code: data.code.toUpperCase(),
-      type: data.type === "Percentage" ? "percentage" : "fixed",
+      type: data.type === "Percentage" ? "percentage" : data.type === "Free Shipping" ? "free_shipping" : "fixed",
       value: parseFloat(data.value) || 0,
       minOrderValue: data.minRequirement === "Amount" ? parseFloat(data.minAmount) || 0 : 0,
       startDate: data.startDate || new Date().toISOString(),

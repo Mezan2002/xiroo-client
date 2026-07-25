@@ -7,6 +7,7 @@ import { Navbar } from "./Navbar";
 const BottomNavbar = dynamic(() => import("./BottomNavbar"));
 const Footer = dynamic(() => import("./Footer"));
 const Newsletter = dynamic(() => import("./Newsletter"));
+// const InitialModal = dynamic(() => import("./InitialModal"));
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();

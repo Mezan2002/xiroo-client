@@ -1,10 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { X, Tag, Check } from "lucide-react";
 import { Button } from "../ui/Button";
 
-export default function OrderSummary({ items, subtotal, shipping, total }) {
+export default function OrderSummary({
+  items,
+  subtotal,
+  shipping,
+  total,
+  discount,
+  discountAmount,
+  onApplyCoupon,
+  onRemoveCoupon,
+  isApplyingCoupon,
+}) {
+  const [couponCode, setCouponCode] = useState("");
+
+  const handleApply = () => {
+    if (!couponCode.trim() || !onApplyCoupon) return;
+    onApplyCoupon(couponCode.trim(), () => setCouponCode(""));
+  };
+
+  const hasDiscount = !!discount;
+
   return (
     <div className="bg-gray-50/50 border border-gray-100 p-5 md:p-8 lg:p-12 space-y-8 lg:space-y-10">
       <h2 className="text-[18px] lg:text-[20px] font-medium uppercase tracking-wider border-b border-gray-100 pb-6 lg:pb-8">
@@ -54,19 +75,60 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
         ))}
       </div>
 
-      {/* Coupon Field */}
-      <div className="pt-8 lg:pt-10 border-t border-gray-100">
-        <div className="flex gap-2 sm:gap-3">
-          <input
-            type="text"
-            placeholder="Coupon Code"
-            className="flex-1 h-12 px-4 md:px-5 bg-white border border-gray-100 focus:border-black outline-none transition-all text-[10px] md:text-xs font-medium uppercase tracking-wider placeholder:text-gray-300 min-w-0"
-          />
-          <Button variant="secondary" className="h-12 px-4 sm:px-6 shrink-0 text-[10px] sm:text-[11px]">
-            Apply
-          </Button>
+      {/* Coupon Section */}
+      {onApplyCoupon && (
+        <div className="pt-6 border-t border-gray-100">
+          {hasDiscount ? (
+            <div className="flex items-center justify-between p-3.5 bg-green-50 border border-green-200">
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+                  <Check className="w-3.5 h-3.5 text-green-600" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-green-700 uppercase tracking-wider">
+                    {discount?.code || "COUPON"}
+                  </span>
+                  <span className="text-[10px] text-green-600 font-medium">
+                    {discount?.type === "percentage"
+                      ? `${discount.value}% off`
+                      : discount?.type === "fixed"
+                        ? `৳${discount.value} off`
+                        : "Free shipping"}
+                  </span>
+                </div>
+              </div>
+              {onRemoveCoupon && (
+                <button
+                  onClick={onRemoveCoupon}
+                  className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all"
+                  title="Remove coupon"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleApply()}
+                placeholder="Coupon code"
+                className="flex-1 h-10 px-3 bg-white border border-gray-200 focus:border-black outline-none transition-all text-[11px] font-medium uppercase tracking-wider placeholder:text-gray-300 placeholder:normal-case"
+              />
+              <Button
+                variant="secondary"
+                className="h-10 px-4 text-[10px] font-bold uppercase tracking-wider shrink-0"
+                onClick={handleApply}
+                disabled={isApplyingCoupon || !couponCode.trim()}
+              >
+                {isApplyingCoupon ? "..." : "Apply"}
+              </Button>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Price Breakdown */}
       <div className="space-y-4 pt-8 lg:pt-10 border-t border-gray-100">
@@ -74,12 +136,35 @@ export default function OrderSummary({ items, subtotal, shipping, total }) {
           <span>Subtotal</span>
           <span className="text-black">৳{subtotal.toLocaleString()}</span>
         </div>
+
+        {hasDiscount && (
+          <div className="flex justify-between items-center text-[12px] font-medium uppercase tracking-wider">
+            <span className="text-green-600">
+              Discount ({discount?.code})
+            </span>
+            <span className="text-green-600">
+              -৳{discountAmount.toLocaleString()}
+            </span>
+          </div>
+        )}
+
         <div className="flex justify-between items-center text-[12px] font-medium uppercase tracking-wider text-gray-400">
           <span>Delivery Fee</span>
-          <span className={`italic ${shipping === null ? "text-gray-300 not-italic" : "text-black"}`}>
-            {shipping === null ? "Select district" : shipping === 0 ? "Free" : `৳${shipping.toLocaleString()}`}
+          <span
+            className={`italic ${
+              shipping === null
+                ? "text-gray-300 not-italic"
+                : "text-black"
+            }`}
+          >
+            {shipping === null
+              ? "Select district"
+              : shipping === 0
+                ? "Free"
+                : `৳${shipping.toLocaleString()}`}
           </span>
         </div>
+
         <div className="flex justify-between items-center pt-4 lg:pt-6 border-t border-gray-100">
           <span className="text-[14px] lg:text-[15px] font-medium uppercase tracking-[0.3em]">
             Total

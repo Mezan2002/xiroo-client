@@ -2,29 +2,33 @@
 
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { Mail, MapPin, Phone } from "lucide-react";
-
-const CONTACT_INFO = [
-  {
-    icon: MapPin,
-    title: "Visit Us",
-    details: ["Dhaka, Bangladesh"],
-  },
-  {
-    icon: Mail,
-    title: "Email Us",
-    details: ["support@xirooshop.com"],
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    details: ["+880 1XXX-XXXXXX"],
-  },
-];
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 
 export default function ContactPage() {
+  const { settings: storeSettings } = useStoreSettings();
+  const supportEmail = storeSettings?.contact?.supportEmail || "support@xirooshop.com";
+  const phone = storeSettings?.contact?.phone || "+880 1XXX-XXXXXX";
+
+  const CONTACT_INFO = [
+    {
+      icon: MapPin,
+      title: "Visit Us",
+      details: ["Dhaka, Bangladesh"],
+    },
+    {
+      icon: Mail,
+      title: "Email Us",
+      details: [supportEmail],
+    },
+    {
+      icon: Phone,
+      title: "Call Us",
+      details: [phone],
+    },
+  ];
+
   return (
     <div className="w-full min-h-screen bg-white pt-32 pb-24 px-6 lg:px-12 max-w-[1600px] mx-auto font-montserrat">
-      {/* Header */}
       <div className="max-w-[800px] mx-auto mb-20">
         <div className="flex flex-col gap-6 items-center text-center">
           <Breadcrumb />
@@ -39,7 +43,6 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Contact Cards */}
       <div className="max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-100 mb-20">
         {CONTACT_INFO.map((info, idx) => {
           const Icon = info.icon;
@@ -62,7 +65,6 @@ export default function ContactPage() {
         })}
       </div>
 
-      {/* Contact Form */}
       <div className="max-w-[600px] mx-auto">
         <h2 className="text-xl font-medium tracking-wide text-black uppercase mb-8 text-center">
           Send Us a Message

@@ -18,6 +18,9 @@ export const useCheckoutForm = (
   total,
   shipping,
   deliveryMethod,
+  discount,
+  discountAmount,
+  note,
 ) => {
   const router = useRouter();
   const { user } = useUser();
@@ -179,6 +182,14 @@ export const useCheckoutForm = (
         paymentMethod: formData.paymentMethod,
         shippingAddress: shippingAddress,
         facebookEventId: "purchase_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now(),
+        ...(discount && {
+          discount: {
+            code: discount.code,
+            type: discount.type,
+            value: discount.value,
+          },
+        }),
+        ...(note && { note }),
       };
 
       // Case 1: Guest wants to register

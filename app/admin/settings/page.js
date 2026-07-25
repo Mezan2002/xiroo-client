@@ -1,58 +1,59 @@
 "use client";
 import React from "react";
-import { Settings, Save, RotateCcw } from "lucide-react";
+import { Settings, Save } from "lucide-react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
+import StoreIdentitySection from "./sections/StoreIdentitySection";
 import OperationalSettings from "./sections/OperationalSettings";
-import SecurityApiSettings from "./sections/SecurityApiSettings";
-import BillingSettings from "./sections/BillingSettings";
-import MarketingSettings from "./sections/MarketingSettings";
+import BundleRulesSection from "./sections/BundleRulesSection";
+import LoyaltySection from "./sections/LoyaltySection";
+import PoliciesSection from "./sections/PoliciesSection";
 import { useAdminSettings } from "./sections/useAdminSettings";
 
 export default function AdminSettings() {
-  const { activeTab, setActiveTab, shipping, setShipping, TABS } = useAdminSettings();
+  const s = useAdminSettings();
 
   return (
-    <div className="space-y-12 pb-24 animate-in fade-in duration-700 font-montserrat antialiased select-none">
+    <div className="space-y-16 pb-24 animate-in fade-in duration-700 font-montserrat antialiased select-none">
       <ModuleHeader 
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Settings", active: true }
         ]}
-        title={`${activeTab} Registry`}
+        title="Store Settings"
         icon={Settings}
-        primaryAction={activeTab === "Security & API" ? {
-          label: "Rotate Keys",
-          icon: RotateCcw,
-          onClick: () => console.log("Rotate Keys"),
-          className: "bg-red-600 hover:bg-red-700"
-        } : activeTab === "Marketing" ? null : {
-          label: "Save Config",
+        primaryAction={{
+          label: s.isSaving ? "Saving..." : "Save All Settings",
           icon: Save,
-          onClick: () => console.log("Save Config")
+          onClick: s.saveAll,
+          disabled: s.isSaving
         }}
       />
 
-      <div className="flex items-center gap-6 md:gap-8 border-b border-[#EDECE9] overflow-x-auto no-scrollbar scrollbar-hide">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-4 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] md:tracking-[0.3em] transition-all relative whitespace-nowrap shrink-0 ${
-              activeTab === tab ? "text-black" : "text-[#37352F40] hover:text-[#37352F80]"
-            }`}
-          >
-            {tab}
-            {activeTab === tab && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black animate-in fade-in slide-in-from-bottom-1 duration-300" />
-            )}
-          </button>
-        ))}
-      </div>
+      <StoreIdentitySection 
+        identity={s.identity} setIdentity={s.setIdentity}
+        contact={s.contact} setContact={s.setContact}
+        social={s.social} setSocial={s.setSocial}
+      />
 
-      {activeTab === "Operational" && <OperationalSettings shipping={shipping} setShipping={setShipping} />}
-      {activeTab === "Marketing" && <MarketingSettings />}
-      {activeTab === "Security & API" && <SecurityApiSettings />}
-      {activeTab === "Billing" && <BillingSettings />}
+      <OperationalSettings 
+        shipping={s.shipping} setShipping={s.setShipping}
+        customRates={s.customRates}
+        addCustomRate={s.addCustomRate}
+        removeCustomRate={s.removeCustomRate}
+      />
+
+      <BundleRulesSection 
+        bundleRules={s.bundleRules} setBundleRules={s.setBundleRules}
+      />
+
+      <LoyaltySection 
+        loyalty={s.loyalty} setLoyalty={s.setLoyalty}
+        updateTierConfig={s.updateTierConfig}
+      />
+
+      <PoliciesSection 
+        policies={s.policies} setPolicies={s.setPolicies}
+      />
     </div>
   );
 }

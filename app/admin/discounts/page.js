@@ -32,15 +32,17 @@ export default function AdminDiscounts() {
     ...d,
     id: d._id,
     code: d.code,
-    type: d.type === "percentage" ? "Percentage" : "Fixed Amount",
+    type: d.type === "percentage" ? "Percentage" : d.type === "free_shipping" ? "Free Shipping" : "Fixed Amount",
     value: d.type === "percentage" ? `${d.value}%` : `৳${d.value}`,
     usage: `${d.usageCount}${d.usageLimit ? ` / ${d.usageLimit}` : ""}`,
-    expiry: new Date(d.endDate).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
-    status: d.isActive && new Date(d.endDate) > new Date() ? "Active" : "Draft",
+    expiry: d.endDate
+      ? new Date(d.endDate).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : "No expiry",
+    status: d.isActive ? "Active" : "Draft",
   }));
 
   const handleDelete = (row) => {

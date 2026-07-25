@@ -96,7 +96,7 @@ export default function BottomNavbar() {
             <div className="relative">
               <ShoppingBag className="w-[22px] h-[22px]" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-extrabold text-black ring-2 ring-black">
+                <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[9px] font-bold text-black">
                   {itemCount}
                 </span>
               )}

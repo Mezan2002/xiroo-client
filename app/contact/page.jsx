@@ -4,9 +4,14 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { useState } from "react";
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { settings: storeSettings } = useStoreSettings();
+  const supportEmail = storeSettings?.contact?.supportEmail || "support@xirooshop.com";
+  const infoEmail = storeSettings?.contact?.infoEmail || "xiroo.shop.official@gmail.com";
+  const phone = storeSettings?.contact?.phone || "+880-1868-922-588";
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,9 +71,13 @@ export default function ContactPage() {
                   Digital Identity
                 </h3>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  support@xirooshop.com
-                  <br />
-                  xiroo.shop.official@gmail.com
+                  {supportEmail}
+                  {infoEmail && (
+                    <>
+                      <br />
+                      {infoEmail}
+                    </>
+                  )}
                 </p>
               </div>
             </div>
@@ -82,7 +91,7 @@ export default function ContactPage() {
                   Voice Protocol
                 </h3>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  +880-1868-922-588
+                  {phone}
                   <br />
                   24/7 Available
                 </p>

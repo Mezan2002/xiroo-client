@@ -1,5 +1,6 @@
 "use client";
 import { Clock, CheckCircle, AlertCircle, Phone, Mail } from "lucide-react";
+import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 
 const statusConfig = {
   pending: {
@@ -29,6 +30,10 @@ const statusConfig = {
 };
 
 export default function CustomerAdvancePayment({ advancePayment, orderId }) {
+  const { settings: storeSettings } = useStoreSettings();
+  const whatsapp = storeSettings?.contact?.whatsapp || "8801XXXXXXXXX";
+  const supportEmail = storeSettings?.contact?.supportEmail || "support@xiroo.shop";
+
   if (!advancePayment?.required) return null;
 
   const config = statusConfig[advancePayment.status] || statusConfig.pending;
@@ -50,13 +55,11 @@ export default function CustomerAdvancePayment({ advancePayment, orderId }) {
             </p>
           </div>
 
-          {/* Amount */}
           <div className="flex items-baseline gap-2">
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Amount:</span>
             <span className="text-[24px] font-black text-zinc-900">৳{advancePayment.amount?.toLocaleString()}</span>
           </div>
 
-          {/* Reason */}
           {advancePayment.reason && (
             <div className="bg-white/50 border border-zinc-100 p-4">
               <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em]">Reason</span>
@@ -64,7 +67,6 @@ export default function CustomerAdvancePayment({ advancePayment, orderId }) {
             </div>
           )}
 
-          {/* Pending Instructions */}
           {advancePayment.status === "pending" && (
             <div className="space-y-4 pt-2">
               <div className="bg-white border border-zinc-100 p-5 space-y-4">
@@ -85,10 +87,9 @@ export default function CustomerAdvancePayment({ advancePayment, orderId }) {
                 </ol>
               </div>
 
-              {/* Contact Info */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
-                  href="https://wa.me/8801XXXXXXXXX"
+                  href={`https://wa.me/${whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#25D366] hover:bg-[#128C7E] text-white text-[11px] font-bold uppercase tracking-wider transition-colors"
@@ -97,7 +98,7 @@ export default function CustomerAdvancePayment({ advancePayment, orderId }) {
                   Pay via WhatsApp
                 </a>
                 <a
-                  href="mailto:support@xiroo.shop?subject=Advance Payment - Order {orderId}"
+                  href={`mailto:${supportEmail}?subject=Advance Payment - Order ${orderId}`}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-[11px] font-bold uppercase tracking-wider transition-colors"
                 >
                   <Mail className="w-4 h-4" />
@@ -107,7 +108,6 @@ export default function CustomerAdvancePayment({ advancePayment, orderId }) {
             </div>
           )}
 
-          {/* Paid Confirmation */}
           {advancePayment.status === "paid" && (
             <div className="pt-2">
               <p className="text-[11px] text-emerald-600 font-bold">
@@ -119,7 +119,6 @@ export default function CustomerAdvancePayment({ advancePayment, orderId }) {
             </div>
           )}
 
-          {/* Waived */}
           {advancePayment.status === "waived" && (
             <div className="pt-2">
               <p className="text-[11px] text-zinc-500 font-bold">

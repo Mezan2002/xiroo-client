@@ -5,6 +5,7 @@ import { ShoppingBag, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { useOrders } from "@/hooks/api/useOrders";
+import { useUser } from "@/hooks/api/useUser";
 import { useToast } from "@/hooks/useToast";
 import CustomerSection from "./sections/CustomerSection";
 import ItemsSection from "./sections/ItemsSection";
@@ -14,6 +15,7 @@ export default function NewOrderPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { placeOrder } = useOrders();
+  const { user: currentUser } = useUser();
   const { order, setOrder, addItem, removeItem, updateItem, calculateTotal, metrics } = useNewOrder();
 
   const handleCreateOrder = async () => {
@@ -34,6 +36,7 @@ export default function NewOrderPage() {
         email: order.email || undefined,
         phone: order.phone
       },
+      createdByAdmin: currentUser?._id || undefined,
       items: order.items.map(item => ({
         product: item.product,
         variant: item.variant || "Standard",

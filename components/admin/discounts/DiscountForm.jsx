@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Percent, Hash, Calendar, Users, AlertCircle, Clock } from "lucide-react";
+import { Percent, Hash, Calendar, Users, AlertCircle, Clock, ToggleLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useDiscountForm } from "./sections/useDiscountForm";
 
@@ -54,6 +54,35 @@ export default function DiscountForm({ initialData = {}, onSubmit, onCancel, isL
 
         <div className="lg:col-span-4 space-y-12">
           <div className="bg-zinc-50 border border-zinc-100 p-8 space-y-10">
+            <FormSection title="Coupon Status" icon={ToggleLeft}>
+              <div className="space-y-4">
+                <Label>Publishing Status</Label>
+                <div className="flex gap-2">
+                  {["Active", "Draft"].map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, status }))}
+                      className={`flex-1 p-3 border text-[11px] font-bold uppercase tracking-widest transition-all ${
+                        formData.status === status
+                          ? status === "Active"
+                            ? "bg-green-600 text-white border-green-600"
+                            : "bg-zinc-900 text-white border-zinc-900"
+                          : "bg-white text-zinc-400 border-zinc-200 hover:border-zinc-400"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-zinc-400 font-medium">
+                  {formData.status === "Active"
+                    ? "Coupon is visible and usable by customers."
+                    : "Coupon is saved but hidden from customers."}
+                </p>
+              </div>
+            </FormSection>
+
             <FormSection title="Usage Governance" icon={Users}>
               <div className="space-y-6">
                 <div className="space-y-2"><Label>Total Usage Limit</Label><input name="usageLimit" type="number" value={formData.usageLimit} onChange={handleChange} placeholder="Unlimited" className="w-full h-10 px-3 text-[12px] font-bold border border-zinc-200" /></div>

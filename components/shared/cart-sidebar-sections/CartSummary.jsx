@@ -60,7 +60,7 @@ export default function CartSummary({
       {discount && (
         <div className="flex justify-between items-center mb-2">
           <span className="text-[14px] text-green-600 tracking-tight flex items-center gap-2">
-            Discount ({discount.code})
+            {discount.type === "free_shipping" ? "Free Shipping" : `Discount (${discount.code})`}
             <Button
               variant="ghost"
               size="icon"
@@ -71,9 +71,11 @@ export default function CartSummary({
               <X className="w-3 h-3" />
             </Button>
           </span>
-          <span className="text-[16px] font-medium text-green-600">
-            -৳{Number(discountAmount || 0).toFixed(0)}
-          </span>
+          {discount.type !== "free_shipping" && (
+            <span className="text-[16px] font-medium text-green-600">
+              -৳{Number(discountAmount || 0).toFixed(0)}
+            </span>
+          )}
         </div>
       )}
 
