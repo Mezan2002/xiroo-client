@@ -51,6 +51,11 @@ export default function ProductView({ productId }) {
         value: product.salePrice || product.price,
         currency: "BDT",
         num_items: 1,
+      }, {
+        email: user?.email,
+        phone: user?.phone,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
       });
     }
   }, [product, dispatch]);

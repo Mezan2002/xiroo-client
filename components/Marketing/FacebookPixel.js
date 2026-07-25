@@ -255,6 +255,7 @@ export default function FacebookPixel() {
             eventSourceUrl: window.location.href,
             eventId,
             testEventCode: testCodeRef.current,
+            eventTime: Math.floor(Date.now() / 1000),
             userData: capiUserData,
           });
         } catch (err) {
@@ -306,6 +307,7 @@ export default function FacebookPixel() {
         eventName: "PageView",
         customData: { page_title: document.title },
         eventSourceUrl: window.location.href,
+        eventTime: Math.floor(Date.now() / 1000),
         userData: capiUserData,
       })
       .catch(() => {});
