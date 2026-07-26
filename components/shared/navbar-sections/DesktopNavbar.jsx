@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/Button";
-import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -118,11 +118,11 @@ export default function DesktopNavbar({
               aria-label="Shopping Bag"
               onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
+              <ShoppingBag className="size-4.5 stroke-[1.5]" />
             </Button>
             {mounted && itemCount > 0 && (
               <motion.span
-                className="absolute -top-1 -right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold text-white"
+                className="absolute top-1 right-0.5 flex size-4 items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold text-white"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 500, damping: 25 }}
