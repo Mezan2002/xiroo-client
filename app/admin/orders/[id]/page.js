@@ -163,7 +163,7 @@ export default function OrderDetailsPage() {
                       const isOverridden = item.originalPrice && Number(item.price) !== item.originalPrice;
                       return (
                         <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
-                          <td className="px-5 py-3">
+                          <td className="px-5 py-3 max-w-[300px]">
                             <div className="flex items-center gap-3">
                               <div className="min-w-0">
                                 <p className="text-[12px] font-bold text-zinc-900 truncate">{item.title}</p>
@@ -258,7 +258,7 @@ export default function OrderDetailsPage() {
                   <tbody className="divide-y divide-zinc-50">
                     {order.items.map((item, idx) => (
                       <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
-                        <td className="px-5 py-3">
+                        <td className="px-5 py-3 max-w-[300px]">
                           <div className="flex items-center gap-3">
                             <div className="relative w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
                               {item.product?.images?.[0] ? (
