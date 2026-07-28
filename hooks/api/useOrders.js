@@ -156,9 +156,21 @@ export const useOrders = () => {
       const response = await axiosInstance.post(`/orders/${id}/advance-payment/waive`);
       return response;
     },
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  const updateOrderPrices = useMutation({
+    mutationFn: async ({ id, items, shippingFee }) => {
+      const response = await axiosInstance.patch(`/orders/${id}/prices`, { items, shippingFee });
+      return response;
+    },
     onSuccess: (data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
     },
   });
 
@@ -176,5 +188,6 @@ export const useOrders = () => {
     requestAdvancePayment,
     confirmAdvancePayment,
     waiveAdvancePayment,
+    updateOrderPrices,
   };
 };

@@ -27,8 +27,11 @@ function OrderSuccessContent() {
   const whatsapp = storeSettings?.contact?.whatsapp || "8801XXXXXXXXX";
   const supportEmail = storeSettings?.contact?.supportEmail || "support@xiroo.shop";
   
-  useEffect(() => {
-    if (order && window.trackFacebookEvent && !purchaseFiredRef.current) {
+  const firePurchaseEvent = (retryCount = 0) => {
+    if (purchaseFiredRef.current) return;
+    if (!order) return;
+
+    if (typeof window !== "undefined" && window.trackFacebookEvent) {
       purchaseFiredRef.current = true;
 
       const email = order.guestInfo?.email || order.user?.email || '';
@@ -60,7 +63,14 @@ function OrderSuccessContent() {
         currency: "BDT",
         num_items: order.items.length
       }, customerData, order.facebookEventId || null);
+    } else if (retryCount < 20) {
+      // Retry up to 20 times (2 seconds total) waiting for pixel to load
+      setTimeout(() => firePurchaseEvent(retryCount + 1), 100);
     }
+  };
+
+  useEffect(() => {
+    firePurchaseEvent();
   }, [order]);
   
   if (isLoading) {

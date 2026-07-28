@@ -1,6 +1,6 @@
 "use client";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package } from "lucide-react";
+import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check } from "lucide-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -30,7 +30,9 @@ export default function OrderDetailsPage() {
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
     isUpdatingStatus, isCancelling, isDispatching,
-    isRequestingAdvancePayment, isConfirmingAdvancePayment, isWaivingAdvancePayment
+    isRequestingAdvancePayment, isConfirmingAdvancePayment, isWaivingAdvancePayment,
+    isEditingPrices, setIsEditingPrices, editedItems, editedShippingFee, setEditedShippingFee,
+    handleEditedItemChange, handlePriceOverrideSave, handleCancelPriceEdit, isSavingPrices,
   } = useOrderManagement(id);
 
   if (loading) {
@@ -62,9 +64,40 @@ export default function OrderDetailsPage() {
 
   const phone = order.guestInfo?.phone || order.user?.phoneNumber;
   const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
+  const canEditPrices = ["pending", "processing", "on-hold"].includes(order.status);
 
   const rawSubtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const delivery = order.shippingFee !== undefined ? order.shippingFee : Math.max(0, order.totalPrice - rawSubtotal);
+
+  // Compute live pricing in edit mode
+  const editedRawSubtotal = editedItems.reduce((acc, item) => acc + (Number(item.price) || 0) * item.quantity, 0);
+
+  const editedBundleGroups = {};
+  editedItems.forEach((item) => {
+    const itemSubtotal = (Number(item.price) || 0) * item.quantity;
+    if (item.bundleId) {
+      if (!editedBundleGroups[item.bundleId]) {
+        editedBundleGroups[item.bundleId] = { quantity: 0, subtotal: 0 };
+      }
+      editedBundleGroups[item.bundleId].quantity += item.quantity;
+      editedBundleGroups[item.bundleId].subtotal += itemSubtotal;
+    }
+  });
+  let editedBundleDiscount = 0;
+  Object.values(editedBundleGroups).forEach((group) => {
+    if (group.quantity >= 2) {
+      editedBundleDiscount += group.subtotal * 0.10;
+    }
+  });
+  const editedSubtotal = editedRawSubtotal - editedBundleDiscount;
+  const editedCouponDiscount = order.discount
+    ? order.discount.type === "percentage"
+      ? Math.min(editedSubtotal * (order.discount.value / 100), editedSubtotal)
+      : order.discount.type === "fixed"
+        ? Math.min(order.discount.value, editedSubtotal)
+        : 0
+    : 0;
+  const editedTotal = Math.round((editedSubtotal - editedCouponDiscount + (Number(editedShippingFee) || 0)) * 100) / 100;
 
   return (
     <div className="max-w-[1200px] mx-auto pb-16 animate-in fade-in duration-300">
@@ -79,64 +112,212 @@ export default function OrderDetailsPage() {
           <div className="bg-white border border-zinc-200 overflow-hidden">
             <div className="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between">
               <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.15em]">Items</h3>
-              <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">{totalQty} units</span>
+              <div className="flex items-center gap-3">
+                {isEditingPrices ? (
+                  <>
+                    <button
+                      onClick={handleCancelPriceEdit}
+                      disabled={isSavingPrices}
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors disabled:opacity-50"
+                    >
+                      <X size={10} /> Cancel
+                    </button>
+                    <button
+                      onClick={handlePriceOverrideSave}
+                      disabled={isSavingPrices}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                    >
+                      {isSavingPrices ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />}
+                      {isSavingPrices ? "Saving..." : "Save Prices"}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">{totalQty} units</span>
+                    {canEditPrices && (
+                      <button
+                        onClick={() => setIsEditingPrices(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:border-black hover:text-black transition-colors"
+                      >
+                        <Pencil size={10} /> Edit Prices
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-            <table className="w-full text-left">
-              <thead className="bg-zinc-50 border-b border-zinc-100">
-                <tr>
-                  <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Product</th>
-                  <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-center">Qty</th>
-                  <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-50">
-                {order.items.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
-                          {item.product?.images?.[0] ? (
-                            <Image fill src={item.product.images[0]} alt="" sizes="40px" className="object-cover" />
-                          ) : (
-                            <Package size={14} strokeWidth={1} className="text-zinc-200" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[12px] font-bold text-zinc-900 truncate">{item.product?.title || "Unknown"}</p>
-                          {item.variant && item.variant !== "Standard" && (
-                            <p className="text-[10px] text-zinc-400">{item.variant}</p>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3 text-center text-[12px] font-bold text-zinc-500 font-mono">x{item.quantity}</td>
-                    <td className="px-5 py-3 text-right text-[12px] font-black text-zinc-900 font-mono">৳{(item.price * item.quantity).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
 
-            {/* Pricing */}
-            <div className="px-5 py-4 bg-zinc-50 border-t border-zinc-100 space-y-2">
-              <div className="flex justify-between text-[11px]">
-                <span className="text-zinc-400 font-medium">Subtotal</span>
-                <span className="text-zinc-700 font-bold font-mono">৳{rawSubtotal.toLocaleString()}</span>
-              </div>
-              {order.discount && (
-                <div className="flex justify-between text-[11px] text-green-600">
-                  <span className="font-medium">Coupon ({order.discount.code})</span>
-                  <span className="font-bold font-mono">-৳{(order.discount.amount || 0).toLocaleString()}</span>
+            {isEditingPrices ? (
+              <>
+                <table className="w-full text-left">
+                  <thead className="bg-zinc-50 border-b border-zinc-100">
+                    <tr>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Product</th>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-center">Qty</th>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-right">Unit Price</th>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-50">
+                    {editedItems.map((item, idx) => {
+                      const isOverridden = item.originalPrice && Number(item.price) !== item.originalPrice;
+                      return (
+                        <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
+                          <td className="px-5 py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="min-w-0">
+                                <p className="text-[12px] font-bold text-zinc-900 truncate">{item.title}</p>
+                                {item.variant && item.variant !== "Standard" && (
+                                  <p className="text-[10px] text-zinc-400">{item.variant}</p>
+                                )}
+                                {isOverridden && (
+                                  <p className="text-[9px] text-amber-500 font-medium mt-0.5">
+                                    orig: ৳{item.originalPrice.toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3 text-center text-[12px] font-bold text-zinc-500 font-mono">x{item.quantity}</td>
+                          <td className="px-5 py-3 text-right">
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={item.price}
+                              onChange={(e) => handleEditedItemChange(idx, "price", parseFloat(e.target.value) || 0)}
+                              className={`w-24 bg-transparent border-b text-right text-[12px] font-bold py-1 outline-none font-mono ${
+                                isOverridden
+                                  ? "border-amber-300 text-amber-600"
+                                  : "border-zinc-200 text-zinc-900 focus:border-black"
+                              }`}
+                            />
+                          </td>
+                          <td className="px-5 py-3 text-right text-[12px] font-black text-zinc-900 font-mono">
+                            ৳{((Number(item.price) || 0) * item.quantity).toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                {/* Editable Pricing Summary */}
+                <div className="px-5 py-4 bg-zinc-50 border-t border-zinc-100 space-y-2">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-zinc-400 font-medium">Subtotal</span>
+                    <span className="text-zinc-700 font-bold font-mono">৳{editedRawSubtotal.toLocaleString()}</span>
+                  </div>
+                  {editedBundleDiscount > 0 && (
+                    <div className="flex justify-between text-[11px] text-green-600">
+                      <span className="font-medium">Bundle Discount (10%)</span>
+                      <span className="font-bold font-mono">-৳{editedBundleDiscount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {order.discount && (
+                    <div className="flex justify-between text-[11px] text-green-600">
+                      <span className="font-medium">Coupon ({order.discount.code})</span>
+                      <span className="font-bold font-mono">-৳{editedCouponDiscount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-zinc-400 font-medium">Shipping</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={editedShippingFee}
+                      onChange={(e) => setEditedShippingFee(parseFloat(e.target.value) || 0)}
+                      className="w-20 bg-transparent border-b border-zinc-200 text-right text-[11px] font-bold text-zinc-700 py-1 outline-none font-mono focus:border-black"
+                    />
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-zinc-200">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total</span>
+                    <span className="text-[16px] font-black text-zinc-900 font-mono">৳{editedTotal.toLocaleString()}</span>
+                  </div>
+                  {editedItems.some((item) => item.originalPrice && Number(item.price) !== item.originalPrice) && (
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
+                        Admin Price Override Active
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
-              <div className="flex justify-between text-[11px]">
-                <span className="text-zinc-400 font-medium">Shipping</span>
-                <span className="text-zinc-700 font-bold font-mono">৳{delivery.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-zinc-200">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total</span>
-                <span className="text-[16px] font-black text-zinc-900 font-mono">৳{order.totalPrice.toLocaleString()}</span>
-              </div>
-            </div>
+              </>
+            ) : (
+              <>
+                <table className="w-full text-left">
+                  <thead className="bg-zinc-50 border-b border-zinc-100">
+                    <tr>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Product</th>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-center">Qty</th>
+                      <th className="px-5 py-2.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-50">
+                    {order.items.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
+                              {item.product?.images?.[0] ? (
+                                <Image fill src={item.product.images[0]} alt="" sizes="40px" className="object-cover" />
+                              ) : (
+                                <Package size={14} strokeWidth={1} className="text-zinc-200" />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[12px] font-bold text-zinc-900 truncate">{item.product?.title || "Unknown"}</p>
+                              {item.variant && item.variant !== "Standard" && (
+                                <p className="text-[10px] text-zinc-400">{item.variant}</p>
+                              )}
+                              {item.originalPrice && item.price !== item.originalPrice && (
+                                <p className="text-[9px] text-amber-500 font-medium">
+                                  orig: ৳{item.originalPrice.toLocaleString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3 text-center text-[12px] font-bold text-zinc-500 font-mono">x{item.quantity}</td>
+                        <td className="px-5 py-3 text-right text-[12px] font-black text-zinc-900 font-mono">৳{(item.price * item.quantity).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Pricing */}
+                <div className="px-5 py-4 bg-zinc-50 border-t border-zinc-100 space-y-2">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-zinc-400 font-medium">Subtotal</span>
+                    <span className="text-zinc-700 font-bold font-mono">৳{rawSubtotal.toLocaleString()}</span>
+                  </div>
+                  {order.discount && (
+                    <div className="flex justify-between text-[11px] text-green-600">
+                      <span className="font-medium">Coupon ({order.discount.code})</span>
+                      <span className="font-bold font-mono">-৳{(order.discount.amount || 0).toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-zinc-400 font-medium">Shipping</span>
+                    <span className="text-zinc-700 font-bold font-mono">৳{delivery.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-zinc-200">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total</span>
+                    <span className="text-[16px] font-black text-zinc-900 font-mono">৳{order.totalPrice.toLocaleString()}</span>
+                  </div>
+                  {order.isAdminOverride && (
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
+                        Admin Price Override Active
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
             {/* Order Note */}
             {order.note && (

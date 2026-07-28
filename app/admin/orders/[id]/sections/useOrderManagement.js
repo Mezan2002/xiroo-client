@@ -1,11 +1,11 @@
 "use client";
 import { useOrders } from "@/hooks/api/useOrders";
 import { useToast } from "@/hooks/useToast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
-  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment } = useOrders();
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices } = useOrders();
   const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -20,6 +20,29 @@ export const useOrderManagement = (id) => {
   const [carrybeeCodAmount, setCarrybeeCodAmount] = useState("");
   const [carrybeeProductType, setCarrybeeProductType] = useState("1");
   const [carrybeeDeliveryType, setCarrybeeDeliveryType] = useState("1");
+
+  // Price override editing state
+  const [isEditingPrices, setIsEditingPrices] = useState(false);
+  const [editedItems, setEditedItems] = useState([]);
+  const [editedShippingFee, setEditedShippingFee] = useState(0);
+
+  // Initialize edited items when order loads or edit mode is entered
+  useEffect(() => {
+    if (order && isEditingPrices) {
+      setEditedItems(
+        order.items.map((item) => ({
+          productId: item.product?._id || item.product,
+          variant: item.variant,
+          quantity: item.quantity,
+          price: item.price,
+          originalPrice: item.originalPrice,
+          bundleId: item.bundleId,
+          title: item.product?.title || "Unknown",
+        }))
+      );
+      setEditedShippingFee(order.shippingFee || 0);
+    }
+  }, [order, isEditingPrices]);
 
   const handleStatusChange = async (newStatus) => {
     updateStatus.mutate({ id, status: newStatus }, {
@@ -100,6 +123,44 @@ export const useOrderManagement = (id) => {
     });
   };
 
+  const handleEditedItemChange = (index, field, value) => {
+    setEditedItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const handlePriceOverrideSave = async () => {
+    const hasZeroOrNegativePrice = editedItems.some((item) => !item.price || item.price <= 0);
+    if (hasZeroOrNegativePrice) {
+      toast.error("All items must have a price greater than 0");
+      return;
+    }
+
+    const payload = editedItems.map((item) => ({
+      productId: item.productId,
+      variant: item.variant,
+      quantity: item.quantity,
+      price: Number(item.price),
+      bundleId: item.bundleId,
+    }));
+
+    updateOrderPrices.mutate(
+      { id, items: payload, shippingFee: Number(editedShippingFee) || 0 },
+      {
+        onSuccess: () => {
+          toast.success("Order prices updated successfully");
+          setIsEditingPrices(false);
+        },
+        onError: (err) => toast.error(err.message || "Failed to update prices"),
+      }
+    );
+  };
+
+  const handleCancelPriceEdit = () => {
+    setIsEditingPrices(false);
+    setEditedItems([]);
+  };
+
   return {
     order, loading, error, isError, isCancelModalOpen, setIsCancelModalOpen,
     isAdvancePaymentModalOpen, setIsAdvancePaymentModalOpen,
@@ -113,11 +174,14 @@ export const useOrderManagement = (id) => {
     carrybeeDeliveryType, setCarrybeeDeliveryType,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
+    isEditingPrices, setIsEditingPrices, editedItems, editedShippingFee, setEditedShippingFee,
+    handleEditedItemChange, handlePriceOverrideSave, handleCancelPriceEdit,
     isUpdatingStatus: updateStatus.isPending,
     isCancelling: cancelOrder.isPending,
     isDispatching: dispatchCourier.isPending,
     isRequestingAdvancePayment: requestAdvancePayment.isPending,
     isConfirmingAdvancePayment: confirmAdvancePayment.isPending,
     isWaivingAdvancePayment: waiveAdvancePayment.isPending,
+    isSavingPrices: updateOrderPrices.isPending,
   };
 };
