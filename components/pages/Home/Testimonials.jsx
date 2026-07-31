@@ -19,10 +19,10 @@ export default function Testimonials() {
   const [selectedReview, setSelectedReview] = useState(null);
   const [modalIndex, setModalIndex] = useState(0);
 
-  const { useFeaturedTestimonials } = useTestimonials();
-  const { data: response, isLoading } = useFeaturedTestimonials(5);
+  const { usePublicTestimonials } = useTestimonials();
+  const { data: response, isLoading } = usePublicTestimonials(1, 5);
 
-  const testimonials = response?.data || response || [];
+  const testimonials = response?.data?.testimonials || response?.data || [];
 
   const handleCardClick = (testimonial, mappedReview) => {
     const displayTestimonials = testimonials.slice(0, 5);
