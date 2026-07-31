@@ -30,9 +30,9 @@ export default function MarketingSettings() {
         axiosInstance.get(`/marketing/logs?ts=${ts}`),
       ]);
       
-      if (settingsRes.data.data) setSettings(settingsRes.data.data);
-      if (statsRes.data.data) setStats(statsRes.data.data);
-      if (logsRes.data.data) setLogs(logsRes.data.data);
+      if (settingsRes.data) setSettings(settingsRes.data);
+      if (statsRes.data) setStats(statsRes.data);
+      if (logsRes.data) setLogs(logsRes.data);
     } catch (error) {
       toast.error("Telemetry synchronization failed");
     } finally {

@@ -22,7 +22,8 @@ function normalizeEmail(email) {
 
 function normalizePhone(phone) {
   if (!phone) return "";
-  return phone.replace(/[\s\-\(\)\+]/g, "");
+  // Keep + prefix for E.164 format (Meta best practice)
+  return phone.replace(/[\s\-\(\)]/g, "");
 }
 
 // ─── IP Cache ───────────────────────────────────────────────────────────────
@@ -68,10 +69,6 @@ function saveUserContext(data) {
 }
 
 // ─── Public Exports (used by other modules) ────────────────────────────────
-
-export function getCachedUserData() {
-  return getUserContext();
-}
 
 export function saveCustomerContext(data) {
   return saveUserContext(data);
@@ -178,10 +175,7 @@ export default function FacebookPixel() {
         window.fbq("init", pixelId);
       }
 
-      // 4. Initial PageView
-      window.fbq("track", "PageView");
-
-      // 5. Expose global tracking function
+      // 4. Expose global tracking function
       window.trackFacebookEvent = async (
         eventName,
         customData = {},
@@ -214,19 +208,8 @@ export default function FacebookPixel() {
         const nPhone = normalizePhone(mergedUser.phone);
 
         // Fire browser pixel with eventID for deduplication
-        const advancedMatching = {};
-        if (nEmail) advancedMatching.em = nEmail;
-        if (nPhone) advancedMatching.ph = nPhone;
-        if (mergedUser.firstName)
-          advancedMatching.fn = mergedUser.firstName.trim().toLowerCase();
-        if (mergedUser.lastName)
-          advancedMatching.ln = mergedUser.lastName.trim().toLowerCase();
-        if (mergedUser.externalId)
-          advancedMatching.external_id = String(mergedUser.externalId);
-
-        if (Object.keys(advancedMatching).length > 0) {
-          window.fbq("init", activePid, advancedMatching);
-        }
+        // Note: fbq('init') is only called once during pixel initialization.
+        // Advanced matching is set at init time — do NOT re-call init before every event.
         window.fbq("track", eventName, customData, { eventID: eventId });
 
         // Send CAPI relay (server-side event)
@@ -257,6 +240,10 @@ export default function FacebookPixel() {
             testEventCode: testCodeRef.current,
             eventTime: Math.floor(Date.now() / 1000),
             userData: capiUserData,
+          }, {
+            headers: {
+              "x-capi-key": process.env.NEXT_PUBLIC_CAPI_SECRET_KEY || "",
+            },
           });
         } catch (err) {
           console.error(`[FB Pixel] CAPI ${eventName} failed:`, err);
@@ -264,7 +251,38 @@ export default function FacebookPixel() {
       };
 
       pixelInitialized.current = true;
-      console.log("[FB Pixel] Initialized:", pixelId);
+
+      // Fire the initial PageView CAPI relay (browser pixel already fires via fbq init)
+      try {
+        const initPageEventId = "pv_" + Date.now() + "_init";
+        const initFbc = getCookie("_fbc");
+        const initFbp = getCookie("_fbp");
+        const initUser = { ...getUserContext(), ...loggedInUserData };
+        const initCapiUser = { userAgent: window.navigator.userAgent, ip: cachedIp || "" };
+        const initNEmail = normalizeEmail(initUser.email);
+        const initNPhone = normalizePhone(initUser.phone);
+        if (initNEmail) initCapiUser.email = initNEmail;
+        if (initNPhone) initCapiUser.phone = initNPhone;
+        if (initUser.firstName) initCapiUser.firstName = initUser.firstName;
+        if (initUser.lastName) initCapiUser.lastName = initUser.lastName;
+        if (initUser.externalId) initCapiUser.externalId = initUser.externalId;
+        if (initFbc) initCapiUser.fbc = initFbc;
+        if (initFbp) initCapiUser.fbp = initFbp;
+
+        axiosInstance.post("/marketing/track", {
+          eventName: "PageView",
+          customData: { page_title: document.title },
+          eventSourceUrl: window.location.href,
+          eventId: initPageEventId,
+          testEventCode: testCodeRef.current,
+          eventTime: Math.floor(Date.now() / 1000),
+          userData: initCapiUser,
+        }, {
+          headers: { "x-capi-key": process.env.NEXT_PUBLIC_CAPI_SECRET_KEY || "" },
+        }).catch(() => {});
+      } catch (e) {
+        // Non-critical — silently ignore
+      }
     };
 
     initPixel();
@@ -274,8 +292,11 @@ export default function FacebookPixel() {
   useEffect(() => {
     if (!window.fbq || !pixelIdRef.current) return;
 
-    // Browser PageView
-    window.fbq("track", "PageView");
+    // Generate shared eventId for PageView deduplication (browser + CAPI)
+    const pageEventId = "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+
+    // Browser PageView — pass eventId for deduplication
+    window.fbq("track", "PageView", {}, { eventID: pageEventId });
 
     // CAPI PageView — include user data when available for better Event Match Quality
     const fbc = getCookie("_fbc");
@@ -302,13 +323,20 @@ export default function FacebookPixel() {
     if (fbc) capiUserData.fbc = fbc;
     if (fbp) capiUserData.fbp = fbp;
 
+    // CAPI PageView — same eventId for deduplication
     axiosInstance
       .post("/marketing/track", {
         eventName: "PageView",
         customData: { page_title: document.title },
         eventSourceUrl: window.location.href,
+        eventId: pageEventId,
+        testEventCode: testCodeRef.current,
         eventTime: Math.floor(Date.now() / 1000),
         userData: capiUserData,
+      }, {
+        headers: {
+          "x-capi-key": process.env.NEXT_PUBLIC_CAPI_SECRET_KEY || "",
+        },
       })
       .catch(() => {});
   }, [pathname, searchParams, user]);

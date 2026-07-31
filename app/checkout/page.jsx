@@ -4,7 +4,7 @@ import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { ChevronLeft, Lock } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { useDeliveryFee } from "@/hooks/api/useDeliverySettings";
 import { useDiscounts } from "@/hooks/api/useDiscounts";
@@ -30,6 +30,8 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1); // 1: Info, 2: Delivery & Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
+  const checkoutFiredRef = useRef(false);
+  const paymentInfoFiredRef = useRef(false);
 
   const { data: deliveryFeeData, isLoading: feeLoading } =
     useDeliveryFee(district);
@@ -68,18 +70,21 @@ export default function CheckoutPage() {
     removeDiscount();
   };
 
+  // InitiateCheckout — fire once when user arrives at checkout
   useEffect(() => {
-    if (window.trackFacebookEvent && items) {
+    if (checkoutFiredRef.current) return;
+    if (window.trackFacebookEvent && items?.length > 0) {
+      checkoutFiredRef.current = true;
       window.trackFacebookEvent(
         "InitiateCheckout",
         {
           content_ids: items
             .map(
               (item) =>
-                item?.product?.id ||
                 item?.product?._id ||
-                item?.id ||
-                item?._id,
+                item?.product?.id ||
+                item?._id ||
+                item?.id,
             )
             .filter(Boolean),
           content_type: "product",
@@ -89,13 +94,47 @@ export default function CheckoutPage() {
         },
         {
           email: user?.email,
-          phone: user?.phone,
+          phone: user?.phoneNumber || user?.phone || "",
           firstName: user?.firstName,
           lastName: user?.lastName,
+          externalId: user?._id || user?.id || "",
         },
       );
     }
-  }, [items, total, user?.email, user?.firstName, user?.lastName, user?.phone]);
+  }, [items, total, user?.email, user?.firstName, user?.lastName, user?.phoneNumber, user?.phone, user?._id]);
+
+  // AddPaymentInfo — fire once when user reaches step 2 (Delivery & Payment)
+  useEffect(() => {
+    if (paymentInfoFiredRef.current) return;
+    if (step === 2 && window.trackFacebookEvent) {
+      paymentInfoFiredRef.current = true;
+      window.trackFacebookEvent(
+        "AddPaymentInfo",
+        {
+          content_ids: items
+            .map(
+              (item) =>
+                item?.product?._id ||
+                item?.product?.id ||
+                item?._id ||
+                item?.id,
+            )
+            .filter(Boolean),
+          content_type: "product",
+          value: total,
+          currency: "BDT",
+          num_items: items.length,
+        },
+        {
+          email: user?.email,
+          phone: user?.phoneNumber || user?.phone || "",
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          externalId: user?._id || user?.id || "",
+        },
+      );
+    }
+  }, [step]);
 
   return (
     <div className="min-h-screen bg-white">

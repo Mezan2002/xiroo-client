@@ -141,6 +141,7 @@ export const useProductActions = (product) => {
     if (window.trackFacebookEvent) {
       window.trackFacebookEvent("AddToCart", {
         content_name: product.title,
+        content_category: product.category?.name || "Product",
         content_ids: [product._id],
         content_type: "product",
         value: displayPrice * quantity,
@@ -148,9 +149,10 @@ export const useProductActions = (product) => {
         num_items: quantity,
       }, {
         email: user?.email,
-        phone: user?.phone,
+        phone: user?.phoneNumber || user?.phone || "",
         firstName: user?.firstName,
         lastName: user?.lastName,
+        externalId: user?._id || user?.id || "",
       });
     }
   };
@@ -188,6 +190,7 @@ export const useProductActions = (product) => {
     if (window.trackFacebookEvent) {
       window.trackFacebookEvent("AddToCart", {
         content_name: product.title,
+        content_category: product.category?.name || "Product",
         content_ids: [product._id],
         content_type: "product",
         value: displayPrice * quantity,
@@ -195,9 +198,10 @@ export const useProductActions = (product) => {
         num_items: quantity,
       }, {
         email: user?.email,
-        phone: user?.phone,
+        phone: user?.phoneNumber || user?.phone || "",
         firstName: user?.firstName,
         lastName: user?.lastName,
+        externalId: user?._id || user?.id || "",
       });
     }
 

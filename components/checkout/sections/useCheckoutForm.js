@@ -227,22 +227,6 @@ export const useCheckoutForm = (
       if (response.success) {
         toast.success("Order placed successfully!");
 
-        // Fire Purchase browser pixel event immediately (safety net)
-        if (typeof window !== "undefined" && window.fbq) {
-          try {
-            window.fbq("track", "Purchase", {
-              content_ids: orderItems.map((i) => i.product),
-              content_type: "product",
-              value: total,
-              currency: "BDT",
-              num_items: orderItems.length,
-              eventID: orderPayload.facebookEventId,
-            });
-          } catch (e) {
-            // silent
-          }
-        }
-
         clearCart();
         router.push(`/checkout/success?id=${response.data._id || response.data.id}`);
       } else {

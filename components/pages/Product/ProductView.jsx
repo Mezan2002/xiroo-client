@@ -53,9 +53,10 @@ export default function ProductView({ productId }) {
         num_items: 1,
       }, {
         email: user?.email,
-        phone: user?.phone,
+        phone: user?.phoneNumber || user?.phone || "",
         firstName: user?.firstName,
         lastName: user?.lastName,
+        externalId: user?._id || user?.id || "",
       });
     }
   }, [product, dispatch]);
