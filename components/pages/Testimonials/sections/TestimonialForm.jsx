@@ -7,7 +7,7 @@ import Image from "next/image";
 export default function TestimonialForm({
   rating, setRating, hovered, setHoveredRating, form, setForm,
   uploadedImages, isSubmitting, handleImageUploaded, removeImage,
-  handleSubmit, user, fullName
+  handleSubmit, user, fullName, showNameInput, isAdmin
 }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-7 py-6 overflow-y-auto">
@@ -30,15 +30,29 @@ export default function TestimonialForm({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 py-3 border-y border-gray-50">
-        <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-semibold uppercase text-[13px]">
-          {(user?.firstName || "U").charAt(0)}
+      {showNameInput ? (
+        <div>
+          <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">Your Name *</label>
+          <input
+            type="text"
+            required
+            value={form.customerName || ""}
+            onChange={(e) => setForm(f => ({ ...f, customerName: e.target.value }))}
+            placeholder="Enter your name"
+            className="w-full border border-gray-200 bg-[#fafafa] px-4 py-3 text-[13px] text-black focus:outline-none focus:border-black transition-colors"
+          />
         </div>
-        <div className="flex flex-col">
-          <span className="text-[13px] font-semibold text-black">{fullName}</span>
-          <span className="text-[10px] text-gray-400 tracking-wider uppercase">Verified Account</span>
+      ) : (
+        <div className="flex items-center gap-3 py-3 border-y border-gray-50">
+          <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-semibold uppercase text-[13px]">
+            {(user?.firstName || "U").charAt(0)}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[13px] font-semibold text-black">{fullName}</span>
+            <span className="text-[10px] text-gray-400 tracking-wider uppercase">Verified Account</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div>
         <label className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 block mb-2">Your Testimonial *</label>
@@ -72,7 +86,7 @@ export default function TestimonialForm({
         </div>
       </div>
 
-      <Button disabled={isSubmitting || !rating || !form.content} variant="primary" size="lg" className="w-full" icon={Send}>
+      <Button disabled={isSubmitting || !rating || !form.content || (showNameInput && !form.customerName)} variant="primary" size="lg" className="w-full" icon={Send}>
         {isSubmitting ? "Submitting..." : "Submit Testimonial"}
       </Button>
     </form>

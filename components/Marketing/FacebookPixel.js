@@ -175,6 +175,9 @@ export default function FacebookPixel() {
         window.fbq("init", pixelId);
       }
 
+      // Track fired eventIds to prevent duplicate browser events
+      const firedEventIds = new Set();
+
       // 4. Expose global tracking function
       window.trackFacebookEvent = async (
         eventName,
@@ -199,6 +202,12 @@ export default function FacebookPixel() {
         const eventId =
           overrideEventId ||
           "evt_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+
+        // Dedup guard — skip if same eventId already fired
+        if (firedEventIds.has(eventName + "_" + eventId)) return;
+        firedEventIds.add(eventName + "_" + eventId);
+        // Cleanup old entries after5 minutes
+        if (firedEventIds.size > 100) firedEventIds.clear();
 
         const fbc = getCookie("_fbc");
         const fbp = getCookie("_fbp");

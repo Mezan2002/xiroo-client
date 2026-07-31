@@ -17,12 +17,23 @@ export const useTestimonialForm = (onClose) => {
   const handleImageUploaded = (url) => setUploadedImages((prev) => [...prev, url].slice(0, 3));
   const removeImage = (idx) => setUploadedImages((prev) => prev.filter((_, i) => i !== idx));
 
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "";
+  const isAdmin = user?.role === "admin";
+  const showNameInput = !user || isAdmin;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!rating || !form.content) return;
+    const customerName = !user
+      ? form.customerName || ""
+      : isAdmin
+        ? form.customerName || fullName
+        : fullName;
+    if (!customerName) return;
     setIsSubmitting(true);
     try {
       await submitTestimonial.mutateAsync({
+        customerName,
         content: form.content,
         rating,
         images: uploadedImages,
@@ -35,11 +46,9 @@ export const useTestimonialForm = (onClose) => {
     }
   };
 
-  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Customer";
-
   return {
     user, rating, setRating, hovered, setHoveredRating, form, setForm,
     uploadedImages, isSubmitting, submitted, handleImageUploaded, removeImage,
-    handleSubmit, fullName
+    handleSubmit, fullName, showNameInput, isAdmin
   };
 };
