@@ -6,7 +6,7 @@ import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Select } from "@/components/ui/Select";
 import { ExternalLink, Search, Trash2, UserPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useUsers } from "@/hooks/api/useUsers";
 import { useToast } from "@/hooks/useToast";
 
@@ -14,13 +14,29 @@ export default function AdminUsers() {
   const router = useRouter();
   const { toast } = useToast();
   const { useAllUsers, updateRole, deleteUser } = useUsers();
-  const { data: rawUsers = [], isLoading: loading, refetch } = useAllUsers();
 
-
+  const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const limit = 20;
+
+  const queryParams = useMemo(() => ({
+    page,
+    limit,
+    search: searchQuery || undefined,
+  }), [page, searchQuery]);
+
+  const { data: response, isLoading: loading, refetch } = useAllUsers(queryParams);
+  const rawUsers = response?.users || response?.data?.users || [];
+  const pagination = response?.pagination || response?.data?.pagination;
+
+  const filteredUsers = useMemo(() => {
+    if (roleFilter === "all") return rawUsers;
+    return rawUsers.filter((u) => u.role === roleFilter);
+  }, [rawUsers, roleFilter]);
 
   const handleRoleUpdate = async (userId, newRole) => {
     updateRole.mutate({ id: userId, role: newRole }, {
@@ -48,18 +64,6 @@ export default function AdminUsers() {
   };
 
   const users = rawUsers;
-
-
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      u.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesRole = roleFilter === "all" || u.role === roleFilter;
-
-    return matchesSearch && matchesRole;
-  });
 
   const COLUMNS = [
     {
@@ -195,7 +199,7 @@ export default function AdminUsers() {
             type="text"
             placeholder="Search registry by name or email..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
             className="w-full bg-white border border-[#EDECE9] rounded-md py-2.5 pl-9 pr-4 text-[13px] outline-none transition-all focus:bg-white focus:border-black/20 placeholder:text-[#37352F40] font-medium"
           />
         </div>
@@ -206,7 +210,7 @@ export default function AdminUsers() {
               size="sm"
               variant="ghost"
               value={roleFilter}
-              onChange={(val) => setRoleFilter(val)}
+              onChange={(val) => { setRoleFilter(val); setPage(1); }}
               options={[
                 { value: "all", label: "ALL CLEARANCES" },
                 { value: "admin", label: "ADMIN REGISTRY" },
@@ -232,6 +236,13 @@ export default function AdminUsers() {
         data={filteredUsers} 
         loading={loading} 
         className="min-h-[calc(100vh-300px)] bg-white border border-[#EDECE9] rounded-sm shadow-sm"
+        pagination={pagination ? {
+          currentPage: pagination.page,
+          totalPages: pagination.pages,
+          total: pagination.total,
+          limit: pagination.limit,
+          onPageChange: setPage,
+        } : undefined}
       />
 
       <ConfirmModal

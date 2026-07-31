@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { Search, Users } from "lucide-react";
 import DataTable from "@/components/admin/shared/DataTable";
@@ -16,16 +16,24 @@ const statusColors = {
 };
 
 export default function CustomersPage() {
+  const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const { useAllCustomers } = useCustomers();
 
-  const { data, isLoading } = useAllCustomers({
+  const limit = 20;
+
+  const queryParams = useMemo(() => ({
+    page,
+    limit,
     search: searchTerm || undefined,
     status: statusFilter || undefined,
-  });
+  }), [page, searchTerm, statusFilter]);
+
+  const { data, isLoading } = useAllCustomers(queryParams);
 
   const customers = data?.customers || [];
+  const pagination = data?.pagination;
 
   const columns = [
     {
@@ -93,6 +101,16 @@ export default function CustomersPage() {
     },
   ];
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1);
+  };
+
+  const handleStatusFilter = (e) => {
+    setStatusFilter(e.target.value);
+    setPage(1);
+  };
+
   return (
     <div className="space-y-6">
       <ModuleHeader
@@ -112,13 +130,13 @@ export default function CustomersPage() {
             type="text"
             placeholder="Search by phone, name, or email..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearch}
             className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
           />
         </div>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={handleStatusFilter}
           className="h-10 px-4 bg-gray-50 border border-gray-100 focus:border-black outline-none transition-all text-sm font-medium"
         >
           <option value="">All Status</option>
@@ -136,6 +154,13 @@ export default function CustomersPage() {
         data={customers}
         isLoading={isLoading}
         emptyMessage="No customers found"
+        pagination={pagination ? {
+          currentPage: pagination.page,
+          totalPages: pagination.pages,
+          total: pagination.total,
+          limit: pagination.limit,
+          onPageChange: setPage,
+        } : undefined}
       />
     </div>
   );

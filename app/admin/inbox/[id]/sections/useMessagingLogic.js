@@ -15,7 +15,8 @@ export const useMessagingLogic = (id) => {
 
   const { data: conversation, isLoading, refetch } = useConversation(id);
   const { useAllUsers } = useUsers();
-  const { data: adminRegistry = [] } = useAllUsers({ role: "admin" });
+  const { data: adminRegistryResponse } = useAllUsers({ role: "admin" });
+  const adminRegistry = adminRegistryResponse?.users || adminRegistryResponse?.data?.users || [];
   const { socket } = useSocket();
   const { user: currentUser } = useAuth();
 

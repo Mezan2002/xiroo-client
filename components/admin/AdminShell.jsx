@@ -28,8 +28,19 @@ export default function AdminShell({ children }) {
   useEffect(() => {
     const handleOpenSearch = () => setIsSearchOpen(true);
     window.addEventListener("open-admin-search", handleOpenSearch);
-    return () =>
-      window.removeEventListener("open-admin-search", handleOpenSearch);
+    return () => window.removeEventListener("open-admin-search", handleOpenSearch);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.code === "KeyK") {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, []);
 
   // Close sidebar on route change

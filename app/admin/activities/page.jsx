@@ -16,14 +16,14 @@ export default function AdminActivities() {
   const { useOrderHistory } = useOrders();
   const { useAllUsers } = useUsers();
 
-  const { data: recentOrders, isLoading: ordersLoading } = useOrderHistory({
+  const { data: ordersResponse, isLoading: ordersLoading } = useOrderHistory({
     limit: 100,
-    sort: "-createdAt",
   });
-  const { data: recentUsers, isLoading: usersLoading } = useAllUsers({
+  const { data: usersResponse, isLoading: usersLoading } = useAllUsers({
     limit: 100,
-    sort: "-createdAt",
   });
+  const recentOrders = ordersResponse?.orders || ordersResponse?.data?.orders || [];
+  const recentUsers = usersResponse?.users || usersResponse?.data?.users || [];
 
   const allActivities = useMemo(() => {
     const orderActivities = (recentOrders || []).map((o) => ({

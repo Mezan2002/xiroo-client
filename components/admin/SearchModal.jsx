@@ -1,174 +1,194 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import { Search, X, Package, ShoppingBag, Users, ArrowRight, Command } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  Search, Command, LayoutDashboard, ShoppingBag, Package, Users,
+  UserCheck, Tag, Truck, MessageSquare, Quote, Share2, Settings,
+  Layers, Hash, StickyNote, Shield, Palette, LineChart, AlertTriangle, Mail, Bell,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+
+const NAV_ITEMS = [
+  { label: "Dashboard", href: "/admin", icon: LayoutDashboard, shortcut: "G D" },
+  { label: "Orders", href: "/admin/orders", icon: ShoppingBag, shortcut: "G O" },
+  { label: "Products", href: "/admin/products", icon: Package, shortcut: "G P" },
+  { label: "Customers", href: "/admin/customers", icon: UserCheck, shortcut: "G C" },
+  { label: "Users", href: "/admin/users", icon: Users, shortcut: "G U" },
+  { label: "Categories", href: "/admin/categories", icon: Layers, shortcut: "" },
+  { label: "Notes", href: "/admin/notes", icon: StickyNote, shortcut: "G N" },
+  { label: "Discounts", href: "/admin/discounts", icon: Tag, shortcut: "" },
+  { label: "Reviews", href: "/admin/reviews", icon: MessageSquare, shortcut: "" },
+  { label: "Testimonials", href: "/admin/testimonials", icon: Quote, shortcut: "" },
+  { label: "Social Feed", href: "/admin/social-posts", icon: Share2, shortcut: "" },
+  { label: "Inbox", href: "/admin/inbox", icon: Mail, shortcut: "G I" },
+  { label: "Courier Check", href: "/admin/courier-check", icon: Truck, shortcut: "" },
+  { label: "Fraud Review", href: "/admin/fraud-review", icon: AlertTriangle, shortcut: "" },
+  { label: "Loyalty", href: "/admin/loyalty", icon: Shield, shortcut: "" },
+  { label: "Analytics", href: "/admin/analytics", icon: LineChart, shortcut: "" },
+  { label: "Navigation", href: "/admin/navigation", icon: Layers, shortcut: "" },
+  { label: "Attributes", href: "/admin/attributes", icon: Hash, shortcut: "" },
+  { label: "Branding", href: "/admin/branding", icon: Palette, shortcut: "" },
+  { label: "Store Layout", href: "/admin/layout", icon: Layers, shortcut: "" },
+  { label: "Settings", href: "/admin/settings", icon: Settings, shortcut: "G S" },
+  { label: "Notifications", href: "/admin/notifications", icon: Bell, shortcut: "" },
+];
 
 export default function SearchModal({ isOpen, onClose }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  
-  // Memoized search logic for high-performance filtration
-  const results = React.useMemo(() => {
-    if (query.length <= 1) return { products: [], orders: [], customers: [] };
+  const [activeIndex, setActiveIndex] = useState(0);
+  const listRef = useRef(null);
+  const inputRef = useRef(null);
 
-    return {
-      products: [
-        { id: "p1", name: "Xiroo™ LED Cap Lamp", price: "৳2,400" },
-        { id: "p2", name: "String Cap Holder", price: "৳450" }
-      ].filter(p => p.name.toLowerCase().includes(query.toLowerCase())),
-      orders: [
-        { id: "ORD-8F8C", customer: "John Doe", total: "৳12,400" }
-      ].filter(o => o.id.toLowerCase().includes(query.toLowerCase()) || o.customer.toLowerCase().includes(query.toLowerCase())),
-      customers: [
-        { id: "c1", name: "Sarah Smith", email: "sarah@example.com" }
-      ].filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
-    };
+  const filtered = useMemo(() => {
+    if (!query.trim()) return NAV_ITEMS;
+    const q = query.toLowerCase();
+    return NAV_ITEMS.filter(
+      (item) =>
+        item.label.toLowerCase().includes(q) ||
+        item.href.replace("/admin", "").replace("/", "").toLowerCase().includes(q)
+    );
   }, [query]);
 
-  // Handle Esc key
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+    setActiveIndex(0);
+  }, [query]);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+      setQuery("");
+      setActiveIndex(0);
+    }
+  }, [isOpen]);
+
+  const navigate = useCallback(
+    (href) => {
+      router.push(href);
+      onClose();
+    },
+    [router, onClose]
+  );
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((i) => (i + 1) % filtered.length);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((i) => (i - 1 + filtered.length) % filtered.length);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filtered[activeIndex]) {
+          navigate(filtered[activeIndex].href);
+        }
+      } else if (e.key === "Escape") {
+        onClose();
+      }
+    },
+    [filtered, activeIndex, navigate, onClose]
+  );
+
+  useEffect(() => {
+    if (listRef.current) {
+      const active = listRef.current.children[activeIndex];
+      if (active) {
+        active.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [activeIndex]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-9999 flex items-start justify-center pt-[10vh] px-4 font-montserrat antialiased">
-      {/* Blurred Backdrop */}
-      <div 
-        className="absolute inset-0 bg-white/60 backdrop-blur-md transition-opacity duration-300"
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-[12vh] px-4">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Command Palette */}
-      <div className="relative w-full max-w-2xl bg-[#F7F7F5] border border-[#EDECE9] shadow-2xl shadow-black/10 rounded-none overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Search Input HUD */}
-        <div className="flex items-center gap-4 px-6 h-16 border-b border-[#EDECE9] bg-white">
-          <Search size={20} className="text-[#37352F40]" />
-          <input 
-            autoFocus
+      <div
+        className="relative w-full max-w-xl bg-white border border-gray-200 shadow-2xl overflow-hidden"
+        onKeyDown={handleKeyDown}
+      >
+        {/* Search Input */}
+        <div className="flex items-center gap-3 px-5 h-14 border-b border-gray-200">
+          <Search size={18} className="text-gray-400 flex-shrink-0" />
+          <input
+            ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products, orders, or customers..."
-            className="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-[#37352F] placeholder:text-[#37352F20]"
+            placeholder="Search commands or navigate..."
+            className="flex-1 bg-transparent border-none outline-none text-[15px] text-gray-900 placeholder:text-gray-400"
           />
-          <div className="flex items-center gap-2 px-2 py-1 bg-[#F7F7F5] border border-[#EDECE9] rounded-none">
-             <span className="text-[10px] font-bold text-[#37352F40] uppercase tracking-widest">Esc</span>
-          </div>
+          <button
+            onClick={onClose}
+            className="px-2 py-0.5 text-[11px] font-semibold text-gray-500 bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"
+          >
+            ESC
+          </button>
         </div>
 
-        {/* Dynamic Results Grid */}
-        <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
-          {query.length > 0 ? (
-            <div className="space-y-6 p-4">
-              {/* Products Segment */}
-              {results.products.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#37352F10] px-2 flex items-center justify-between">
-                    Products
-                    <Package size={12} />
-                  </h4>
-                  <div className="space-y-1">
-                    {results.products.map(product => (
-                      <button 
-                        key={product.id}
-                        onClick={() => { router.push(`/admin/products/${product.id}`); onClose(); }}
-                        className="w-full flex items-center justify-between p-3 hover:bg-white border border-transparent hover:border-[#EDECE9] transition-all group rounded-none text-left"
-                      >
-                        <span className="text-[13px] font-bold text-[#37352F]">{product.name}</span>
-                        <span className="text-[11px] text-[#37352F40] font-bold">{product.price}</span>
-                      </button>
-                    ))}
+        {/* Results */}
+        <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-1">
+          {filtered.length > 0 ? (
+            filtered.map((item, i) => {
+              const Icon = item.icon;
+              const isActive = i === activeIndex;
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => navigate(item.href)}
+                  onMouseEnter={() => setActiveIndex(i)}
+                  className={`w-full flex items-center justify-between px-5 py-3 text-left transition-colors ${
+                    isActive ? "bg-gray-100" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={18} className={isActive ? "text-gray-900" : "text-gray-500"} strokeWidth={1.5} />
+                    <span className={`text-[14px] ${isActive ? "text-gray-900 font-semibold" : "text-gray-700 font-medium"}`}>
+                      {item.label}
+                    </span>
                   </div>
-                </div>
-              )}
-
-              {/* Orders Segment */}
-              {results.orders.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#37352F10] px-2 flex items-center justify-between">
-                    Orders
-                    <ShoppingBag size={12} />
-                  </h4>
-                  <div className="space-y-1">
-                    {results.orders.map(order => (
-                      <button 
-                        key={order.id}
-                        onClick={() => { router.push(`/admin/orders/${order.id}`); onClose(); }}
-                        className="w-full flex items-center justify-between p-3 hover:bg-white border border-transparent hover:border-[#EDECE9] transition-all group rounded-none text-left"
-                      >
-                        <div className="flex flex-col">
-                           <span className="text-[13px] font-bold text-[#37352F]">{order.id}</span>
-                           <span className="text-[10px] text-[#37352FA6] font-medium uppercase tracking-wider">{order.customer}</span>
-                        </div>
-                        <span className="text-[11px] text-[#37352F40] font-bold">{order.total}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Customers Segment */}
-              {results.customers.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#37352F10] px-2 flex items-center justify-between">
-                    Customers
-                    <Users size={12} />
-                  </h4>
-                  <div className="space-y-1">
-                    {results.customers.map(customer => (
-                      <button 
-                        key={customer.id}
-                        onClick={() => { router.push(`/admin/customers/${customer.id}`); onClose(); }}
-                        className="w-full flex items-center justify-between p-3 hover:bg-white border border-transparent hover:border-[#EDECE9] transition-all group rounded-none text-left"
-                      >
-                        <div className="flex flex-col">
-                           <span className="text-[13px] font-bold text-[#37352F]">{customer.name}</span>
-                           <span className="text-[10px] text-[#37352FA6] font-medium tracking-tight">{customer.email}</span>
-                        </div>
-                        <ArrowRight size={14} className="text-[#37352F20] opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {results.products.length === 0 && results.orders.length === 0 && results.customers.length === 0 && (
-                <div className="py-20 text-center space-y-4">
-                   <div className="flex justify-center flex-col items-center gap-3">
-                      <Command size={32} className="text-[#37352F10] rotate-45" />
-                      <p className="text-[11px] font-bold text-[#37352F40] uppercase tracking-[0.3em]">No direct intelligence found</p>
-                   </div>
-                </div>
-              )}
-            </div>
+                  {item.shortcut && (
+                    <div className="flex items-center gap-1">
+                      {item.shortcut.split(" ").map((k, j) => (
+                        <span
+                          key={j}
+                          className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1 text-[10px] font-semibold text-gray-500 bg-gray-100 border border-gray-200"
+                        >
+                          {k}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              );
+            })
           ) : (
-            <div className="p-10 text-center space-y-4 opacity-50">
-               <div className="flex justify-center flex-col items-center gap-2">
-                  <Search size={24} className="text-[#37352F20]" />
-                  <p className="text-[10px] font-bold text-[#37352F40] uppercase tracking-[0.4em]">Start typing to explore Xiroo Core</p>
-               </div>
+            <div className="py-16 text-center">
+              <p className="text-[13px] text-gray-400">No results found</p>
             </div>
           )}
         </div>
 
-        {/* Palette Footer */}
-        <div className="h-12 bg-white border-t border-[#EDECE9] flex items-center justify-between px-6">
-           <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5 grayscale opacity-50">
-                 <Package size={12} />
-                 <span className="text-[9px] font-bold text-[#37352F] uppercase tracking-widest">Products</span>
-              </div>
-           </div>
-           <div className="flex items-center gap-1.5 opacity-30">
-              <Command size={10} />
-              <span className="text-[9px] font-bold text-[#37352FA6] uppercase tracking-widest leading-none">Global Index</span>
-           </div>
+        {/* Footer */}
+        <div className="h-11 border-t border-gray-200 flex items-center justify-between px-5 bg-gray-50">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold text-gray-500">↑↓</span>
+              <span className="text-[10px] text-gray-400">Navigate</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold text-gray-500">↵</span>
+              <span className="text-[10px] text-gray-400">Select</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Command size={10} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400">⌘K</span>
+          </div>
         </div>
       </div>
     </div>

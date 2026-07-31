@@ -30,7 +30,8 @@ export default function AdminDashboard() {
   const { useDashboardStats } = useDashboard();
   const { useAllUsers } = useUsers();
   const { data: response, isLoading } = useDashboardStats();
-  const { data: recentUsers } = useAllUsers({ limit: 10, sort: "-createdAt" });
+  const { data: recentUsersResponse } = useAllUsers({ limit: 10 });
+  const recentUsers = recentUsersResponse?.users || recentUsersResponse?.data?.users || [];
   const stats = response?.data;
 
   return (

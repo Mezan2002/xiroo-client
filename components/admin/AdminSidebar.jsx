@@ -113,7 +113,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
         {/* Quick Links */}
         <div className="px-3 space-y-px">
           {[
-            { icon: Search, label: "Search", onClick: handleOpenSearch },
+            { icon: Search, label: "Search", onClick: handleOpenSearch, shortcut: "⌘ K" },
             {
               icon: Inbox,
               label: "Inbox",
@@ -147,6 +147,18 @@ export default function AdminSidebar({ isOpen, onClose }) {
                   }
                 />
                 <span className="flex-1 text-left">{item.label}</span>
+                {item.shortcut && (
+                  <div className="flex items-center gap-0.5">
+                    {item.shortcut.split(" ").map((k, j) => (
+                      <span
+                        key={j}
+                        className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[9px] font-semibold text-[#91918E] bg-[#EDECE9]"
+                      >
+                        {k}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {item.badge > 0 && (
                   <span className="text-[10px] font-bold bg-[#37352F] text-white px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                     {item.badge}
