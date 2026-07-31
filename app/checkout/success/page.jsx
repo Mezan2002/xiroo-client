@@ -59,7 +59,7 @@ function OrderSuccessContent() {
       window.trackFacebookEvent("Purchase", {
         content_ids: order.items.map(item => item.product?._id || item.product),
         content_type: "product",
-        value: order.totalPrice,
+        value: Number(order.totalPrice) || 0,
         currency: "BDT",
         num_items: order.items.length
       }, customerData, order.facebookEventId || null);
