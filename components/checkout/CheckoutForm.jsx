@@ -48,21 +48,20 @@ export default function CheckoutForm({
         )}
 
         {step === 2 && (
-          <DeliverySection
-            deliveryMethod={deliveryMethod}
-            setDeliveryMethod={setDeliveryMethod}
-            district={formData.district}
-            deliveryFeeData={deliveryFeeData}
-          />
-        )}
-
-        {step === 3 && (
-          <PaymentSection
-            user={user}
-            formData={formData}
-            handleChange={handleChange}
-            customerStats={customerStats}
-          />
+          <div className="space-y-10">
+            <DeliverySection
+              deliveryMethod={deliveryMethod}
+              setDeliveryMethod={setDeliveryMethod}
+              district={formData.district}
+              deliveryFeeData={deliveryFeeData}
+            />
+            <PaymentSection
+              user={user}
+              formData={formData}
+              handleChange={handleChange}
+              customerStats={customerStats}
+            />
+          </div>
         )}
 
         {/* Order Notes */}
@@ -105,10 +104,10 @@ export default function CheckoutForm({
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Processing...
               </div>
-            ) : step === 3 ? (
+            ) : step === 2 ? (
               "Complete Purchase"
             ) : (
-              "Continue to Delivery"
+              "Continue to Payment"
             )}
           </Button>
         </div>

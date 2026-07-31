@@ -6,6 +6,8 @@ import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
+
+
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { saveCustomerContext } from "@/components/Marketing/FacebookPixel";
 
@@ -39,7 +41,7 @@ export const useCheckoutForm = (
     postalCode: "",
     phone: "",
     paymentMethod: "cod",
-    // Registration at checkout (only shown to guests on step 3)
+    // Registration at checkout (only shown to guests on step 2)
     shouldRegister: false,
     password: "",
   });
@@ -47,10 +49,12 @@ export const useCheckoutForm = (
   const [customerStats, setCustomerStats] = useState(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const phoneLookupTimeout = useRef(null);
+  const isFormInitialized = useRef(false);
 
-  // Pre-fill form if user is logged in
+  // Pre-fill form if user is logged in (only once on initial load)
   useEffect(() => {
-    if (user) {
+    if (user && !isFormInitialized.current) {
+      isFormInitialized.current = true;
       const defaultAddress =
         user.addresses?.find((addr) => addr.isDefault) || user.addresses?.[0];
       setFormData((prev) => ({
@@ -251,7 +255,7 @@ export const useCheckoutForm = (
 
   const handleNext = async (e) => {
     e.preventDefault();
-    if (step < 3) {
+    if (step < 2) {
       setStep(step + 1);
     } else {
       await handlePlaceOrder();

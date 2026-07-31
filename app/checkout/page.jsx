@@ -27,7 +27,7 @@ export default function CheckoutPage() {
   } = useCart();
   const { validateDiscount } = useDiscounts();
   const { toast } = useToast();
-  const [step, setStep] = useState(1); // 1: Info, 2: Shipping, 3: Payment
+  const [step, setStep] = useState(1); // 1: Info, 2: Delivery & Payment
   const [district, setDistrict] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
 

@@ -3,12 +3,6 @@ import Link from "next/link";
 import CustomerStats from "./CustomerStats";
 
 export default function PaymentSection({ user, formData, handleChange, customerStats }) {
-  const methods = [
-    { id: "cod", label: "Cash on Delivery", active: true },
-    { id: "card", label: "Credit Card (Coming Soon)", active: false },
-    { id: "mobile", label: "Mobile Banking (Coming Soon)", active: false },
-  ];
-
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-700">
 
@@ -20,29 +14,28 @@ export default function PaymentSection({ user, formData, handleChange, customerS
         <h2 className="text-[18px] font-medium uppercase tracking-wider">
           Payment Method
         </h2>
-        <div className="space-y-4">
-          {methods.map((m) => (
-            <label
-              key={m.id}
-              className={`flex items-center gap-4 p-4 sm:p-6 border cursor-pointer transition-colors ${
-                m.active
-                  ? "border-black bg-gray-50/50"
-                  : "border-gray-100 opacity-50 grayscale hover:bg-gray-50/50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="payment"
-                defaultChecked={m.id === "cod"}
-                disabled={!m.active}
-                className="w-4 h-4 accent-black shrink-0"
-              />
-              <span className="text-[13px] md:text-sm font-medium uppercase tracking-wider leading-tight mt-px">
-                {m.label}
+        <div className="border border-gray-100 bg-gray-50/50 p-4 sm:p-6">
+          <div className="flex items-center gap-4">
+            <input
+              type="radio"
+              name="payment"
+              checked
+              readOnly
+              className="w-4 h-4 accent-black shrink-0"
+            />
+            <div className="flex flex-col">
+              <span className="text-sm font-medium uppercase tracking-wider leading-tight">
+                Cash on Delivery
               </span>
-            </label>
-          ))}
+              <span className="text-[11px] text-gray-400 font-medium mt-0.5">
+                Pay when your order arrives
+              </span>
+            </div>
+          </div>
         </div>
+        <p className="text-[10px] text-gray-400 font-medium">
+          Currently we only support Cash on Delivery (COD). More payment methods coming soon.
+        </p>
       </div>
 
       {/* Register with checkout info — only shown to guests */}

@@ -4,8 +4,7 @@ import { ChevronRight } from "lucide-react";
 export default function StepIndicator({ step }) {
   const steps = [
     { id: 1, label: "Information" },
-    { id: 2, label: "Delivery" },
-    { id: 3, label: "Payment" },
+    { id: 2, label: "Delivery & Payment" },
   ];
 
   return (
@@ -17,7 +16,7 @@ export default function StepIndicator({ step }) {
           >
             {s.label}
           </span>
-          {s.id < 3 && <ChevronRight className="w-3 h-3 text-gray-200" />}
+          {s.id < 2 && <ChevronRight className="w-3 h-3 text-gray-200" />}
         </div>
       ))}
     </div>
