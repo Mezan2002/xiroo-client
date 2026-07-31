@@ -18,6 +18,7 @@ import {
   Share2,
   Shield,
   ShoppingBag,
+  StickyNote,
   Tag,
   Truck,
   UserCheck,
@@ -126,6 +127,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
               badge: notificationUnread,
             },
             { label: "Dashboard", href: "/admin", icon: BarChart3 },
+            { label: "Notes", href: "/admin/notes", icon: StickyNote },
           ].map((item, idx) => {
             const Icon = item.icon;
             const isActive =
