@@ -29,6 +29,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
     updateVariantName,
     addVariantValue,
     updateVariantValuePrice,
+    updateVariantValueQuantity,
+    updateVariantValueImage,
     removeVariantValue,
     addSpecGroup,
     removeSpecGroup,
@@ -94,6 +96,8 @@ const ProductForm = forwardRef(({ initialData, onSubmit, isPending }, ref) => {
         updateVariantName={updateVariantName}
         addVariantValue={addVariantValue}
         updateVariantValuePrice={updateVariantValuePrice}
+        updateVariantValueQuantity={updateVariantValueQuantity}
+        updateVariantValueImage={updateVariantValueImage}
         removeVariantValue={removeVariantValue}
       />
 

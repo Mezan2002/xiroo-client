@@ -67,7 +67,12 @@ export const useProductForm = (initialData, onSubmit) => {
       tax: Number(product.tax || 15),
       variants: product.variants.map((v) => ({
         name: v.name,
-        values: v.values.map((val) => ({ value: val.value, price: val.price ? Number(val.price) : undefined })),
+        values: v.values.map((val) => ({
+          value: val.value,
+          price: val.price ? Number(val.price) : undefined,
+          quantity: val.quantity !== undefined && val.quantity !== "" ? Number(val.quantity) : undefined,
+          image: val.image || undefined,
+        })),
       })),
       specifications: product.specifications.map((g) => ({ group: g.group, items: g.items.map((i) => ({ label: i.label, value: i.value })) })),
       bundles: product.bundles.map((b) => ({ ...b, price: Number(b.price), unitPrice: Number(b.unitPrice) })),

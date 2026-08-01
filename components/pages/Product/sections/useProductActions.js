@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/useToast";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-export const useProductActions = (product) => {
+export const useProductActions = (product, externalVariants, externalSetVariants) => {
   const { user } = useUser();
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -73,7 +73,9 @@ export const useProductActions = (product) => {
   const currentActivePrice = isSaleActive ? product.salePrice : product.price;
 
   const [selectedBundleId, setSelectedBundleId] = useState(1);
-  const [selectedVariants, setSelectedVariants] = useState({});
+  const [internalVariants, setInternalVariants] = useState({});
+  const selectedVariants = externalVariants ?? internalVariants;
+  const setSelectedVariants = externalSetVariants ?? setInternalVariants;
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
@@ -88,6 +90,28 @@ export const useProductActions = (product) => {
 
   const displayPrice =
     variantPriceOverride > 0 ? variantPriceOverride : currentActivePrice;
+
+  const variantQuantity = useMemo(() => {
+    for (const [vName, vVal] of Object.entries(selectedVariants)) {
+      const variant = product.variants?.find((v) => v.name === vName);
+      const valObj = variant?.values?.find((v) => (v.value || v) === vVal);
+      if (valObj?.quantity !== undefined && valObj.quantity !== null) {
+        return valObj.quantity;
+      }
+    }
+    return null;
+  }, [selectedVariants, product.variants]);
+
+  const variantImage = useMemo(() => {
+    for (const [vName, vVal] of Object.entries(selectedVariants)) {
+      const variant = product.variants?.find((v) => v.name === vName);
+      const valObj = variant?.values?.find((v) => (v.value || v) === vVal);
+      if (valObj?.image) return valObj.image;
+    }
+    return null;
+  }, [selectedVariants, product.variants]);
+
+  const effectiveStock = variantQuantity ?? product.inventory;
 
   const activeBundles = useMemo(() => {
     const hasBundles = product.bundles && product.bundles.length > 0;
@@ -129,7 +153,7 @@ export const useProductActions = (product) => {
             : isSaleActive
               ? product.salePrice
               : undefined,
-        image: product.images?.[0] || "",
+        image: variantImage || product.images?.[0] || "",
       },
       variant: variantString || "Standard",
       quantity,
@@ -179,7 +203,7 @@ export const useProductActions = (product) => {
             : isSaleActive
               ? product.salePrice
               : undefined,
-        image: product.images?.[0] || "",
+        image: variantImage || product.images?.[0] || "",
       },
       variant: variantString || "Standard",
       quantity,
@@ -225,5 +249,8 @@ export const useProductActions = (product) => {
     handleAddToCart,
     handleOrderNow,
     variantPriceOverride,
+    variantQuantity,
+    variantImage,
+    effectiveStock,
   };
 };

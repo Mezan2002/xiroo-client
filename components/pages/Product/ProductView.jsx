@@ -9,7 +9,7 @@ import { addRecentView } from "@/redux/slices/recentlyViewedSlice";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
@@ -27,6 +27,18 @@ export default function ProductView({ productId }) {
   const product = response?.data;
 
   const dispatch = useDispatch();
+
+  const [selectedVariants, setSelectedVariants] = useState({});
+
+  const variantImage = useMemo(() => {
+    if (!product?.variants) return null;
+    for (const [vName, vVal] of Object.entries(selectedVariants)) {
+      const variant = product.variants.find((v) => v.name === vName);
+      const valObj = variant?.values?.find((v) => (v.value || v) === vVal);
+      if (valObj?.image) return valObj.image;
+    }
+    return null;
+  }, [selectedVariants, product?.variants]);
 
   // Track product view for Recently Viewed feature
   useEffect(() => {
@@ -102,13 +114,24 @@ export default function ProductView({ productId }) {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 relative">
           {/* Left Side: Image Gallery */}
           <div className="w-full lg:w-1/2">
-            <ProductGallery title={product.title} images={product.images} />
+            <ProductGallery
+              title={product.title}
+              images={product.images}
+              variants={product.variants}
+              selectedVariants={selectedVariants}
+              variantImage={variantImage}
+            />
           </div>
 
           {/* Right Side: Sticky Purchasing Block */}
           <div className="w-full lg:w-1/2 relative bg-white">
             <div className="lg:sticky lg:top-[120px]">
-              <ProductInfo product={product} cartRef={cartRef} />
+              <ProductInfo
+                product={product}
+                cartRef={cartRef}
+                selectedVariants={selectedVariants}
+                setSelectedVariants={setSelectedVariants}
+              />
             </div>
           </div>
         </div>
@@ -134,9 +157,9 @@ export default function ProductView({ productId }) {
         <div className="pointer-events-auto w-full max-w-[560px] h-[64px] md:h-[72px] flex items-center gap-3 bg-white border border-gray-200 shadow-[0_12px_40px_rgba(0,0,0,0.12)] px-3">
           {/* Thumbnail */}
           <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 shrink-0 overflow-hidden flex items-center justify-center">
-            {product.images?.[0] ? (
+            {(variantImage || product.images?.[0]) ? (
               <Image
-                src={product.images[0]}
+                src={variantImage || product.images[0]}
                 alt={product.title}
                 width={48}
                 height={48}

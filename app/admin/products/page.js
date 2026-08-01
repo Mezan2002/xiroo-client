@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Plus, Package } from "lucide-react";
+import { Select } from "@/components/ui/Select";
+import { Plus, Package, Search } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { useProducts } from "@/hooks/api/useProducts";
+import { useCategories } from "@/hooks/api/useCategories";
 import Image from "next/image";
 
 const PAGE_LIMIT = 10;
@@ -15,15 +17,54 @@ export default function AdminInventory() {
   const router = useRouter();
   const { toast } = useToast();
   const { useAllProducts, useProductMutation } = useProducts();
+  const { useCategoryTree } = useCategories();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [subCategoryFilter, setSubCategoryFilter] = useState("");
+  const [stockFilter, setStockFilter] = useState("");
 
-  const { data: response, isLoading } = useAllProducts({ page: currentPage, limit: PAGE_LIMIT });
+  const { data: categories = [] } = useCategoryTree();
+
+  const queryParams = useMemo(() => {
+    const params = { page: currentPage, limit: PAGE_LIMIT };
+    if (searchTerm) params.searchTerm = searchTerm;
+    if (categoryFilter) params.category = categoryFilter;
+    if (subCategoryFilter) params.subCategory = subCategoryFilter;
+    if (stockFilter) params.inStock = stockFilter;
+    return params;
+  }, [currentPage, searchTerm, categoryFilter, subCategoryFilter, stockFilter]);
+
+  const { data: response, isLoading } = useAllProducts(queryParams);
   const products = response?.data || [];
   const meta = response?.meta || {};
   const totalPages = meta.totalPage || 1;
 
   const { deleteMutation } = useProductMutation();
+
+  const subCategoryOptions = useMemo(() => {
+    if (!categoryFilter) return [];
+    return categories.filter(
+      (c) => c.parentId && c.parentId.toString() === categoryFilter
+    );
+  }, [categories, categoryFilter]);
+
+  const categorySelectOptions = useMemo(() => {
+    return categories
+      .filter((c) => !c.parentId)
+      .map((c) => ({ value: c._id, label: c.name }));
+  }, [categories]);
+
+  const subCategorySelectOptions = useMemo(() => {
+    return subCategoryOptions.map((c) => ({ value: c._id, label: c.name }));
+  }, [subCategoryOptions]);
+
+  const stockSelectOptions = [
+    { value: "", label: "All Stock" },
+    { value: "true", label: "In Stock" },
+    { value: "false", label: "Out of Stock" },
+  ];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -85,13 +126,17 @@ export default function AdminInventory() {
       key: "isActive", 
       label: "Status", 
       width: "120px",
-      render: (row) => (
-        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm ${
-          row.inventory > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
-        }`}>
-          {row.inventory > 0 ? 'In Stock' : 'Out of Stock'}
-        </span>
-      )
+      render: (row) => {
+        const stock = Number(row.inventory) || 0;
+        const isOut = stock <= 0 || row.stockStage === "out-of-stock";
+        return (
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm ${
+            isOut ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
+          }`}>
+            {isOut ? 'Out of Stock' : 'In Stock'}
+          </span>
+        );
+      }
     },
     { 
       key: "price", 
@@ -134,7 +179,53 @@ export default function AdminInventory() {
           onClick: () => router.push("/admin/products/new")
         }}
       />
-      
+
+      {/* Filter Bar */}
+      <div className="bg-white border border-zinc-200 p-4 flex flex-col md:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+          <input
+            type="text"
+            placeholder="Search by product name or SKU..."
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+            className="w-full h-10 pl-10 pr-4 bg-white border border-zinc-200 focus:border-zinc-400 outline-none text-[12px] font-medium rounded-md transition-colors"
+          />
+        </div>
+        <div className="flex gap-3">
+          <div className="w-44">
+            <Select
+              options={[{ value: "", label: "All Categories" }, ...categorySelectOptions]}
+              value={categoryFilter}
+              onChange={(val) => {
+                setCategoryFilter(val);
+                setSubCategoryFilter("");
+                setCurrentPage(1);
+              }}
+              placeholder="All Categories"
+            />
+          </div>
+          {subCategorySelectOptions.length > 0 && (
+            <div className="w-44">
+              <Select
+                options={[{ value: "", label: "All Sub-Categories" }, ...subCategorySelectOptions]}
+                value={subCategoryFilter}
+                onChange={(val) => { setSubCategoryFilter(val); setCurrentPage(1); }}
+                placeholder="All Sub-Categories"
+              />
+            </div>
+          )}
+          <div className="w-36">
+            <Select
+              options={stockSelectOptions}
+              value={stockFilter}
+              onChange={(val) => { setStockFilter(val); setCurrentPage(1); }}
+              placeholder="All Stock"
+            />
+          </div>
+        </div>
+      </div>
+
       <DataTable 
         columns={COLUMNS}
         data={products}

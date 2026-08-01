@@ -8,7 +8,7 @@ import QuantitySelector from "./sections/QuantitySelector";
 import VariantSelector from "./sections/VariantSelector";
 import { useProductActions } from "./sections/useProductActions";
 
-export default function ProductInfo({ product, cartRef }) {
+export default function ProductInfo({ product, cartRef, selectedVariants, setSelectedVariants }) {
   const {
     dates,
     timeLeft,
@@ -17,8 +17,8 @@ export default function ProductInfo({ product, cartRef }) {
     activeBundles,
     selectedBundleId,
     setSelectedBundleId,
-    selectedVariants,
-    setSelectedVariants,
+    selectedVariants: hookVariants,
+    setSelectedVariants: hookSetVariants,
     quantity,
     setQuantity,
     activeTab,
@@ -26,7 +26,10 @@ export default function ProductInfo({ product, cartRef }) {
     handleAddToCart,
     handleOrderNow,
     variantPriceOverride,
-  } = useProductActions(product);
+    variantQuantity,
+    variantImage,
+    effectiveStock,
+  } = useProductActions(product, selectedVariants, setSelectedVariants);
 
   const isBuyDisabled = ["out-of-stock", "upcoming"].includes(product.stockStage);
 
@@ -41,8 +44,8 @@ export default function ProductInfo({ product, cartRef }) {
 
       <VariantSelector
         variants={product.variants}
-        selectedVariants={selectedVariants}
-        setSelectedVariants={setSelectedVariants}
+        selectedVariants={hookVariants}
+        setSelectedVariants={hookSetVariants}
       />
 
       <BundleSelector

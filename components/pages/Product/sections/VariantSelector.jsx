@@ -22,6 +22,7 @@ export default function VariantSelector({ variants, selectedVariants, setSelecte
               {variant.values.map((vObj) => {
                 const val = typeof vObj === "string" ? vObj : vObj.value;
                 const vPrice = typeof vObj === "string" ? null : vObj.price;
+                const vQuantity = typeof vObj === "string" ? null : vObj.quantity;
                 const isSelected = selectedVariants[variant.name] === val;
                 return (
                   <button
@@ -44,6 +45,13 @@ export default function VariantSelector({ variants, selectedVariants, setSelecte
                         className={`text-[8px] ${isSelected ? "text-white/60" : "text-zinc-400"}`}
                       >
                         ৳{vPrice}
+                      </span>
+                    )}
+                    {vQuantity !== null && vQuantity !== undefined && (
+                      <span
+                        className={`text-[7px] ${vQuantity <= 0 ? "text-red-400" : isSelected ? "text-white/50" : "text-zinc-300"}`}
+                      >
+                        {vQuantity <= 0 ? "Out of stock" : vQuantity <= 5 ? `Only ${vQuantity} left` : `${vQuantity} in stock`}
                       </span>
                     )}
                   </button>

@@ -1,5 +1,7 @@
 "use client";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Camera, ImageIcon } from "lucide-react";
+import Image from "next/image";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 import { Label, SectionHeader } from "./Shared";
 
 const VariantManager = ({
@@ -11,6 +13,8 @@ const VariantManager = ({
   updateVariantName,
   addVariantValue,
   updateVariantValuePrice,
+  updateVariantValueQuantity,
+  updateVariantValueImage,
   removeVariantValue,
 }) => {
   const otherAttributes = allAttributes.filter(
@@ -112,36 +116,73 @@ const VariantManager = ({
                 </div>
               </div>
               <div className="flex flex-wrap gap-4">
-                {v.values.map((val, idx) => (
-                  <span
-                    key={idx}
-                    className="px-4 md:px-6 py-2 md:py-3 bg-white border border-zinc-900 text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-3 md:gap-4 text-black shadow-lg shadow-black/5"
-                  >
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="leading-none">
-                        {typeof val === "string" ? val : val.value}
-                      </span>
-                      <div className="flex items-center gap-1 border-b border-zinc-100 pb-0.5">
-                        <span className="text-[8px] text-zinc-400">৳</span>
-                        <input
-                          type="number"
-                          placeholder="Price"
-                          value={typeof val === "string" ? "" : val.price}
-                          onChange={(e) =>
-                            updateVariantValuePrice(v.id, idx, e.target.value)
-                          }
-                          className="bg-transparent border-none outline-none text-[9px] w-12 text-zinc-500 font-bold placeholder:text-zinc-200"
-                        />
+                {v.values.map((val, idx) => {
+                  const valObj = typeof val === "string" ? { value: val } : val;
+                  return (
+                    <span
+                      key={idx}
+                      className="px-4 md:px-6 py-2 md:py-3 bg-white border border-zinc-900 text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-start gap-3 md:gap-4 text-black shadow-lg shadow-black/5"
+                    >
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="leading-none">{valObj.value}</span>
+                        <div className="flex items-center gap-1 border-b border-zinc-100 pb-0.5">
+                          <span className="text-[8px] text-zinc-400">৳</span>
+                          <input
+                            type="number"
+                            placeholder="Price"
+                            value={valObj.price || ""}
+                            onChange={(e) =>
+                              updateVariantValuePrice(v.id, idx, e.target.value)
+                            }
+                            className="bg-transparent border-none outline-none text-[9px] w-12 text-zinc-500 font-bold placeholder:text-zinc-200"
+                          />
+                        </div>
+                        <div className="flex items-center gap-1 border-b border-zinc-100 pb-0.5">
+                          <span className="text-[8px] text-zinc-400">Qty</span>
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={valObj.quantity ?? ""}
+                            onChange={(e) =>
+                              updateVariantValueQuantity(v.id, idx, e.target.value)
+                            }
+                            className="bg-transparent border-none outline-none text-[9px] w-12 text-zinc-500 font-bold placeholder:text-zinc-200"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <button onClick={() => removeVariantValue(v.id, idx)}>
-                      <X
-                        size={12}
-                        className="text-zinc-300 hover:text-black"
-                      />
-                    </button>
-                  </span>
-                ))}
+                      {valObj.image ? (
+                        <div className="relative w-10 h-10 shrink-0 border border-zinc-200 overflow-hidden group">
+                          <Image
+                            src={valObj.image}
+                            alt={valObj.value}
+                            fill
+                            className="object-cover"
+                            sizes="40px"
+                          />
+                          <button
+                            onClick={() => updateVariantValueImage(v.id, idx, "")}
+                            className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                          >
+                            <X size={10} className="text-white" />
+                          </button>
+                        </div>
+                      ) : (
+                        <ImageUploader
+                          onUploadSuccess={(url) => updateVariantValueImage(v.id, idx, url)}
+                          className="w-10 h-10 shrink-0 border border-dashed border-zinc-300 flex items-center justify-center hover:border-black transition-colors"
+                        >
+                          <Camera size={12} className="text-zinc-300" />
+                        </ImageUploader>
+                      )}
+                      <button onClick={() => removeVariantValue(v.id, idx)}>
+                        <X
+                          size={12}
+                          className="text-zinc-300 hover:text-black"
+                        />
+                      </button>
+                    </span>
+                  );
+                })}
                 <input
                   className="px-6 py-3 bg-zinc-50 border-2 border-dashed border-zinc-300 text-[11px] font-bold tracking-widest uppercase outline-none focus:border-black focus:border-solid w-40"
                   placeholder="+ VALUE"

@@ -31,8 +31,28 @@ export const useVariantHandlers = (setProduct) => {
     }));
   };
 
+  const updateVariantValueQuantity = (vid, idx, quantity) => {
+    setProduct((p) => ({
+      ...p,
+      variants: p.variants.map((v) => v.id === vid ? {
+        ...v,
+        values: v.values.map((val, i) => i === idx ? { ...(typeof val === "string" ? { value: val } : val), quantity } : val),
+      } : v),
+    }));
+  };
+
+  const updateVariantValueImage = (vid, idx, image) => {
+    setProduct((p) => ({
+      ...p,
+      variants: p.variants.map((v) => v.id === vid ? {
+        ...v,
+        values: v.values.map((val, i) => i === idx ? { ...(typeof val === "string" ? { value: val } : val), image } : val),
+      } : v),
+    }));
+  };
+
   const removeVariantValue = (vid, idx) =>
     setProduct((p) => ({ ...p, variants: p.variants.map((v) => v.id === vid ? { ...v, values: v.values.filter((_, i) => i !== idx) } : v) }));
 
-  return { addVariant, removeVariant, updateVariantName, addVariantValue, updateVariantValuePrice, removeVariantValue };
+  return { addVariant, removeVariant, updateVariantName, addVariantValue, updateVariantValuePrice, updateVariantValueQuantity, updateVariantValueImage, removeVariantValue };
 };
