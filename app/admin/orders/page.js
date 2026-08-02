@@ -3,6 +3,7 @@ import React, { useState, useMemo } from "react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import { Select } from "@/components/ui/Select";
 import { Plus, ShoppingBag, Loader2, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useOrders } from "@/hooks/api/useOrders";
@@ -129,11 +130,6 @@ export default function AdminOrders() {
     setPage(1);
   };
 
-  const handleStatusFilter = (e) => {
-    setStatusFilter(e.target.value);
-    setPage(1);
-  };
-
   return (
     <div className="space-y-6">
       <ModuleHeader
@@ -163,29 +159,35 @@ export default function AdminOrders() {
           />
         </div>
         <div className="flex gap-4">
-          <select
-            value={statusFilter}
-            onChange={handleStatusFilter}
-            className="bg-zinc-50 border border-zinc-100 px-4 py-2 text-[12px] font-bold uppercase tracking-widest outline-none focus:border-black transition-all"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="returned">Returned</option>
-            <option value="failed">Failed</option>
-          </select>
-          <select
-            value={deliveryFilter}
-            onChange={(e) => { setDeliveryFilter(e.target.value); setPage(1); }}
-            className="bg-zinc-50 border border-zinc-100 px-4 py-2 text-[12px] font-bold uppercase tracking-widest outline-none focus:border-black transition-all"
-          >
-            <option value="all">All Delivery</option>
-            <option value="regular">Regular</option>
-            <option value="fast">Fast Delivery</option>
-          </select>
+          <div className="w-40">
+            <Select
+              value={statusFilter}
+              onChange={(val) => { setStatusFilter(val); setPage(1); }}
+              placeholder="All Status"
+              options={[
+                { value: "all", label: "All Status" },
+                { value: "pending", label: "Pending" },
+                { value: "processing", label: "Processing" },
+                { value: "shipped", label: "Shipped" },
+                { value: "delivered", label: "Delivered" },
+                { value: "cancelled", label: "Cancelled" },
+                { value: "returned", label: "Returned" },
+                { value: "failed", label: "Failed" },
+              ]}
+            />
+          </div>
+          <div className="w-40">
+            <Select
+              value={deliveryFilter}
+              onChange={(val) => { setDeliveryFilter(val); setPage(1); }}
+              placeholder="All Delivery"
+              options={[
+                { value: "all", label: "All Delivery" },
+                { value: "regular", label: "Regular" },
+                { value: "fast", label: "Fast Delivery" },
+              ]}
+            />
+          </div>
         </div>
       </div>
 
