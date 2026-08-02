@@ -80,9 +80,17 @@ export default function OrderItemsRegistry({ order, handleCancelOrder }) {
                         <span className="text-[13px] font-bold text-zinc-900 tracking-tight leading-tight line-clamp-1">
                           {item.product?.title || "Unknown Product"}
                         </span>
-                        {item.variant && item.variant !== "Standard" && (
+                        {item.multiItems && item.multiItems.length > 0 ? (
+                          <div className="flex flex-col gap-1 mt-1">
+                            {item.multiItems.map((mi, miIdx) => (
+                              <span key={miIdx} className="text-[9px] text-zinc-500 font-medium bg-zinc-100 px-2 py-0.5 inline-block w-fit">
+                                Item {miIdx + 1}: {Object.entries(mi).map(([k, v]) => `${k}: ${v}`).join(", ")}
+                              </span>
+                            ))}
+                          </div>
+                        ) : item.variant && item.variant !== "Standard" ? (
                           <span className="text-[10px] text-zinc-500 font-medium">{item.variant}</span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </td>

@@ -27,7 +27,17 @@ export default function OrderItemList({ items }) {
                 <p className="text-[12px] md:text-[13px] font-bold tracking-tight">৳{item.price}</p>
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1">
-                {item.variant && <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Variant: <span className="text-black">{item.variant}</span></p>}
+                {item.multiItems && item.multiItems.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {item.multiItems.map((mi, miIdx) => (
+                      <span key={miIdx} className="text-[9px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-sm">
+                        Item {miIdx + 1}: {Object.entries(mi).map(([k, v]) => `${k}: ${v}`).join(", ")}
+                      </span>
+                    ))}
+                  </div>
+                ) : item.variant ? (
+                  <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Variant: <span className="text-black">{item.variant}</span></p>
+                ) : null}
                 <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Qty: <span className="text-black">{item.quantity}</span></p>
               </div>
               {item.product?._id && (

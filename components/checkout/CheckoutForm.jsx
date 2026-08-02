@@ -22,6 +22,7 @@ export default function CheckoutForm({
   note,
   setNote,
   deliveryFeeData,
+  hasFreeDelivery,
 }) {
   const {
     user,
@@ -54,6 +55,7 @@ export default function CheckoutForm({
               setDeliveryMethod={setDeliveryMethod}
               district={formData.district}
               deliveryFeeData={deliveryFeeData}
+              hasFreeDelivery={hasFreeDelivery}
             />
             <PaymentSection
               user={user}

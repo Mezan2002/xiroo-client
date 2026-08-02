@@ -36,9 +36,11 @@ export default function CheckoutPage() {
   const { data: deliveryFeeData, isLoading: feeLoading } =
     useDeliveryFee(district);
 
+  const hasFreeDelivery = items.some((item) => item.isFreeDelivery);
+
   const shipping = !district
     ? null
-    : isBundleFreeShipping || discount?.type === "free_shipping"
+    : isBundleFreeShipping || discount?.type === "free_shipping" || hasFreeDelivery
       ? 0
       : deliveryFeeData
         ? deliveryMethod === "fast"
@@ -186,6 +188,7 @@ export default function CheckoutPage() {
               note={note}
               setNote={setNote}
               deliveryFeeData={deliveryFeeData}
+              hasFreeDelivery={hasFreeDelivery}
             />
           </div>
 
@@ -202,6 +205,7 @@ export default function CheckoutPage() {
                 onApplyCoupon={handleApplyCoupon}
                 onRemoveCoupon={handleRemoveCoupon}
                 isApplyingCoupon={validateDiscount.isPending}
+                hasFreeDelivery={hasFreeDelivery}
               />
             </div>
           </div>

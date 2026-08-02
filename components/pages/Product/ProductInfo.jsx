@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/Button";
 import BundleSelector from "./sections/BundleSelector";
 import DeliveryTimeline from "./sections/DeliveryTimeline";
+import MultiItemVariantSelector from "./sections/MultiItemVariantSelector";
 import ProductPricing from "./sections/ProductPricing";
 import ProductTabs from "./sections/ProductTabs";
 import QuantitySelector from "./sections/QuantitySelector";
@@ -29,6 +30,8 @@ export default function ProductInfo({ product, cartRef, selectedVariants, setSel
     variantQuantity,
     variantImage,
     effectiveStock,
+    multiItems,
+    setMultiItems,
   } = useProductActions(product, selectedVariants, setSelectedVariants);
 
   const isBuyDisabled = ["out-of-stock", "upcoming"].includes(product.stockStage);
@@ -42,11 +45,20 @@ export default function ProductInfo({ product, cartRef, selectedVariants, setSel
         variantPriceOverride={variantPriceOverride}
       />
 
-      <VariantSelector
-        variants={product.variants}
-        selectedVariants={hookVariants}
-        setSelectedVariants={hookSetVariants}
-      />
+      {product.isMultiItem ? (
+        <MultiItemVariantSelector
+          variants={product.variants}
+          packQuantity={product.multiItemQuantity || 1}
+          selectedItems={multiItems}
+          setSelectedItems={setMultiItems}
+        />
+      ) : (
+        <VariantSelector
+          variants={product.variants}
+          selectedVariants={hookVariants}
+          setSelectedVariants={hookSetVariants}
+        />
+      )}
 
       <BundleSelector
         product={product}
@@ -57,7 +69,22 @@ export default function ProductInfo({ product, cartRef, selectedVariants, setSel
 
       {!isBuyDisabled && (
         <>
-          <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+          {product.isMultiItem && (
+            <div className="flex items-center justify-between w-full mt-6 pt-6 pb-2 border-t border-gray-200">
+              <div className="text-[10px] font-bold tracking-[0.2em] text-black uppercase">
+                Package Quantity
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-bold text-black">
+                  {product.multiItemQuantity || 1} items per pack
+                </span>
+              </div>
+            </div>
+          )}
+
+          {!product.isMultiItem && (
+            <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+          )}
 
           <DeliveryTimeline timeLeft={timeLeft} dates={dates} />
 
@@ -67,8 +94,7 @@ export default function ProductInfo({ product, cartRef, selectedVariants, setSel
               className="w-full h-14 bg-black text-white text-[11px] font-bold tracking-[0.3em] transition-all active:scale-[0.98] shadow-2xl shadow-black/10"
               onClick={handleAddToCart}
             >
-              ADD TO CART — ৳{(displayPrice * quantity).toLocaleString()}
-              {quantity > 1 ? ` (${quantity} ITEMS)` : ""}
+              ADD TO CART — ৳{displayPrice.toLocaleString()}
             </Button>
             <Button
               variant="outline"

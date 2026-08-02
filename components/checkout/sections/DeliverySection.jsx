@@ -1,6 +1,35 @@
 "use client";
 
-export default function DeliverySection({ deliveryMethod, setDeliveryMethod, district, deliveryFeeData }) {
+export default function DeliverySection({ deliveryMethod, setDeliveryMethod, district, deliveryFeeData, hasFreeDelivery }) {
+  if (hasFreeDelivery) {
+    return (
+      <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
+        <div className="space-y-4">
+          <h2 className="text-[18px] font-medium uppercase tracking-wider">
+            Delivery Method
+          </h2>
+          <div className="p-6 bg-green-50 border border-green-200">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <span className="text-sm font-bold text-green-800 uppercase tracking-wider">
+                  Free Delivery
+                </span>
+                <p className="text-[11px] text-green-600 mt-0.5">
+                  This order qualifies for free shipping
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const normalFee = deliveryFeeData?.normal ?? null;
   const fastFee = deliveryFeeData?.fast ?? null;
   const estimatedDays = deliveryFeeData?.estimatedDays || {};

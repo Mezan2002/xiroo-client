@@ -77,6 +77,14 @@ const ProductDetails = ({ product }) => {
             label="Featured"
             value={product.isFeatured ? "YES" : "NO"}
           />
+          <DetailField
+            label="Free Delivery"
+            value={product.isFreeDelivery ? "YES" : "NO"}
+          />
+          <DetailField
+            label="Multi-Item Package"
+            value={product.isMultiItem ? `YES (${product.multiItemQuantity || 1} items per pack)` : "NO"}
+          />
           <DetailField label="Badge" value={product.badge} />
 
           <div className="col-span-full space-y-4">

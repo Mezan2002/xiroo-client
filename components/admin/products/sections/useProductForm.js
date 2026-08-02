@@ -10,7 +10,7 @@ export const useProductForm = (initialData, onSubmit) => {
   const [product, setProduct] = useState({
     title: "", description: "", price: "", salePrice: "", saleStartDate: "", saleEndDate: "",
     inventory: "", sku: "", tax: "15", variants: [], specifications: [], bundles: [],
-    category: "", subCategory: "", images: [], stockStage: "in-stock", isFeatured: false, badge: "",
+    category: "", subCategory: "", images: [], stockStage: "in-stock", isFeatured: false, isFreeDelivery: false, isMultiItem: false, multiItemQuantity: 1, badge: "",
     seoTitle: "", seoDescription: "", seoKeywords: "",
   });
 
@@ -59,6 +59,9 @@ export const useProductForm = (initialData, onSubmit) => {
       ...product,
       subCategory: product.subCategory || undefined,
       sku: product.sku.toUpperCase(),
+      isFreeDelivery: product.isFreeDelivery || false,
+      isMultiItem: product.isMultiItem || false,
+      multiItemQuantity: product.isMultiItem ? Number(product.multiItemQuantity || 1) : 1,
       price: Number(product.price),
       salePrice: product.salePrice ? Number(product.salePrice) : undefined,
       saleStartDate: product.saleStartDate ? new Date(product.saleStartDate) : undefined,

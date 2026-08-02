@@ -68,6 +68,72 @@ const PricingInventory = ({ product, setProduct }) => {
           />
         </div>
       </div>
+
+      {/* Free Delivery Toggle */}
+      <div className="mt-6 flex items-center gap-4 p-4 bg-zinc-50 border border-[#EDECE9]">
+        <button
+          type="button"
+          onClick={() => setProduct({ ...product, isFreeDelivery: !product.isFreeDelivery })}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+            product.isFreeDelivery ? "bg-black" : "bg-zinc-200"
+          }`}
+        >
+          <span
+            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+              product.isFreeDelivery ? "translate-x-5" : "translate-x-0"
+            }`}
+          />
+        </button>
+        <div className="space-y-1">
+          <Label>Free Delivery</Label>
+          <p className="text-[11px] text-zinc-400 font-medium">
+            Enable to offer free shipping on this product
+          </p>
+        </div>
+      </div>
+
+      {/* Multi-Item Package Toggle */}
+      <div className="mt-4 p-4 bg-zinc-50 border border-[#EDECE9] space-y-4">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setProduct({ ...product, isMultiItem: !product.isMultiItem })}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              product.isMultiItem ? "bg-black" : "bg-zinc-200"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                product.isMultiItem ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+          <div className="space-y-1">
+            <Label>Multi-Item Package</Label>
+            <p className="text-[11px] text-zinc-400 font-medium">
+              Enable if this product is sold as a pack of multiple items
+            </p>
+          </div>
+        </div>
+
+        {product.isMultiItem && (
+          <div className="flex items-center gap-4 pl-[60px]">
+            <div className="space-y-1">
+              <Label>Pack Quantity</Label>
+              <input
+                type="number"
+                min="1"
+                value={product.multiItemQuantity || 1}
+                onChange={(e) => setProduct({ ...product, multiItemQuantity: Number(e.target.value) })}
+                className="w-24 bg-white border border-[#EDECE9] px-4 py-2 text-[13px] font-bold outline-none focus:border-black transition-all"
+              />
+            </div>
+            <p className="text-[11px] text-zinc-400 font-medium pt-6">
+              Customer must buy this exact quantity per unit
+            </p>
+          </div>
+        )}
+      </div>
     </section>
   );
 };

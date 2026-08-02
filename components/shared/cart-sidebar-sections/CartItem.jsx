@@ -51,8 +51,18 @@ export default function CartItem({ item, updateQuantity, removeItem, onClose }) 
             ৳{price}
           </span>
         </div>
-        <div className="flex items-center gap-2 mb-1">
-          <p className="text-[13px] text-gray-400">{item.variant}</p>
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          {item.multiItems && item.multiItems.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {item.multiItems.map((mi, miIdx) => (
+                <span key={miIdx} className="text-[9px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-sm">
+                  {miIdx + 1}: {Object.values(mi).join("/")}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[13px] text-gray-400">{item.variant}</p>
+          )}
           {item.bundleId && (
             <span className="bg-red-50 text-red-600 px-1.5 py-0.5 text-[9px] font-bold tracking-widest uppercase rounded-sm border border-red-100">
               Bundle

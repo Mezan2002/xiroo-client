@@ -166,6 +166,7 @@ export const useCheckoutForm = (
           (item.salePrice || item.price)?.toString().replace(/[^0-9.]/g, "") || 0,
         ),
         bundleId: item.bundleId || undefined,
+        multiItems: item.multiItems || undefined,
       }));
 
       const shippingAddress = `${formData.address}, ${formData.upazila}, ${formData.district} - ${formData.postalCode}`;

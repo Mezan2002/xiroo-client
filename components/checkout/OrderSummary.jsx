@@ -16,6 +16,7 @@ export default function OrderSummary({
   onApplyCoupon,
   onRemoveCoupon,
   isApplyingCoupon,
+  hasFreeDelivery,
 }) {
   const [couponCode, setCouponCode] = useState("");
 
@@ -64,9 +65,19 @@ export default function OrderSummary({
                   {item.title}
                 </Link>
               </div>
-              <p className="text-[10px] md:text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1 md:mb-2 line-clamp-1">
-                {item.variant}
-              </p>
+              {item.multiItems && item.multiItems.length > 0 ? (
+                <div className="flex flex-wrap gap-1 mb-1 md:mb-2">
+                  {item.multiItems.map((mi, miIdx) => (
+                    <span key={miIdx} className="text-[8px] md:text-[9px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-sm">
+                      {Object.values(mi).join("/")}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] md:text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1 md:mb-2 line-clamp-1">
+                  {item.variant}
+                </p>
+              )}
               <span className="text-sm font-medium text-black">
                 ৳{(item.salePrice || item.price).toLocaleString()}
               </span>
@@ -151,16 +162,18 @@ export default function OrderSummary({
         <div className="flex justify-between items-center text-[12px] font-medium uppercase tracking-wider text-gray-400">
           <span>Delivery Fee</span>
           <span
-            className={`italic ${
+            className={`${
               shipping === null
                 ? "text-gray-300 not-italic"
-                : "text-black"
+                : shipping === 0
+                  ? "text-green-600 font-bold"
+                  : "text-black"
             }`}
           >
             {shipping === null
               ? "Select district"
               : shipping === 0
-                ? "Free"
+                ? hasFreeDelivery ? "Free Delivery" : "Free"
                 : `৳${shipping.toLocaleString()}`}
           </span>
         </div>

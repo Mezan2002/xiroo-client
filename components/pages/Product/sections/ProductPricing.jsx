@@ -28,9 +28,22 @@ export default function ProductPricing({
               </span>
             )}
           </div>
-          <span className="text-[10px] md:text-[12px] text-gray-500 font-medium tracking-widest uppercase mt-2">
-            Complimentary shipping on orders over 3 products
-          </span>
+          {product.isMultiItem && (
+            <span className="text-[10px] md:text-[12px] text-gray-500 font-medium tracking-widest uppercase mt-1">
+              {product.multiItemQuantity || 1} items per pack
+            </span>
+          )}
+          {product.isFreeDelivery ? (
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <span className="inline-flex items-center px-3 py-1 bg-green-50 border border-green-200 text-[10px] md:text-[11px] font-bold text-green-700 uppercase tracking-wider">
+                Free Delivery
+              </span>
+            </div>
+          ) : (
+            <span className="text-[10px] md:text-[12px] text-gray-500 font-medium tracking-widest uppercase mt-2">
+              Complimentary shipping on orders over 3 products
+            </span>
+          )}
         </>
       ) : (
         <div className="mt-4 p-8 bg-zinc-50 border border-zinc-200 w-full mb-6">
