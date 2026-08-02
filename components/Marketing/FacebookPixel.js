@@ -183,7 +183,8 @@ export default function FacebookPixel() {
         eventName,
         customData = {},
         userData = {},
-        overrideEventId = null
+        overrideEventId = null,
+        overrideTestEventCode = null
       ) => {
         const activePid = pixelIdRef.current;
         if (!activePid || !window.fbq) return;
@@ -216,6 +217,15 @@ export default function FacebookPixel() {
         const nEmail = normalizeEmail(mergedUser.email);
         const nPhone = normalizePhone(mergedUser.phone);
 
+        // Resolve test event code: explicit override > stored admin code > global setting
+        let activeTestCode = overrideTestEventCode;
+        if (!activeTestCode && typeof window !== "undefined") {
+          try {
+            activeTestCode = sessionStorage.getItem("admin_test_event_code") || null;
+          } catch {}
+        }
+        if (!activeTestCode) activeTestCode = testCodeRef.current;
+
         // Fire browser pixel with eventID for deduplication
         // Note: fbq('init') is only called once during pixel initialization.
         // Advanced matching is set at init time — do NOT re-call init before every event.
@@ -246,7 +256,7 @@ export default function FacebookPixel() {
             customData,
             eventSourceUrl: window.location.href,
             eventId,
-            testEventCode: testCodeRef.current,
+            testEventCode: activeTestCode,
             eventTime: Math.floor(Date.now() / 1000),
             userData: capiUserData,
           }, {

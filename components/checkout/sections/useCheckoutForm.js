@@ -171,6 +171,12 @@ export const useCheckoutForm = (
 
       const shippingAddress = `${formData.address}, ${formData.upazila}, ${formData.district} - ${formData.postalCode}`;
 
+      // Read admin test event code from sessionStorage (set by checkout page modal)
+      let adminTestEventCode = null;
+      if (typeof window !== "undefined") {
+        adminTestEventCode = sessionStorage.getItem("admin_test_event_code") || null;
+      }
+
       const orderPayload = {
         user: user?._id || user?.id,
         guestInfo: {
@@ -186,6 +192,7 @@ export const useCheckoutForm = (
         paymentMethod: formData.paymentMethod,
         shippingAddress: shippingAddress,
         facebookEventId: "purchase_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now(),
+        ...(adminTestEventCode && { adminTestEventCode }),
         ...(discount && {
           discount: {
             code: discount.code,

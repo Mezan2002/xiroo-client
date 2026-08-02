@@ -2,6 +2,7 @@
 
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import AdminOrderConfirmModal from "@/components/checkout/sections/AdminOrderConfirmModal";
 import { ChevronLeft, Lock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
@@ -32,6 +33,27 @@ export default function CheckoutPage() {
   const [deliveryMethod, setDeliveryMethod] = useState("normal");
   const checkoutFiredRef = useRef(false);
   const paymentInfoFiredRef = useRef(false);
+
+  // Admin: show test event ID modal on mount
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const adminModalShownRef = useRef(false);
+
+  useEffect(() => {
+    if (adminModalShownRef.current) return;
+    if (!isLoading && user?.role === "admin") {
+      adminModalShownRef.current = true;
+      setAdminModalOpen(true);
+    }
+  }, [user, isLoading]);
+
+  const handleAdminModalConfirm = (testEventCode) => {
+    if (testEventCode) {
+      sessionStorage.setItem("admin_test_event_code", testEventCode);
+    } else {
+      sessionStorage.removeItem("admin_test_event_code");
+    }
+    setAdminModalOpen(false);
+  };
 
   const { data: deliveryFeeData, isLoading: feeLoading } =
     useDeliveryFee(district);
@@ -161,10 +183,6 @@ export default function CheckoutPage() {
           <div className="lg:col-span-7">
             <Link
               href="/"
-              onClick={(e) => {
-                // If we're on mobile and the cart is a sidebar, maybe just go back?
-                // For now, simplicity.
-              }}
               className="inline-flex items-center gap-2 text-gray-400 hover:text-black transition-colors mb-8 md:mb-10 group"
             >
               <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -234,6 +252,13 @@ export default function CheckoutPage() {
           </div>
         </div>
       </footer>
+
+      {/* Admin Test Event ID Modal — shown on mount for admin users */}
+      <AdminOrderConfirmModal
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
+        onConfirm={handleAdminModalConfirm}
+      />
     </div>
   );
 }

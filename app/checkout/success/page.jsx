@@ -34,6 +34,21 @@ function OrderSuccessContent() {
     if (typeof window !== "undefined" && window.trackFacebookEvent) {
       purchaseFiredRef.current = true;
 
+      // Check if this is an admin test order — skip browser pixel entirely
+      let isAdminTestOrder = false;
+      try {
+        isAdminTestOrder = !!sessionStorage.getItem("admin_test_event_code");
+      } catch {}
+
+      if (isAdminTestOrder) {
+        // Only server-side CAPI fires (in order.service.ts) with test event code
+        // Browser pixel is skipped so Meta does not count this as a real conversion
+        try {
+          sessionStorage.removeItem("admin_test_event_code");
+        } catch {}
+        return;
+      }
+
       const email = order.guestInfo?.email || order.user?.email || '';
       const phone = order.guestInfo?.phone || order.user?.phoneNumber || order.user?.phone || '';
       const firstName = order.guestInfo?.firstName || order.user?.firstName || '';
