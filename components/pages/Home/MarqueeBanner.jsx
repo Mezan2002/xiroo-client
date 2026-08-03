@@ -8,7 +8,7 @@ const ROW_A = [
   { label: "Xiroo Shop", accent: false },
   { label: "Buy 3 or more items to get free delivery!", accent: true },
   { label: "Live your dream", accent: false },
-  { label: "Easy returns on sealed items only.", accent: true },
+  { label: "Check before you accept — easy returns on delivery!", accent: true },
   { label: "Cash on delivery available!", accent: false },
   {
     label: "Create your own bundle with any product to get flat discounts",

@@ -21,7 +21,7 @@ export default function FaqPage() {
     },
     {
       q: "What is your return policy?",
-      a: "We offer a hassle-free 7-day return policy. If you're not satisfied with your purchase, you can return or exchange any unworn item within 7 days of delivery.",
+      a: "We encourage you to inspect your product in front of the delivery person. If you notice any issues with quality or size at the time of delivery, you can return the product immediately. If you discover any problems after accepting the delivery, please reach out to us through our social media channels. We will listen to your concern and, if the issue is a valid mistake on our part, we will exchange the product for you.",
     },
     {
       q: "Are your products authentic?",

@@ -11,9 +11,9 @@ const FEATURES = [
   },
   {
     icon: RotateCcw,
-    title: "Easy 7-Day Returns",
+    title: "Easy Returns",
     description:
-      "Fit not quite right? Return or exchange any item within 7 days of delivery, hassle-free.",
+      "Inspect your product before accepting. Any quality or size issues? Return it right away. Already received? Contact us and we'll exchange it.",
   },
   {
     icon: ShieldCheck,

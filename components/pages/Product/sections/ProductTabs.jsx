@@ -69,15 +69,19 @@ export default function ProductTabs({ product, activeTab, setActiveTab }) {
         )}
         {activeTab === "return" && (
           <div className="leading-relaxed text-gray-600 text-[13px] md:text-sm">
-            <p className="mb-4 text-black font-semibold">7-Day Easy Returns</p>
+            <p className="mb-4 text-black font-semibold">Check Before You Accept</p>
             <p className="mb-4">
-              If you are not completely satisfied with your purchase, you can
-              return or exchange the item within 7 days of delivery.
+              We encourage you to inspect your product in front of the delivery
+              person. If you notice any issues with quality or size at the time
+              of delivery, you can return the product immediately — no questions
+              asked.
             </p>
-            <p>
-              Please ensure the item is unworn, unwashed, and retains all
-              original tags and packaging. For further assistance or to initiate
-              a return, please contact our support team.
+            <p className="mb-4 text-black font-semibold">Already Received the Product?</p>
+            <p className="mb-4">
+              If you discover any problems after accepting the delivery, please
+              reach out to us through our social media channels. We will listen
+              to your concern and, if the issue is a valid mistake on our part,
+              we will exchange the product for you.
             </p>
           </div>
         )}

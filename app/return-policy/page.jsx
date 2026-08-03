@@ -7,60 +7,56 @@ export const metadata = {
 
 export default function ReturnPolicy() {
   return (
-    <PolicyPage title="Return Policy" lastUpdated="April 2026">
+    <PolicyPage title="Return Policy" lastUpdated="August 2026">
       <section>
-        <h2>Satisfaction Guarantee</h2>
+        <h2>Inspect Before You Accept</h2>
         <p>
-          At Xiroo, we stand by the quality of our curated selections. If the
-          product does not meet your architectural standards, we offer a
-          streamlined return and refund protocol.
+          At Xiroo, we want you to be completely confident in your purchase.
+          We strongly encourage you to inspect your product in front of the
+          delivery person at the time of delivery.
         </p>
       </section>
 
       <section>
-        <h2>Return Conditions</h2>
-        <p>To be eligible for a return, the following criteria must be met:</p>
-        <ul>
-          <li>Request must be initiated within 14 days of receipt.</li>
-          <li>Products must be in original, unutilized condition.</li>
-          <li>All original packaging and tags must be intact.</li>
-          <li>Proof of purchase is required for verification.</li>
-        </ul>
+        <h2>Return at the Doorstep</h2>
+        <p>
+          If you notice any issues with the product — whether it's a quality
+          concern or a sizing problem — you can return the product immediately
+          to the delivery person. No questions asked, no hassle involved.
+        </p>
       </section>
 
       <section>
-        <h2>Refund Processing</h2>
-        <p>Once your return is verified by our quality control team:</p>
-        <ul>
-          <li>Refunds are processed to the original payment source.</li>
-          <li>
-            Please allow 5-10 business days for financial synchronization.
-          </li>
-          <li>
-            Shipping costs are non-refundable unless the return is due to a
-            Xiroo error.
-          </li>
-        </ul>
+        <h2>Already Accepted the Delivery?</h2>
+        <p>
+          If you discover any problems after accepting the delivery, don't
+          worry. Simply reach out to us through our social media channels
+          (Facebook, Instagram) or contact our support team. We will listen
+          to your concern and work with you to resolve it.
+        </p>
       </section>
 
       <hr />
 
       <section>
-        <h2>Exchanges</h2>
+        <h2>Exchange Policy</h2>
         <p>
-          We currently facilitate exchanges for size or color variations,
-          subject to real-time inventory availability. Please initiate an
-          exchange request through our support portal.
+          If the issue is a valid mistake on our part — such as a defective
+          product, wrong item, or size discrepancy — we will happily exchange
+          the product for you. Your satisfaction is our priority.
         </p>
       </section>
 
       <section>
-        <h2>Non-Returnable Items</h2>
+        <h2>How to Reach Us</h2>
         <p>
-          Select products, including limited-edition collaborations and custom
-          configurations, may be excluded from the standard return protocol.
-          This will be clearly indicated on the product profile.
+          For any post-delivery concerns, you can contact us through:
         </p>
+        <ul>
+          <li>Facebook Messenger — DM us directly</li>
+          <li>Instagram — Send us a message</li>
+          <li>Email — Our support team responds within 24 hours</li>
+        </ul>
       </section>
     </PolicyPage>
   );

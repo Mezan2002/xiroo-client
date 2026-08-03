@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/Button";
 import BundleSelector from "./sections/BundleSelector";
 import DeliveryTimeline from "./sections/DeliveryTimeline";
+import FeaturedServices from "./sections/FeaturedServices";
 import MultiItemVariantSelector from "./sections/MultiItemVariantSelector";
 import ProductPricing from "./sections/ProductPricing";
 import ProductTabs from "./sections/ProductTabs";
@@ -106,6 +107,8 @@ export default function ProductInfo({ product, cartRef, selectedVariants, setSel
           </div>
         </>
       )}
+
+      <FeaturedServices />
 
       <ProductTabs
         product={product}

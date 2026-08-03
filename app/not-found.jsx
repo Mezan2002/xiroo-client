@@ -73,7 +73,7 @@ export default function NotFound() {
             </Button>
           </Link>
 
-          <Link href="/shop" passHref className="w-full sm:w-auto">
+          <Link href="/collections" passHref className="w-full sm:w-auto">
             <Button
               variant="outline"
               size="lg"
