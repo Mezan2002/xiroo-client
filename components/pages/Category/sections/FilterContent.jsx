@@ -68,7 +68,7 @@ export default function FilterContent({
                 onChange={() => toggleStatusFilter(status.id)}
               />
               <div
-                className={`w-[14px] h-[14px] border rounded-[2px] flex items-center justify-center transition-colors shadow-sm ${selectedStatuses.includes(status.id) ? "border-black" : "border-gray-300 group-hover:border-black"}`}
+                className={`w-[14px] h-[14px] shrink-0 border rounded-[2px] flex items-center justify-center transition-colors shadow-sm ${selectedStatuses.includes(status.id) ? "border-black" : "border-gray-300 group-hover:border-black"}`}
               >
                 <div
                   className={`w-[6px] h-[6px] bg-black rounded-[1px] transition-all duration-300 ${selectedStatuses.includes(status.id) ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
@@ -147,7 +147,7 @@ export default function FilterContent({
                     onChange={() => toggleVariantFilter(variantName, value)}
                   />
                   <div
-                    className={`w-[14px] h-[14px] border rounded-[2px] flex items-center justify-center transition-colors shadow-sm ${isActive ? "border-black" : "border-gray-300 group-hover:border-black"}`}
+                    className={`w-[14px] h-[14px] shrink-0 border rounded-[2px] flex items-center justify-center transition-colors shadow-sm ${isActive ? "border-black" : "border-gray-300 group-hover:border-black"}`}
                   >
                     <div
                       className={`w-[6px] h-[6px] bg-black rounded-[1px] transition-all duration-300 ${isActive ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}

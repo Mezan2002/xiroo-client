@@ -7,10 +7,9 @@ import { useEffect, useState } from "react";
 
 export default function InitialModal() {
   const [isVisible, setIsVisible] = useState(false);
-  const { settings: storeSettings } = useStoreSettings();
+  const { settings: storeSettings, isLoading } = useStoreSettings();
 
-  const imageUrl =
-    storeSettings?.identity?.initialModalImage || "/images/luxury-modal-bg.png";
+  const imageUrl = storeSettings?.identity?.initialModalImage;
 
   useEffect(() => {
     const hasBeenShown = sessionStorage.getItem("xiroo_initial_modal_shown");
@@ -44,15 +43,19 @@ export default function InitialModal() {
           <X className="size-6" />
         </button>
 
-        {/* Image */}
+        {/* Image or Skeleton */}
         <div className="relative w-full" style={{ aspectRatio: "2400 / 1792" }}>
-          <Image
-            src={imageUrl}
-            alt="Welcome"
-            fill
-            className="object-cover"
-            priority
-          />
+          {isLoading || !imageUrl ? (
+            <div className="absolute inset-0 bg-zinc-200 animate-pulse" />
+          ) : (
+            <Image
+              src={imageUrl}
+              alt="Welcome"
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
         </div>
       </div>
     </div>
