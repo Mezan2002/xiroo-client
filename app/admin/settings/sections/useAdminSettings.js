@@ -4,7 +4,7 @@ import { useDeliverySettings } from "@/hooks/api/useDeliverySettings";
 import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 import { useLoyaltySettings } from "@/hooks/api/useLoyaltySettings";
 
-export const useAdminSettings = () => {
+export const useAdminSettings = ({ onSaveSuccess } = {}) => {
   const { settings: deliverySettings, updateSettings: updateDelivery } = useDeliverySettings();
   const { settings: storeSettings, updateSettings: updateStore } = useStoreSettings();
   const { settings: loyaltySettings, updateSettings: updateLoyalty } = useLoyaltySettings();
@@ -25,6 +25,7 @@ export const useAdminSettings = () => {
     tagline: "",
     domain: "xiroo.shop",
     logo: "",
+    initialModalImage: "",
   });
   const [contact, setContact] = useState({
     supportEmail: "support@xirooshop.com",
@@ -96,41 +97,59 @@ export const useAdminSettings = () => {
   const isSaving = updateDelivery.isPending || updateStore.isPending || updateLoyalty.isPending;
 
   const saveAll = () => {
-    updateDelivery.mutate({
-      freeShippingThreshold: Number(shipping.freeThreshold) || 0,
-      defaultInsideDhaka: {
-        normal: Number(shipping.insideCity) || 80,
-        fast: Number(shipping.insideFast) || 130,
-      },
-      defaultOutsideDhaka: {
-        normal: Number(shipping.outsideCity) || 150,
-        fast: Number(shipping.outsideFast) || 200,
-      },
-      customRates,
-    });
+    let completed = 0;
+    const total = 3;
+    const checkDone = () => {
+      completed++;
+      if (completed === total) {
+        onSaveSuccess?.();
+      }
+    };
 
-    updateStore.mutate({
-      identity,
-      contact,
-      social,
-      bundleRules: {
-        discountPercentage: Number(bundleRules.discountPercentage) || 10,
-        quantityForDiscount: Number(bundleRules.quantityForDiscount) || 2,
-        quantityForFreeShipping: Number(bundleRules.quantityForFreeShipping) || 3,
+    updateDelivery.mutate(
+      {
+        freeShippingThreshold: Number(shipping.freeThreshold) || 0,
+        defaultInsideDhaka: {
+          normal: Number(shipping.insideCity) || 80,
+          fast: Number(shipping.insideFast) || 130,
+        },
+        defaultOutsideDhaka: {
+          normal: Number(shipping.outsideCity) || 150,
+          fast: Number(shipping.outsideFast) || 200,
+        },
+        customRates,
       },
-      policies: {
-        returnWindowDays: Number(policies.returnWindowDays) || 7,
-        refundPolicy: policies.refundPolicy,
-        advancePaymentThreshold: Number(policies.advancePaymentThreshold) || 0,
-        advancePaymentPercentage: Number(policies.advancePaymentPercentage) || 50,
-      },
-    });
+      { onSuccess: checkDone, onError: checkDone }
+    );
 
-    updateLoyalty.mutate({
-      pointsPerHundred: Number(loyalty.pointsPerHundred) || 1,
-      pointsPerOrder: Number(loyalty.pointsPerOrder) || 20,
-      tierConfig: loyalty.tierConfig,
-    });
+    updateStore.mutate(
+      {
+        identity,
+        contact,
+        social,
+        bundleRules: {
+          discountPercentage: Number(bundleRules.discountPercentage) || 10,
+          quantityForDiscount: Number(bundleRules.quantityForDiscount) || 2,
+          quantityForFreeShipping: Number(bundleRules.quantityForFreeShipping) || 3,
+        },
+        policies: {
+          returnWindowDays: Number(policies.returnWindowDays) || 7,
+          refundPolicy: policies.refundPolicy,
+          advancePaymentThreshold: Number(policies.advancePaymentThreshold) || 0,
+          advancePaymentPercentage: Number(policies.advancePaymentPercentage) || 50,
+        },
+      },
+      { onSuccess: checkDone, onError: checkDone }
+    );
+
+    updateLoyalty.mutate(
+      {
+        pointsPerHundred: Number(loyalty.pointsPerHundred) || 1,
+        pointsPerOrder: Number(loyalty.pointsPerOrder) || 20,
+        tierConfig: loyalty.tierConfig,
+      },
+      { onSuccess: checkDone, onError: checkDone }
+    );
   };
 
   const addCustomRate = (rate) => {

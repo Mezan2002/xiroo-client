@@ -8,13 +8,18 @@ import BundleRulesSection from "./sections/BundleRulesSection";
 import LoyaltySection from "./sections/LoyaltySection";
 import PoliciesSection from "./sections/PoliciesSection";
 import { useAdminSettings } from "./sections/useAdminSettings";
+import { useToast } from "@/hooks/useToast";
 
 export default function AdminSettings() {
-  const s = useAdminSettings();
+  const { toast } = useToast();
+  const s = useAdminSettings({
+    onSaveSuccess: () => toast.success("Store settings saved successfully."),
+  });
 
   return (
-    <div className="space-y-16 pb-24 animate-in fade-in duration-700 font-montserrat antialiased select-none">
+    <div className="pb-24 animate-in fade-in duration-700 font-montserrat antialiased select-none">
       <ModuleHeader 
+        sticky
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Settings", active: true }
@@ -29,31 +34,33 @@ export default function AdminSettings() {
         }}
       />
 
-      <StoreIdentitySection 
-        identity={s.identity} setIdentity={s.setIdentity}
-        contact={s.contact} setContact={s.setContact}
-        social={s.social} setSocial={s.setSocial}
-      />
+      <div className="space-y-16 mt-8 md:mt-14">
+        <StoreIdentitySection 
+          identity={s.identity} setIdentity={s.setIdentity}
+          contact={s.contact} setContact={s.setContact}
+          social={s.social} setSocial={s.setSocial}
+        />
 
-      <OperationalSettings 
-        shipping={s.shipping} setShipping={s.setShipping}
-        customRates={s.customRates}
-        addCustomRate={s.addCustomRate}
-        removeCustomRate={s.removeCustomRate}
-      />
+        <OperationalSettings 
+          shipping={s.shipping} setShipping={s.setShipping}
+          customRates={s.customRates}
+          addCustomRate={s.addCustomRate}
+          removeCustomRate={s.removeCustomRate}
+        />
 
-      <BundleRulesSection 
-        bundleRules={s.bundleRules} setBundleRules={s.setBundleRules}
-      />
+        <BundleRulesSection 
+          bundleRules={s.bundleRules} setBundleRules={s.setBundleRules}
+        />
 
-      <LoyaltySection 
-        loyalty={s.loyalty} setLoyalty={s.setLoyalty}
-        updateTierConfig={s.updateTierConfig}
-      />
+        <LoyaltySection 
+          loyalty={s.loyalty} setLoyalty={s.setLoyalty}
+          updateTierConfig={s.updateTierConfig}
+        />
 
-      <PoliciesSection 
-        policies={s.policies} setPolicies={s.setPolicies}
-      />
+        <PoliciesSection 
+          policies={s.policies} setPolicies={s.setPolicies}
+        />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,16 @@
 "use client";
-import { Store, Mail, Phone, MessageCircle } from "lucide-react";
+import { Store, Mail, Phone, MessageCircle, Image as ImageIcon, Trash2 } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
+import Image from "next/image";
 
 export default function StoreIdentitySection({ identity, setIdentity, contact, setContact, social, setSocial }) {
+  const handleModalImageUpload = (url) => {
+    setIdentity({ ...identity, initialModalImage: url });
+  };
+
+  const handleRemoveModalImage = () => {
+    setIdentity({ ...identity, initialModalImage: "" });
+  };
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Store Identity */}
@@ -132,6 +141,81 @@ export default function StoreIdentitySection({ identity, setIdentity, contact, s
               />
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Initial Modal Image */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-zinc-100">
+          <ImageIcon size={16} className="text-zinc-300" />
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em]">Initial Modal Image</h3>
+        </div>
+
+        <p className="text-[11px] text-gray-400">
+          This image will be shown in the popup modal when visitors first arrive at your store.
+        </p>
+
+        <div className="bg-[#FDFDFB] border border-gray-100 p-6 space-y-5">
+          {/* Preview */}
+          <div
+            className="relative w-full bg-gray-50 border border-gray-100 overflow-hidden group"
+            style={{ aspectRatio: "2400 / 1792" }}
+          >
+            {identity.initialModalImage ? (
+              <>
+                <Image
+                  src={identity.initialModalImage}
+                  alt="Initial modal preview"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                <button
+                  onClick={handleRemoveModalImage}
+                  className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-all shadow-sm opacity-0 group-hover:opacity-100"
+                  title="Remove image"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </>
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-300">
+                <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+                  <ImageIcon size={20} className="text-gray-300" />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-300">No Image Set</span>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-[9px] text-gray-300 space-y-0.5">
+              <p className="font-medium">Required: 2400 x 1792px</p>
+              <p>JPG, PNG, or WebP</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {identity.initialModalImage && (
+                <button
+                  onClick={handleRemoveModalImage}
+                  className="h-9 px-4 border border-gray-200 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
+                >
+                  Remove
+                </button>
+              )}
+              <ImageUploader
+                onUploadSuccess={handleModalImageUpload}
+                onUploadError={(err) => console.error("Upload failed:", err)}
+              >
+                <div className="h-9 px-6 bg-black hover:bg-black/80 flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <ImageIcon size={12} className="text-white" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white">
+                    {identity.initialModalImage ? "Replace" : "Upload"}
+                  </span>
+                </div>
+              </ImageUploader>
+            </div>
+          </div>
         </div>
       </div>
     </div>

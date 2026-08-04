@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Navbar } from "./Navbar";
+import InitialModal from "./InitialModal";
 
 const BottomNavbar = dynamic(() => import("./BottomNavbar"));
 const Footer = dynamic(() => import("./Footer"));
@@ -35,7 +36,7 @@ export default function ConditionalLayout({ children }) {
       <Footer />
       {/* <ChatBubble /> */}
       <BottomNavbar />
-      {/* <InitialModal /> */}
+      <InitialModal />
     </div>
   );
 }
