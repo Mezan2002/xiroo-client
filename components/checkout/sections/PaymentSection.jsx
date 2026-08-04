@@ -1,13 +1,9 @@
 "use client";
 import Link from "next/link";
-import CustomerStats from "./CustomerStats";
 
-export default function PaymentSection({ user, formData, handleChange, customerStats }) {
+export default function PaymentSection({ user, formData, handleChange }) {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-700">
-
-      {/* Customer Stats (if returning customer) */}
-      {customerStats && <CustomerStats customerStats={customerStats} />}
 
       {/* Payment Method */}
       <div className="space-y-4">
@@ -33,9 +29,6 @@ export default function PaymentSection({ user, formData, handleChange, customerS
             </div>
           </div>
         </div>
-        <p className="text-[10px] text-gray-400 font-medium">
-          Currently we only support Cash on Delivery (COD). More payment methods coming soon.
-        </p>
       </div>
 
       {/* Register with checkout info — only shown to guests */}

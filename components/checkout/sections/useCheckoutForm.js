@@ -48,6 +48,7 @@ export const useCheckoutForm = (
 
   const [customerStats, setCustomerStats] = useState(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const [errors, setErrors] = useState({});
   const phoneLookupTimeout = useRef(null);
   const isFormInitialized = useRef(false);
 
@@ -247,6 +248,32 @@ export const useCheckoutForm = (
 
   const handleNext = async (e) => {
     e.preventDefault();
+
+    if (step === 1) {
+      const newErrors = {};
+      if (!formData.email.trim()) {
+        newErrors.email = "Email is required";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = "Please enter a valid email";
+      }
+      if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+      if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+      if (!formData.address.trim()) newErrors.address = "Address is required";
+      if (!formData.district.trim()) newErrors.district = "District is required";
+      if (!formData.upazila.trim()) newErrors.upazila = "Upazila is required";
+      if (!formData.postalCode.trim()) newErrors.postalCode = "Postal code is required";
+      if (!formData.phone.trim()) {
+        newErrors.phone = "Phone number is required";
+      } else if (formData.phone.replace(/\D/g, "").length < 11) {
+        newErrors.phone = "Please enter a valid 11-digit number";
+      }
+
+      setErrors(newErrors);
+      if (Object.keys(newErrors).length > 0) return;
+    }
+
+    setErrors({});
+
     if (step < 2) {
       setStep(step + 1);
     } else {
@@ -261,7 +288,7 @@ export const useCheckoutForm = (
     handleDistrictChange,
     handleNext,
     customerStats,
-    isLookingUp,
+    errors,
     isSubmitting: placeOrder.isPending || placeGuestOrder.isPending || registerMutation.isPending,
   };
 };

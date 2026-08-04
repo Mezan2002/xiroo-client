@@ -171,12 +171,15 @@ export default function OrderSummary({
             }`}
           >
             {shipping === null
-              ? "Select district"
+              ? "৳80 - ৳200*"
               : shipping === 0
                 ? hasFreeDelivery ? "Free Delivery" : "Free"
                 : `৳${shipping.toLocaleString()}`}
           </span>
         </div>
+        {shipping === null && (
+          <p className="text-[9px] text-gray-300 font-medium text-right">*Estimated based on location</p>
+        )}
 
         <div className="flex justify-between items-center pt-4 lg:pt-6 border-t border-gray-100">
           <span className="text-[14px] lg:text-[15px] font-medium uppercase tracking-[0.3em]">

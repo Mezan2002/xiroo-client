@@ -30,7 +30,7 @@ export default function CheckoutForm({
     handleChange,
     handleDistrictChange,
     handleNext,
-    customerStats,
+    errors,
     isSubmitting,
   } = useCheckoutForm(step, setStep, setProductDistrict, items, total, shipping, deliveryMethod, discount, discountAmount, note);
 
@@ -44,7 +44,7 @@ export default function CheckoutForm({
             formData={formData}
             handleChange={handleChange}
             handleDistrictChange={handleDistrictChange}
-            customerStats={customerStats}
+            errors={errors}
           />
         )}
 
@@ -61,7 +61,6 @@ export default function CheckoutForm({
               user={user}
               formData={formData}
               handleChange={handleChange}
-              customerStats={customerStats}
             />
           </div>
         )}
@@ -91,7 +90,7 @@ export default function CheckoutForm({
               onClick={() => setStep(step - 1)}
               className="sm:w-[200px] group flex items-center justify-center transition-all duration-300"
             >
-              <ChevronLeft className="h-4 w-0 mr-0 opacity-0 group-hover:w-4 group-hover:mr-2 group-hover:opacity-100 transition-all duration-300" />
+              <ChevronLeft className="h-4 w-4 mr-2 transition-all duration-300" />
               Back
             </Button>
           )}

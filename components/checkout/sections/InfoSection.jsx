@@ -2,10 +2,14 @@
 import SearchableDistrict from "@/components/ui/SearchableDistrict";
 import LocationDropdown from "@/components/ui/LocationDropdown";
 import { BANGLADESH_LOCATIONS } from "@/lib/bangladeshLocations";
-import { CheckCircle } from "lucide-react";
 
-export default function InfoSection({ formData, handleChange, handleDistrictChange, customerStats }) {
+export default function InfoSection({ formData, handleChange, handleDistrictChange, errors = {} }) {
   const thanas = formData.district ? (BANGLADESH_LOCATIONS[formData.district] || []) : [];
+
+  const inputClass = (field) =>
+    `w-full h-14 px-6 bg-gray-50 border focus:border-black focus:bg-white outline-none transition-all text-sm font-medium ${
+      errors[field] ? "border-red-400 bg-red-50/30" : "border-gray-100"
+    }`;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -20,12 +24,14 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
           <input
             type="email"
             name="email"
-            required
             value={formData.email}
             onChange={handleChange}
             placeholder="name@example.com"
-            className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium placeholder:text-gray-300"
+            className={inputClass("email")}
           />
+          {errors.email && (
+            <p className="text-[11px] text-red-500 font-medium ml-1">{errors.email}</p>
+          )}
         </div>
       </div>
 
@@ -34,89 +40,109 @@ export default function InfoSection({ formData, handleChange, handleDistrictChan
           Delivery Address
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="firstName"
-            required
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="First Name"
-            className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
-          />
-          <input
-            type="text"
-            name="lastName"
-            required
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Last Name"
-            className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
-          />
+          <div>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="First Name"
+              className={inputClass("firstName")}
+            />
+            {errors.firstName && (
+              <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.firstName}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Last Name"
+              className={inputClass("lastName")}
+            />
+            {errors.lastName && (
+              <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.lastName}</p>
+            )}
+          </div>
         </div>
-        <input
-          type="text"
-          name="address"
-          required
-          value={formData.address}
-          onChange={handleChange}
-          placeholder="Street Address or House No."
-          className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-50 border border-gray-100 px-6 pt-3 h-16 flex flex-col justify-center transition-all group focus-within:border-black focus-within:bg-white">
-            <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
-              District
-            </label>
-            <SearchableDistrict
-              value={formData.district}
-              onChange={handleDistrictChange}
-              placeholder="Select District"
-              className="border-none! px-0! h-8! pt-0! min-h-0! flex items-center"
-            />
-          </div>
-          <div className="bg-gray-50 border border-gray-100 px-6 pt-3 h-16 flex flex-col justify-center transition-all group focus-within:border-black focus-within:bg-white">
-            <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
-              Upazila / Thana
-            </label>
-            <LocationDropdown
-              value={formData.upazila}
-              onChange={(val) => handleChange({ target: { name: "upazila", value: val } })}
-              options={thanas}
-              placeholder={formData.district ? "Select Thana" : "Select district first"}
-              allowCustom
-            />
-          </div>
+        <div>
+          <input
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            placeholder="Street Address or House No."
+            className={inputClass("address")}
+          />
+          {errors.address && (
+            <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.address}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="postalCode"
-            required
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Postal Code"
-            className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
-          />
-          <div className="relative">
+          <div>
+            <div className={`bg-gray-50 border px-6 pt-3 h-16 flex flex-col justify-center transition-all group focus-within:border-black focus-within:bg-white ${errors.district ? "border-red-400 bg-red-50/30" : "border-gray-100"}`}>
+              <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
+                District
+              </label>
+              <SearchableDistrict
+                value={formData.district}
+                onChange={handleDistrictChange}
+                placeholder="Select District"
+                className="border-none! px-0! h-8! pt-0! min-h-0! flex items-center"
+              />
+            </div>
+            {errors.district && (
+              <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.district}</p>
+            )}
+          </div>
+          <div>
+            <div className={`bg-gray-50 border px-6 pt-3 h-16 flex flex-col justify-center transition-all group focus-within:border-black focus-within:bg-white ${errors.upazila ? "border-red-400 bg-red-50/30" : "border-gray-100"}`}>
+              <label className="text-[9px] font-medium text-gray-400 uppercase tracking-wider leading-none mb-1 block">
+                Upazila / Thana
+              </label>
+              <LocationDropdown
+                value={formData.upazila}
+                onChange={(val) => handleChange({ target: { name: "upazila", value: val } })}
+                options={thanas}
+                placeholder={formData.district ? "Select Thana" : "Select district first"}
+                allowCustom
+              />
+            </div>
+            {errors.upazila && (
+              <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.upazila}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <input
+              type="text"
+              name="postalCode"
+              value={formData.postalCode}
+              onChange={handleChange}
+              placeholder="Postal Code"
+              className={inputClass("postalCode")}
+            />
+            {errors.postalCode && (
+              <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.postalCode}</p>
+            )}
+          </div>
+          <div>
             <input
               type="tel"
               name="phone"
-              required
               value={formData.phone}
               onChange={handleChange}
               placeholder="Phone Number (e.g. 017...)"
-              className="w-full h-14 px-6 bg-gray-50 border border-gray-100 focus:border-black focus:bg-white outline-none transition-all text-sm font-medium"
+              className={inputClass("phone")}
             />
-            {customerStats && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-green-50 border border-green-200 px-2 py-1 rounded">
-                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                <span className="text-[10px] font-medium text-green-700 uppercase tracking-wider">
-                  Returning Customer
-                </span>
-              </div>
-            )}
+            {errors.phone ? (
+              <p className="text-[11px] text-red-500 font-medium mt-1 ml-1">{errors.phone}</p>
+            ) : null}
           </div>
         </div>
       </div>
