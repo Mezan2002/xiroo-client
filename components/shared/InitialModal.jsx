@@ -37,7 +37,7 @@ export default function InitialModal() {
         {/* Close Button - Top right corner of modal */}
         <button
           onClick={closeModal}
-          className="absolute -top-8 -right-10 z-20 p-2 text-white hover:rotate-90 transition-all duration-500"
+          className="absolute -top-14 -right-3.5 lg:-top-8 lg:-right-10 z-20 p-2 text-white hover:rotate-90 transition-all duration-500"
           aria-label="Close"
         >
           <X className="size-6" />
