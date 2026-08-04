@@ -69,14 +69,14 @@ export default function ProductImageGallery({
 
       {/* Progress Indicators for Gallery */}
       {hasMultipleImages && isHovered && (
-        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 px-3 z-20">
+        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 px-3 z-20">
           {validImages.map((_, index) => (
             <div
               key={index}
-              className={`h-[1.5px] transition-all duration-500 ${
+              className={`h-[3px] transition-all duration-500 ${
                 index === currentImageIndex
-                  ? "w-4 bg-black"
-                  : "w-1.5 bg-black/20"
+                  ? "w-6 bg-black"
+                  : "w-2 bg-black/20"
               }`}
             />
           ))}
