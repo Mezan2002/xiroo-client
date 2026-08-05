@@ -101,6 +101,12 @@ export default function FacebookPixel() {
     if (typeof window === "undefined" || pixelInitialized.current) return;
 
     const initPixel = async () => {
+      // Skip pixel on localhost/development
+      if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+        console.warn("[FB Pixel] Skipped — running on localhost");
+        return;
+      }
+
       // 1. Resolve pixel ID
       let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID || "";
       let testCode = "";
@@ -186,6 +192,9 @@ export default function FacebookPixel() {
         overrideEventId = null,
         overrideTestEventCode = null
       ) => {
+        // Skip on localhost
+        if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) return;
+
         const activePid = pixelIdRef.current;
         if (!activePid || !window.fbq) return;
 
@@ -310,6 +319,8 @@ export default function FacebookPixel() {
   // ── PageView on route change ────────────────────────────────────────────
   useEffect(() => {
     if (!window.fbq || !pixelIdRef.current) return;
+    // Skip on localhost
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) return;
 
     // Generate shared eventId for PageView deduplication (browser + CAPI)
     const pageEventId = "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
