@@ -107,13 +107,17 @@ export default function FacebookPixel() {
         return;
       }
 
-      // 1. Resolve pixel ID
+      // 1. Resolve pixel ID from env (instant, no network)
       let pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID || "";
       let testCode = "";
       let isEnabled = !!pixelId;
 
+      // 2. Optionally fetch extra settings (non-blocking, short timeout)
       try {
-        const resp = await axiosInstance.get("/marketing");
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const resp = await axiosInstance.get("/marketing", { signal: controller.signal });
+        clearTimeout(timeoutId);
         const settings = resp?.data;
         if (settings) {
           if (!pixelId) {
@@ -123,7 +127,8 @@ export default function FacebookPixel() {
           testCode = settings.testEventCode || "";
         }
       } catch (err) {
-        console.warn("[FB Pixel] Failed to fetch settings:", err);
+        // Non-critical — pixel still works with env var pixel ID
+        console.warn("[FB Pixel] Settings fetch skipped (using env defaults):", err.message || err);
       }
 
       if (!pixelId || !isEnabled) {
