@@ -86,7 +86,7 @@ function LoginForm() {
           Welcome <br />
           <span className="italic font-bold">Back</span>
         </h1>
-        <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-bold mt-4">
+        <p className="text-[10px] uppercase text-gray-600 font-semibold mt-4">
           Enter your identity to continue
         </p>
       </div>
