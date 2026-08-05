@@ -87,6 +87,10 @@ export default function CategoryDetailsSidebar({ category, onClose, onSave, isLo
                 <div><p className="text-[11px] font-bold text-black uppercase tracking-wider">Priority Highlighting</p><p className="text-[10px] text-[#91918E]">Feature in prime collection areas.</p></div>
                 <div className={`w-10 h-5 rounded-full relative transition-colors ${formData.isFeatured ? 'bg-amber-400' : 'bg-[#EDECE9]'}`}><div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${formData.isFeatured ? 'left-6' : 'left-1'}`} /></div>
               </div>
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => setFormData(p => ({...p, bundleOfferEnabled: !p.bundleOfferEnabled}))}>
+                <div><p className="text-[11px] font-bold text-black uppercase tracking-wider">Bundle Offers</p><p className="text-[10px] text-[#91918E]">Allow bundle discounts for products in this category.</p></div>
+                <div className={`w-10 h-5 rounded-full relative transition-colors ${formData.bundleOfferEnabled ? 'bg-emerald-500' : 'bg-[#EDECE9]'}`}><div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${formData.bundleOfferEnabled ? 'left-6' : 'left-1'}`} /></div>
+              </div>
             </div>
           </form>
 

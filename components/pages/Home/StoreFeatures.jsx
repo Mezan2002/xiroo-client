@@ -1,5 +1,6 @@
 "use client";
 
+import SectionHeader from "@/components/ui/SectionHeader";
 import { Coins, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 
 const FEATURES = [
@@ -33,14 +34,7 @@ export default function StoreFeatures() {
   return (
     <section className="w-full py-16 lg:py-24 px-6 lg:px-12 bg-white border-t border-gray-100">
       {/* Section Header */}
-      <div className="flex flex-col items-center text-center mb-12 lg:mb-16">
-        <span className="text-[10px] font-bold tracking-[0.4em] text-gray-400 uppercase mb-3">
-          Our Guarantees
-        </span>
-        <h2 className="text-3xl md:text-4xl font-mono tracking-[0.12em] font-medium text-black uppercase">
-          Why Shop With Us
-        </h2>
-      </div>
+      <SectionHeader subtitle="Our Guarantees" title="Why Shop With Us" className="mb-12 lg:mb-16" />
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border border-gray-100 divide-y md:divide-y-0 md:divide-x divide-gray-100">

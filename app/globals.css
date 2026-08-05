@@ -33,6 +33,14 @@ body {
   background: #d3d1cb;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 @keyframes xiroo-left {
   from {
     transform: translateX(0);

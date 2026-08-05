@@ -10,6 +10,7 @@ export const useCategoryForm = (category, onSave) => {
     image: category?.image || null,
     isActive: category?.isActive !== false,
     isFeatured: category?.isFeatured || false,
+    bundleOfferEnabled: category?.bundleOfferEnabled !== false,
     allowedAttributes: category?.allowedAttributes || [],
   });
 

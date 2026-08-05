@@ -13,6 +13,7 @@ export default function OrderSummary({
   total,
   discount,
   discountAmount,
+  autoBundleDiscountAmount,
   onApplyCoupon,
   onRemoveCoupon,
   isApplyingCoupon,
@@ -147,6 +148,15 @@ export default function OrderSummary({
           <span>Subtotal</span>
           <span className="text-black">৳{subtotal.toLocaleString()}</span>
         </div>
+
+        {autoBundleDiscountAmount > 0 && (
+          <div className="flex justify-between items-center text-[12px] font-medium uppercase tracking-wider">
+            <span className="text-green-600">Bundle Discount (10%)</span>
+            <span className="text-green-600">
+              -৳{Number(autoBundleDiscountAmount || 0).toLocaleString()}
+            </span>
+          </div>
+        )}
 
         {hasDiscount && (
           <div className="flex justify-between items-center text-[12px] font-medium uppercase tracking-wider">

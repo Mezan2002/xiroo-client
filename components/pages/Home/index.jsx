@@ -11,6 +11,9 @@ const FeaturedProduct = dynamic(
   () => import("@/components/pages/Home/FeaturedProduct"),
 );
 const NewArrival = dynamic(() => import("@/components/pages/Home/NewArrival"));
+const BestSelling = dynamic(() => import("@/components/pages/Home/BestSelling"));
+const BundlesCollection = dynamic(() => import("@/components/pages/Home/BundlesCollection"));
+const BundleCTA = dynamic(() => import("@/components/pages/Home/BundleCTA"));
 const StoreFeatures = dynamic(
   () => import("@/components/pages/Home/StoreFeatures"),
 );
@@ -41,6 +44,13 @@ const Home = () => {
       <FadeIn>
         <NewArrival />
       </FadeIn>
+      <FadeIn>
+        <BestSelling />
+      </FadeIn>
+      <FadeIn>
+        <BundlesCollection />
+      </FadeIn>
+      <BundleCTA />
       <FadeIn>
         <OurStory />
       </FadeIn>

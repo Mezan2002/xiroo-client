@@ -46,6 +46,11 @@ const BundleProductCard = ({ product, bundleItems, onAdd, onRemove }) => {
   const combinations = getVariantCombinations(attributeGroups, selectedVariants);
   const hasVariants = attributeGroups.length > 0;
   const hasSelections = combinations.length > 0;
+  const allVariantsSelected = hasVariants
+    ? attributeGroups.every(
+        (group) => (selectedVariants[group.name] || []).length > 0
+      )
+    : true;
 
   const totalQuantityInBundle = bundleItems
     .filter((i) => i.product._id === product._id)
@@ -58,7 +63,7 @@ const BundleProductCard = ({ product, bundleItems, onAdd, onRemove }) => {
 
   const handleAddAll = (e) => {
     e.preventDefault();
-    if (!hasSelections) return;
+    if (!allVariantsSelected) return;
     combinations.forEach((combo) => onAdd(product, combo));
   };
 
@@ -182,14 +187,14 @@ const BundleProductCard = ({ product, bundleItems, onAdd, onRemove }) => {
         {totalQuantityInBundle === 0 ? (
           <button
             onClick={handleAddAll}
-            disabled={!hasSelections}
+            disabled={!allVariantsSelected}
             className={`w-full h-8 text-[11px] font-bold uppercase tracking-widest transition-colors ${
-              hasSelections
+              allVariantsSelected
                 ? "bg-black text-white hover:bg-zinc-800"
                 : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
             }`}
           >
-            {hasVariants && !hasSelections ? "Select Variants" : "Add to Bundle"}
+            {hasVariants && !allVariantsSelected ? "Select All Variants" : "Add to Bundle"}
           </button>
         ) : (
           <div className="flex items-center justify-between h-8 bg-zinc-100 px-2">
@@ -210,7 +215,12 @@ const BundleProductCard = ({ product, bundleItems, onAdd, onRemove }) => {
             </span>
             <button
               onClick={handleAddAll}
-              className="w-6 h-6 flex items-center justify-center bg-white hover:bg-zinc-200 transition-colors"
+              disabled={!allVariantsSelected}
+              className={`w-6 h-6 flex items-center justify-center transition-colors ${
+                allVariantsSelected
+                  ? "bg-white hover:bg-zinc-200"
+                  : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              }`}
             >
               <Plus className="w-3 h-3" />
             </button>
@@ -309,9 +319,11 @@ export default function BundleCreator() {
     const names = ["All"];
     if (Array.isArray(categoryTree)) {
       categoryTree.forEach((c) => {
+        if (c.bundleOfferEnabled === false) return;
         if (c.name) names.push(c.name);
         if (c.categories && Array.isArray(c.categories)) {
           c.categories.forEach((sub) => {
+            if (sub.bundleOfferEnabled === false) return;
             if (sub.name) names.push(sub.name);
           });
         }
@@ -321,6 +333,8 @@ export default function BundleCreator() {
   }, [categoryTree]);
 
   const availableProducts = allProducts.filter((p) => {
+    const categoryEnabled = p.category?.bundleOfferEnabled !== false;
+    if (!categoryEnabled) return false;
     if (selectedCategory === "All") return true;
     const catName = p.category?.name || p.category;
     const subCatName = p.subCategory?.name || p.subCategory;

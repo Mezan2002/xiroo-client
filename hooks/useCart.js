@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, updateQuantity, removeFromCart, clearCart, setNote, applyDiscount, removeDiscount } from "@/redux/slices/cartSlice";
+import { addToCart, updateQuantity, removeFromCart, clearCart, setNote, applyDiscount, removeDiscount, convertToBundle } from "@/redux/slices/cartSlice";
 import { addToast } from "@/redux/slices/toastSlice";
 
 /** 
@@ -44,6 +44,24 @@ export const useCart = () => {
     dispatch(setNote(value));
   };
 
+  const convertItemsToBundle = (eligibleItems, allItems) => {
+    const bundleId = `bundle_${Date.now()}`;
+    const indices = [];
+    eligibleItems.forEach((ei) => {
+      const idx = allItems.findIndex(
+        (item) =>
+          (item._id || item.id) === (ei._id || ei.id) &&
+          item.variant === ei.variant &&
+          !item.bundleId
+      );
+      if (idx !== -1) indices.push(idx);
+    });
+    if (indices.length > 0) {
+      dispatch(convertToBundle({ itemIndices: indices, bundleId }));
+      dispatch(addToast({ message: "Bundle created! Discount applied.", type: "success" }));
+    }
+  };
+
   return {
     items,
     subtotal,
@@ -61,5 +79,6 @@ export const useCart = () => {
     applyDiscount: applyDiscountCode,
     removeDiscount: removeDiscountCode,
     setNote: updateNote,
+    convertItemsToBundle,
   };
 };

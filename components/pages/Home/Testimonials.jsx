@@ -1,5 +1,6 @@
 "use client";
 
+import SectionHeader from "@/components/ui/SectionHeader";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -114,14 +115,7 @@ export default function Testimonials() {
   return (
     <section className="w-full py-16 lg:py-24 px-6 lg:px-12 bg-white border-t border-gray-100">
       {/* Section Header */}
-      <div className="flex flex-col items-center text-center mb-12 lg:mb-16">
-        <span className="text-[10px] font-bold tracking-[0.4em] text-gray-400 uppercase mb-3">
-          Testimonials
-        </span>
-        <h2 className="text-3xl md:text-4xl font-mono tracking-[0.12em] font-medium text-black uppercase">
-          What People Say About Us
-        </h2>
-      </div>
+      <SectionHeader subtitle="Testimonials" title="What People Say About Us" className="mb-12 lg:mb-16" />
 
       {/* Masonry Grid with Fade */}
       <div className="relative max-w-6xl mx-auto">

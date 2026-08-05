@@ -1,5 +1,6 @@
 "use client";
 
+import SectionHeader from "@/components/ui/SectionHeader";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProducts } from "@/hooks/api/useProducts";
 
@@ -11,17 +12,13 @@ export default function NewArrival() {
   if (isLoading) {
     return (
       <section className="w-full py-20 lg:py-32 px-6 lg:px-12 border-t border-gray-100">
-        <div className="flex justify-center mb-12 lg:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-[40px] font-mono tracking-[0.15em] lg:tracking-[0.2em] font-medium text-black uppercase">
-            NEW ARRIVAL
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-8">
+        <SectionHeader subtitle="Just Dropped" title="NEW ARRIVAL" className="mb-12 lg:mb-16" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-8 lg:gap-x-8 lg:gap-y-12">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex flex-col gap-4 animate-pulse">
-              <div className="w-full aspect-4/5 bg-gray-100" />
-              <div className="h-4 bg-gray-100 rounded w-3/4" />
-              <div className="h-3 bg-gray-100 rounded w-1/2" />
+            <div key={i} className="flex flex-col gap-3 animate-pulse">
+              <div className="w-full aspect-3/4 bg-gray-100" />
+              <div className="h-3 bg-gray-100 rounded w-3/4" />
+              <div className="h-2.5 bg-gray-100 rounded w-1/2" />
             </div>
           ))}
         </div>
@@ -33,15 +30,11 @@ export default function NewArrival() {
 
   return (
     <section className="w-full py-20 lg:py-32 px-6 lg:px-12 border-t border-gray-100">
-      {/* Section Header */}
-      <div className="flex justify-center mb-12 lg:mb-16">
-        <h2 className="text-3xl md:text-4xl lg:text-[40px] font-mono tracking-[0.15em] lg:tracking-[0.2em] font-medium text-black uppercase">
-          NEW ARRIVAL
-        </h2>
-      </div>
+      {/* Header */}
+      <SectionHeader subtitle="Just Dropped" title="NEW ARRIVAL" className="mb-12 lg:mb-16" />
 
-      {/* Products Display Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-8">
+      {/* 4-col equal grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-8 lg:gap-x-8 lg:gap-y-12">
         {products.map((product, idx) => (
           <ProductCard
             key={product._id}

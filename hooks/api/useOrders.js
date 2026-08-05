@@ -126,6 +126,42 @@ export const useOrders = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["trashed-orders"] });
+    },
+  });
+
+  // Trash operations
+  const useTrashedOrders = (params = {}, options = {}) => {
+    return useQuery({
+      queryKey: ["trashed-orders", params],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/orders/trash", { params });
+        return response.data;
+      },
+      ...options,
+    });
+  };
+
+  const restoreOrder = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.patch(`/orders/${id}/restore`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trashed-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
+  const permanentDeleteOrder = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.delete(`/orders/${id}/permanent`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trashed-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
     },
   });
 
@@ -185,6 +221,9 @@ export const useOrders = () => {
     dispatchCourier,
     cancelOrder,
     deleteOrder,
+    useTrashedOrders,
+    restoreOrder,
+    permanentDeleteOrder,
     requestAdvancePayment,
     confirmAdvancePayment,
     waiveAdvancePayment,

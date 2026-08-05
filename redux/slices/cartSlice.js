@@ -92,6 +92,16 @@ const cartSlice = createSlice({
       const metrics = calculateMetrics(state.items, state.discount);
       Object.assign(state, metrics);
     },
+    convertToBundle: (state, action) => {
+      const { itemIndices, bundleId } = action.payload;
+      itemIndices.forEach((idx) => {
+        if (state.items[idx]) {
+          state.items[idx].bundleId = bundleId;
+        }
+      });
+      const metrics = calculateMetrics(state.items, state.discount);
+      Object.assign(state, metrics);
+    },
   },
 });
 
@@ -109,6 +119,9 @@ const calculateMetrics = (items, discount = null) => {
     itemCount += item.quantity;
 
     if (item.bundleId) {
+      const categoryEnabled = item.category?.bundleOfferEnabled !== false;
+      if (!categoryEnabled) return;
+
       if (!bundleGroups[item.bundleId]) {
         bundleGroups[item.bundleId] = {
           quantity: 0,
@@ -156,5 +169,5 @@ const calculateMetrics = (items, discount = null) => {
   };
 };
 
-export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart, setNote, applyDiscount, removeDiscount } = cartSlice.actions;
+export const { setCart, addToCart, updateQuantity, removeFromCart, clearCart, setNote, applyDiscount, removeDiscount, convertToBundle } = cartSlice.actions;
 export default cartSlice.reducer;

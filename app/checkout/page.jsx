@@ -3,6 +3,7 @@
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import AdminOrderConfirmModal from "@/components/checkout/sections/AdminOrderConfirmModal";
+import BundleSuggestionModal from "@/components/checkout/BundleSuggestionModal";
 import { ChevronLeft, Lock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
@@ -18,13 +19,16 @@ export default function CheckoutPage() {
   const {
     items,
     subtotal,
+    total: cartTotal,
     discount,
     discountAmount,
+    autoBundleDiscountAmount,
     isBundleFreeShipping,
     note,
     setNote,
     applyDiscount,
     removeDiscount,
+    convertItemsToBundle,
   } = useCart();
   const { validateDiscount } = useDiscounts();
   const { toast } = useToast();
@@ -70,8 +74,7 @@ export default function CheckoutPage() {
           : deliveryFeeData.normal
         : null;
 
-  const discountedSubtotal = subtotal - (discountAmount || 0);
-  const total = discountedSubtotal + (shipping || 0);
+  const total = cartTotal + (shipping || 0);
 
   const handleApplyCoupon = (code, onSuccess) => {
     validateDiscount.mutate(
@@ -93,6 +96,12 @@ export default function CheckoutPage() {
   const handleRemoveCoupon = () => {
     removeDiscount();
   };
+
+  const handleBundleAccept = (eligibleItems) => {
+    convertItemsToBundle(eligibleItems, items);
+  };
+
+  const handleBundleDecline = () => {};
 
   // InitiateCheckout — fire once when user arrives at checkout
   useEffect(() => {
@@ -220,6 +229,7 @@ export default function CheckoutPage() {
                 total={total}
                 discount={discount}
                 discountAmount={discountAmount}
+                autoBundleDiscountAmount={autoBundleDiscountAmount}
                 onApplyCoupon={handleApplyCoupon}
                 onRemoveCoupon={handleRemoveCoupon}
                 isApplyingCoupon={validateDiscount.isPending}
@@ -252,6 +262,13 @@ export default function CheckoutPage() {
           </div>
         </div>
       </footer>
+
+      {/* Bundle Suggestion Modal — shown when 2+ eligible non-bundled items in cart */}
+      <BundleSuggestionModal
+        items={items}
+        onAccept={handleBundleAccept}
+        onDecline={handleBundleDecline}
+      />
 
       {/* Admin Test Event ID Modal — shown on mount for admin users */}
       <AdminOrderConfirmModal

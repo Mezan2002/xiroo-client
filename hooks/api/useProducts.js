@@ -75,6 +75,34 @@ export const useProducts = (options = {}) => {
     });
   };
 
+  // 5. Best Selling Products (by order aggregation)
+  const useBestSelling = (limit = 8) => {
+    return useQuery({
+      queryKey: ["products", "best-selling", limit],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/products/best-selling", {
+          params: { limit },
+        });
+        return response;
+      },
+      staleTime: 15 * 60 * 1000, // 15 minutes — sales data changes slowly
+    });
+  };
+
+  // 6. Multi-Item / Bundle Collection Products
+  const useMultiItemProducts = (limit = 8) => {
+    return useQuery({
+      queryKey: ["products", "multi-item", limit],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/products/multi-item", {
+          params: { limit },
+        });
+        return response;
+      },
+      staleTime: 10 * 60 * 1000,
+    });
+  };
+
   // 5. Admin Protocol: Inventory Mutations
   const useProductMutation = () => {
     const createMutation = useMutation({
@@ -117,6 +145,8 @@ export const useProducts = (options = {}) => {
     useNewArrivals,
     useSearchProducts,
     useProductDetail,
+    useBestSelling,
+    useMultiItemProducts,
     useProductMutation,
   };
 };

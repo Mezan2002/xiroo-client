@@ -116,11 +116,11 @@ export default function AdminOrders() {
     if (!selectedOrder) return;
     deleteOrder.mutate(selectedOrder._id, {
       onSuccess: () => {
-        toast.success(`Protocol: Order ${selectedOrder.orderId} permanently excised.`);
+        toast.success(`Order ${selectedOrder.orderId} moved to trash.`);
         setIsDeleteModalOpen(false);
       },
       onError: (err) => {
-        toast.error(err.message || "Deletion protocol failed.");
+        toast.error(err.message || "Failed to move order to trash.");
       }
     });
   };
@@ -215,9 +215,9 @@ export default function AdminOrders() {
         isOpen={isDeleteModalOpen}
         onClose={() => !confirming && setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}
-        title="Permanently Delete Order Registry"
-        message={`Notice: Order record ${selectedOrder?.orderId} will be permanently removed from the database. This action is irreversible and will impact financial history.`}
-        confirmLabel={confirming ? "Processing..." : "Confirm Deletion"}
+        title="Move Order to Trash"
+        message={`Order ${selectedOrder?.orderId} will be moved to trash. You can restore it later from the Order Trash page.`}
+        confirmLabel={confirming ? "Processing..." : "Move to Trash"}
         variant="danger"
       />
     </div>

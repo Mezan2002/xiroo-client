@@ -1,5 +1,6 @@
 "use client";
 
+import SectionHeader from "@/components/ui/SectionHeader";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -31,14 +32,7 @@ export default function QuickLinks() {
     <section className="w-full py-16 lg:py-24 px-6 lg:px-12 bg-[#F7F7F5] border-t border-gray-100">
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className="flex flex-col items-center text-center mb-12 lg:mb-16">
-          <span className="text-[10px] font-bold tracking-[0.4em] text-gray-400 uppercase mb-3">
-            Explore
-          </span>
-          <h2 className="text-3xl md:text-4xl font-mono tracking-[0.12em] font-medium text-black uppercase">
-            More From XIROO
-          </h2>
-        </div>
+        <SectionHeader subtitle="Explore" title="More From XIROO" className="mb-12 lg:mb-16" />
 
         {/* Links Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200">
