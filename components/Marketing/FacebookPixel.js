@@ -265,6 +265,7 @@ export default function FacebookPixel() {
           if (fbc) capiUserData.fbc = fbc;
           if (fbp) capiUserData.fbp = fbp;
 
+          console.log("[FB Pixel] CAPI track sending:", { eventName, hasCapiKey: !!process.env.NEXT_PUBLIC_CAPI_SECRET_KEY });
           await axiosInstance.post("/marketing/track", {
             eventName,
             customData,
