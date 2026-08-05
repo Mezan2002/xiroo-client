@@ -176,10 +176,10 @@ function LoginForm() {
 
         <div className="relative py-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-100"></div>
+            <div className="w-full border-t border-gray-300"></div>
           </div>
-          <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest">
-            <span className="bg-white px-4 text-gray-300">
+          <div className="relative flex justify-center text-[10px] font-semibold uppercase tracking-widest">
+            <span className="bg-white px-4 text-gray-600">
               or continue with
             </span>
           </div>

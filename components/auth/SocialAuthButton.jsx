@@ -13,6 +13,7 @@ export default function SocialAuthButton({
       variant="outline"
       size="lg"
       onClick={onClick}
+      showHoverIcon={false}
       className="w-full rounded-none flex items-center justify-center gap-3 border-gray-200 hover:border-black hover:text-black transition-all group"
     >
       <div className="flex items-center gap-2">
