@@ -11,6 +11,12 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { saveCustomerContext } from "@/components/Marketing/FacebookPixel";
 
+function getFbcCookie() {
+  if (typeof document === "undefined") return "";
+  const match = document.cookie.match(/(^| )_fbc=([^;]+)/);
+  return match ? decodeURIComponent(match[2]) : "";
+}
+
 export const useCheckoutForm = (
   step,
   setStep,
@@ -192,7 +198,7 @@ export const useCheckoutForm = (
         deliveryMethod: deliveryMethod,
         paymentMethod: formData.paymentMethod,
         shippingAddress: shippingAddress,
-        facebookEventId: "purchase_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now(),
+        ...(getFbcCookie() && { facebookEventId: "purchase_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now() }),
         ...(adminTestEventCode && { adminTestEventCode }),
         ...(discount && {
           discount: {

@@ -21,7 +21,6 @@ import {
   ShoppingBag,
   StickyNote,
   Tag,
-  Trash2,
   Truck,
   UserCheck,
   Users,
@@ -36,7 +35,6 @@ const NAV_GROUPS = [
     label: "Commerce",
     items: [
       { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-      { label: "Order Trash", href: "/admin/orders/trash", icon: Trash2 },
       { label: "Products", href: "/admin/products", icon: Package },
       { label: "Categories", href: "/admin/categories", icon: LayoutGrid },
       { label: "Customers", href: "/admin/customers", icon: UserCheck },

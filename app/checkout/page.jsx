@@ -62,7 +62,7 @@ export default function CheckoutPage() {
   const { data: deliveryFeeData, isLoading: feeLoading } =
     useDeliveryFee(district);
 
-  const hasFreeDelivery = items.some((item) => item.isFreeDelivery);
+  const hasFreeDelivery = items.some((item) => item.isFreeDelivery) || itemCount >= 3;
 
   const shipping = !district
     ? null

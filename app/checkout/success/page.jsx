@@ -31,6 +31,9 @@ function OrderSuccessContent() {
     if (purchaseFiredRef.current) return;
     if (!order) return;
 
+    // Skip if no facebookEventId — means customer didn't come from a Facebook ad
+    if (!order.facebookEventId) return;
+
     // Skip purchase event on localhost
     if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) return;
 
@@ -80,7 +83,7 @@ function OrderSuccessContent() {
         value: Number(order.totalPrice) || 0,
         currency: "BDT",
         num_items: order.items.length
-      }, customerData, order.facebookEventId || null);
+      }, customerData, order.facebookEventId);
     } else if (retryCount < 20) {
       // Retry up to 20 times (2 seconds total) waiting for pixel to load
       setTimeout(() => firePurchaseEvent(retryCount + 1), 100);
