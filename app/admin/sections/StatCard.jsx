@@ -1,6 +1,6 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
 
-export default function StatCard({ label, value, icon: Icon, trend, trendLabel, accent }) {
+export default function StatCard({ label, value, icon: Icon, trend, trendLabel, accent, count }) {
   const isPositive = trend > 0;
   const isNegative = trend < 0;
 
@@ -19,7 +19,7 @@ export default function StatCard({ label, value, icon: Icon, trend, trendLabel, 
       </div>
       <div className="space-y-1">
         <p className="text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
-          {label}
+          {label}{count !== undefined && <span className="ml-1.5 text-black font-extrabold">({count})</span>}
         </p>
         <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900">
           {value}

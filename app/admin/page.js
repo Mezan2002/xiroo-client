@@ -4,7 +4,8 @@ import { useDashboard } from "@/hooks/api/useDashboard";
 import { useUsers } from "@/hooks/api/useUsers";
 import {
   LayoutDashboard, TrendingUp, ShoppingBag, Package, Users,
-  DollarSign, BarChart3, CreditCard,
+  DollarSign, BarChart3, CreditCard, Clock, CheckCircle, Loader,
+  Truck, XCircle, RotateCcw, AlertTriangle, Target,
 } from "lucide-react";
 import StatCard from "./sections/StatCard";
 import RevenueChart from "./sections/RevenueChart";
@@ -110,6 +111,83 @@ export default function AdminDashboard() {
                 value={(stats?.customers?.total || 0).toLocaleString()}
                 icon={Users}
                 trendLabel={`${stats?.customers?.blacklisted || 0} blacklisted`}
+              />
+            </>
+          )}
+      </div>
+
+      {/* Order Status Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {isLoading
+          ? [1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)
+          : (
+            <>
+              <StatCard
+                label="Pending"
+                count={(stats?.orderStatus?.pending || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.pendingRevenue || 0).toLocaleString()}`}
+                icon={Clock}
+                trendLabel="awaiting processing"
+              />
+              <StatCard
+                label="Delivered"
+                count={(stats?.orderStatus?.delivered || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.deliveredRevenue || 0).toLocaleString()}`}
+                icon={CheckCircle}
+                trendLabel="of total orders"
+                accent
+              />
+              <StatCard
+                label="Processing"
+                count={(stats?.orderStatus?.processing || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.processingRevenue || 0).toLocaleString()}`}
+                icon={Loader}
+                trendLabel="in progress"
+              />
+              <StatCard
+                label="Shipped"
+                count={(stats?.orderStatus?.shipped || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.shippedRevenue || 0).toLocaleString()}`}
+                icon={Truck}
+                trendLabel="in transit"
+              />
+            </>
+          )}
+      </div>
+
+      {/* Order Status Cards Row 2 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {isLoading
+          ? [1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)
+          : (
+            <>
+              <StatCard
+                label="Cancelled"
+                count={(stats?.orderStatus?.cancelled || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.cancelledRevenue || 0).toLocaleString()}`}
+                icon={XCircle}
+                trendLabel={`${stats?.orderStatus?.cancellationRate || 0}% rate`}
+              />
+              <StatCard
+                label="Returned"
+                count={(stats?.orderStatus?.returned || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.returnedRevenue || 0).toLocaleString()}`}
+                icon={RotateCcw}
+                trendLabel={`${stats?.orderStatus?.returnRate || 0}% rate`}
+              />
+              <StatCard
+                label="Failed"
+                count={(stats?.orderStatus?.failed || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.failedRevenue || 0).toLocaleString()}`}
+                icon={AlertTriangle}
+                trendLabel="payment/issues"
+              />
+              <StatCard
+                label="Fulfillment Rate"
+                value={`${stats?.orderStatus?.fulfillmentRate || 0}%`}
+                icon={Target}
+                trendLabel="orders delivered"
+                accent
               />
             </>
           )}

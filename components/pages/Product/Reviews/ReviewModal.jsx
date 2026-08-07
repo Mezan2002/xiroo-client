@@ -36,7 +36,7 @@ export default function ReviewModal({ review, onClose, onPrev, onNext }) {
                   src={gallery[activeIndex]}
                   alt="Review focus"
                   fill
-                  className="object-contain grayscale group-hover:grayscale-0 transition-all duration-1000 scale-[0.98] group-hover:scale-100"
+                  className="object-contain scale-[0.98] group-hover:scale-100 transition-all duration-1000"
                 />
               </div>
 
@@ -65,7 +65,7 @@ export default function ReviewModal({ review, onClose, onPrev, onNext }) {
                       src={img}
                       alt=""
                       fill
-                      className="object-cover grayscale-sm hover:grayscale-0"
+                      className="object-cover"
                     />
                   </button>
                 ))}
