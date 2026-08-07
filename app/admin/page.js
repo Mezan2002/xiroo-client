@@ -18,6 +18,11 @@ import SplitChart from "./sections/SplitChart";
 import UserTiers from "./sections/UserTiers";
 import FraudOverview from "./sections/FraudOverview";
 import RecentActivity from "./sections/RecentActivity";
+import RevenueVsOrders from "./sections/RevenueVsOrders";
+import RevenueByCategory from "./sections/RevenueByCategory";
+import RatingDistribution from "./sections/RatingDistribution";
+import UserRegistrationTrend from "./sections/UserRegistrationTrend";
+import DeliveryProviderChart from "./sections/DeliveryProviderChart";
 
 const SkeletonCard = () => (
   <div className="h-40 md:h-44 bg-zinc-50 animate-pulse border border-zinc-100" />
@@ -244,6 +249,51 @@ export default function AdminDashboard() {
             <TopProducts products={stats?.products?.topSelling || []} />
             <RecentOrders orders={stats?.recentOrders || []} />
             <UserTiers tiers={stats?.users?.tiers || []} />
+          </>
+        )}
+      </div>
+
+      {/* Revenue vs Orders + Revenue by Category */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {isLoading ? (
+          <>
+            <SkeletonChart />
+            <SkeletonChart />
+          </>
+        ) : (
+          <>
+            <RevenueVsOrders data={stats?.orders?.revenueByDay || []} />
+            <RevenueByCategory data={stats?.categoryRevenue || []} />
+          </>
+        )}
+      </div>
+
+      {/* Rating Distribution + User Registration Trend */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {isLoading ? (
+          <>
+            <SkeletonChart />
+            <SkeletonChart />
+          </>
+        ) : (
+          <>
+            <RatingDistribution data={stats?.ratingDistribution || []} />
+            <UserRegistrationTrend data={stats?.userTrend || []} />
+          </>
+        )}
+      </div>
+
+      {/* Delivery Providers + Customer Reliability */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {isLoading ? (
+          <>
+            <SkeletonChart />
+            <SkeletonChart />
+          </>
+        ) : (
+          <>
+            <DeliveryProviderChart data={stats?.deliveryProviders || []} />
+            <BusinessMetrics stats={stats} />
           </>
         )}
       </div>
