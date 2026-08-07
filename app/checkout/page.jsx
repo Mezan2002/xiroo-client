@@ -19,6 +19,7 @@ export default function CheckoutPage() {
   const {
     items,
     subtotal,
+    itemCount,
     total: cartTotal,
     discount,
     discountAmount,
