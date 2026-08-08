@@ -292,10 +292,10 @@ export default function AdminAnalytics() {
                 <th className="px-4 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
                   Source
                 </th>
-                <th className="px-4 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest hidden md:table-cell">
+                <th className="px-4 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
                   URL
                 </th>
-                <th className="px-4 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest hidden lg:table-cell">
+                <th className="px-4 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
                   Customer
                 </th>
                 <th className="px-4 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">
@@ -348,14 +348,14 @@ export default function AdminAnalytics() {
                           {log.source}
                         </span>
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
+                      <td className="px-4 py-3">
                         <span className="text-[11px] text-zinc-400 truncate max-w-[200px] block">
                           {log.url
                             ? new URL(log.url).pathname
                             : "—"}
                         </span>
                       </td>
-                      <td className="px-4 py-3 hidden lg:table-cell">
+                      <td className="px-4 py-3">
                         <div className="flex flex-col gap-0.5">
                           {log.userData?.email && (
                             <span className="text-[10px] font-bold text-zinc-600">
