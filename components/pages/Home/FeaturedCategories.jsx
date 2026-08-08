@@ -29,7 +29,7 @@ export default function FeaturedCategories() {
   if (isLoading) {
     return (
       <section className="w-full bg-white animate-pulse">
-        <div className="grid grid-cols-2 lg:grid-cols-[1fr_0.6fr_1fr] grid-rows-2 h-[85vh] max-h-[800px]">
+        <div className="grid grid-cols-2 grid-rows-2 gap-2 h-[85vh] max-h-[800px]">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="bg-gray-100" />
           ))}
@@ -42,26 +42,16 @@ export default function FeaturedCategories() {
 
   return (
     <section className="w-full bg-white overflow-hidden my-2">
-      {/* Mobile: left tall + right 2 stacked (3 items) */}
+      {/* Mobile: 2x2 grid showing all 4 categories */}
       <div className="grid grid-cols-2 grid-rows-2 gap-2 h-[85vh] max-h-[800px] lg:hidden">
-        <BentoCell
-          cat={categories[0]}
-          index={0}
-          className="col-span-1 row-span-2"
-          sizes="50vw"
-        />
-        <BentoCell
-          cat={categories[1]}
-          index={1}
-          className="col-start-2 row-start-1"
-          sizes="50vw"
-        />
-        <BentoCell
-          cat={categories[2]}
-          index={2}
-          className="col-start-2 row-start-2"
-          sizes="50vw"
-        />
+        {categories.map((cat, idx) => (
+          <BentoCell
+            key={cat._id || idx}
+            cat={cat}
+            index={idx}
+            sizes="50vw"
+          />
+        ))}
       </div>
 
       {/* Desktop: diagonal bento — top-left tall, bottom-right tall */}

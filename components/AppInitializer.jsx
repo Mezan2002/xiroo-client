@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hydrate } from "@/redux/slices/authSlice";
+import { hydrate, setLoading } from "@/redux/slices/authSlice";
 import { setCart } from "@/redux/slices/cartSlice";
 import { setWishlist } from "@/redux/slices/wishlistSlice";
 import { setRecentlyViewed } from "@/redux/slices/recentlyViewedSlice";
@@ -27,6 +27,7 @@ export default function AppInitializer({ children }) {
   useEffect(() => {
     // Auth Hydration
     dispatch(hydrate());
+    dispatch(setLoading(false));
 
     // Registry Hydration (Client-only)
     if (typeof window !== "undefined") {

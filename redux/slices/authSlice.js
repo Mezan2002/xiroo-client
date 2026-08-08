@@ -14,7 +14,7 @@ const getInitialAuthContent = () => {
 
 const initialState = {
   ...getInitialAuthContent(),
-  loading: false,
+  loading: true,
 };
 
 const authSlice = createSlice({
