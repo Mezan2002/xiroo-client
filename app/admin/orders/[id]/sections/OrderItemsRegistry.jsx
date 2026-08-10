@@ -35,7 +35,8 @@ export default function OrderItemsRegistry({ order, handleCancelOrder }) {
   });
 
   const subtotal = rawSubtotal - autoBundleDiscountAmount;
-  const delivery = order.shippingFee !== undefined ? order.shippingFee : (order.totalPrice - subtotal);
+  const couponDiscountAmount = order.discount?.amount || 0;
+  const delivery = order.shippingFee !== undefined ? order.shippingFee : Math.max(0, order.totalPrice - subtotal + couponDiscountAmount);
 
   return (
     <div className="space-y-6">
@@ -121,6 +122,12 @@ export default function OrderItemsRegistry({ order, handleCancelOrder }) {
             <div className="flex justify-between items-center text-[12px] text-green-600">
               <span className="font-medium">Bundle Discount (10%)</span>
               <span className="font-bold font-mono">-৳{autoBundleDiscountAmount.toLocaleString()}</span>
+            </div>
+          )}
+          {order.discount && couponDiscountAmount > 0 && (
+            <div className="flex justify-between items-center text-[12px] text-green-600">
+              <span className="font-medium">Coupon ({order.discount.code})</span>
+              <span className="font-bold font-mono">-৳{couponDiscountAmount.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between items-center text-[12px]">

@@ -27,6 +27,26 @@ const PricingInventory = ({ product, setProduct }) => {
           </div>
         </div>
 
+        {/* Cost Price */}
+        <div className="space-y-3">
+          <Label>Cost Price</Label>
+          <div className="relative group">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm font-bold group-focus-within:text-black transition-colors">
+              ৳
+            </span>
+            <input
+              type="number"
+              value={product.costPrice}
+              onChange={(e) => setProduct({ ...product, costPrice: e.target.value })}
+              placeholder="0.00"
+              className="w-full bg-white border border-[#EDECE9] px-10 py-4 text-[13px] font-bold outline-none focus:border-black transition-all placeholder:text-zinc-200"
+            />
+          </div>
+          <p className="text-[10px] text-zinc-400 font-medium">
+            Your supplier cost (for profit calculation)
+          </p>
+        </div>
+
         {/* Offered Price */}
         <div className="space-y-3">
           <Label>Sale Price</Label>

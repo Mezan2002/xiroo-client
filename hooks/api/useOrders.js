@@ -210,6 +210,17 @@ export const useOrders = () => {
     },
   });
 
+  const updateOrder = useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await axiosInstance.patch(`/orders/${id}`, data);
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
   return {
     placeOrder,
     placeGuestOrder,
@@ -228,5 +239,6 @@ export const useOrders = () => {
     confirmAdvancePayment,
     waiveAdvancePayment,
     updateOrderPrices,
+    updateOrder,
   };
 };

@@ -61,6 +61,11 @@ export const useAdminSettings = ({ onSaveSuccess } = {}) => {
     advancePaymentPercentage: 50,
   });
 
+  // Business Costs
+  const [businessCosts, setBusinessCosts] = useState({
+    defaultShippingCostToBusiness: 0,
+  });
+
   useEffect(() => {
     if (deliverySettings) {
       setShipping({
@@ -81,6 +86,7 @@ export const useAdminSettings = ({ onSaveSuccess } = {}) => {
       setSocial(storeSettings.social || {});
       setBundleRules(storeSettings.bundleRules || {});
       setPolicies(storeSettings.policies || {});
+      setBusinessCosts(storeSettings.businessCosts || { defaultShippingCostToBusiness: 0 });
     }
   }, [storeSettings]);
 
@@ -138,6 +144,9 @@ export const useAdminSettings = ({ onSaveSuccess } = {}) => {
           advancePaymentThreshold: Number(policies.advancePaymentThreshold) || 0,
           advancePaymentPercentage: Number(policies.advancePaymentPercentage) || 50,
         },
+        businessCosts: {
+          defaultShippingCostToBusiness: Number(businessCosts.defaultShippingCostToBusiness) || 0,
+        },
       },
       { onSuccess: checkDone, onError: checkDone }
     );
@@ -187,6 +196,8 @@ export const useAdminSettings = ({ onSaveSuccess } = {}) => {
     loyalty, setLoyalty, updateTierConfig,
     // Policies
     policies, setPolicies,
+    // Business Costs
+    businessCosts, setBusinessCosts,
     // Save
     saveAll, isSaving,
   };

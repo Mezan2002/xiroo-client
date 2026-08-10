@@ -8,22 +8,21 @@ import { useEffect, useCallback } from "react";
  * Senior Dev Hook: useNotifications
  * Synchronizes real-time socket events with the server-side registry.
  */
-export const useNotifications = () => {
+export const useNotifications = ({ page = 1, limit = 20 } = {}) => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const { token, isAuthenticated } = useSelector((state) => state.auth);
 
   // 1. Registry Fetching (Server-side)
   const notificationsQuery = useQuery({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", { page, limit }],
     queryFn: async () => {
-      const response = await axiosInstance.get("/notifications");
+      const response = await axiosInstance.get("/notifications", {
+        params: { page, limit },
+      });
       return response.data;
     },
     enabled: isAuthenticated && !!token,
-    onSuccess: (data) => {
-      dispatch(setNotifications(data));
-    },
   });
 
   const unreadCountQuery = useQuery({
@@ -33,10 +32,21 @@ export const useNotifications = () => {
       return response.data;
     },
     enabled: isAuthenticated && !!token,
-    onSuccess: (data) => {
-      dispatch(setUnreadCount(data));
-    },
   });
+
+  // Sync notifications to Redux
+  useEffect(() => {
+    if (notificationsQuery.data) {
+      dispatch(setNotifications(notificationsQuery.data.notifications || []));
+    }
+  }, [notificationsQuery.data, dispatch]);
+
+  // Sync unread count to Redux
+  useEffect(() => {
+    if (unreadCountQuery.data !== undefined) {
+      dispatch(setUnreadCount(unreadCountQuery.data));
+    }
+  }, [unreadCountQuery.data, dispatch]);
 
   // 2. Technical Mutations: Synchronization
   const markAsReadMutation = useMutation({
@@ -66,8 +76,11 @@ export const useNotifications = () => {
     queryClient.invalidateQueries({ queryKey: ["notifications"] });
   }, [queryClient]);
 
+  const data = notificationsQuery.data || {};
+
   return {
-    notifications: notificationsQuery.data || [],
+    notifications: data.notifications || [],
+    pagination: data.pagination || { page: 1, limit: 20, total: 0, totalPages: 0 },
     unreadCount: unreadCountQuery.data || 0,
     isLoading: notificationsQuery.isLoading || unreadCountQuery.isLoading,
     markAsRead: markAsReadMutation.mutate,

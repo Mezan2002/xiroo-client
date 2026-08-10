@@ -15,6 +15,7 @@ const VariantManager = ({
   updateVariantValuePrice,
   updateVariantValueQuantity,
   updateVariantValueImage,
+  updateVariantValueCostPrice,
   removeVariantValue,
 }) => {
   const otherAttributes = allAttributes.filter(
@@ -133,6 +134,18 @@ const VariantManager = ({
                             value={valObj.price || ""}
                             onChange={(e) =>
                               updateVariantValuePrice(v.id, idx, e.target.value)
+                            }
+                            className="bg-transparent border-none outline-none text-[9px] w-12 text-zinc-500 font-bold placeholder:text-zinc-200"
+                          />
+                        </div>
+                        <div className="flex items-center gap-1 border-b border-zinc-100 pb-0.5">
+                          <span className="text-[8px] text-zinc-400">Cost</span>
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={valObj.costPrice || ""}
+                            onChange={(e) =>
+                              updateVariantValueCostPrice(v.id, idx, e.target.value)
                             }
                             className="bg-transparent border-none outline-none text-[9px] w-12 text-zinc-500 font-bold placeholder:text-zinc-200"
                           />

@@ -23,6 +23,7 @@ import RevenueByCategory from "./sections/RevenueByCategory";
 import RatingDistribution from "./sections/RatingDistribution";
 import UserRegistrationTrend from "./sections/UserRegistrationTrend";
 import DeliveryProviderChart from "./sections/DeliveryProviderChart";
+import ProfitOverview from "./sections/ProfitOverview";
 
 const SkeletonCard = () => (
   <div className="h-40 md:h-44 bg-zinc-50 animate-pulse border border-zinc-100" />
@@ -85,6 +86,11 @@ export default function AdminDashboard() {
             </>
           )}
       </div>
+
+      {/* Profit Overview */}
+      {!isLoading && stats?.profit && (
+        <ProfitOverview profit={stats.profit} />
+      )}
 
       {/* Secondary Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

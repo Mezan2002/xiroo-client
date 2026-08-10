@@ -8,7 +8,7 @@ import { useBundleHandlers } from "./hooks/useBundleHandlers";
 export const useProductForm = (initialData, onSubmit) => {
   const { toast } = useToast();
   const [product, setProduct] = useState({
-    title: "", description: "", price: "", salePrice: "", saleStartDate: "", saleEndDate: "",
+    title: "", description: "", price: "", costPrice: "", salePrice: "", saleStartDate: "", saleEndDate: "",
     inventory: "", sku: "", tax: "15", variants: [], specifications: [], bundles: [],
     category: "", subCategory: "", images: [], stockStage: "in-stock", isFeatured: false, isFreeDelivery: false, isMultiItem: false, multiItemQuantity: 1, badge: "",
     seoTitle: "", seoDescription: "", seoKeywords: "",
@@ -25,6 +25,7 @@ export const useProductForm = (initialData, onSubmit) => {
       setProduct({
         ...initialData,
         price: initialData.price?.toString() || "",
+        costPrice: initialData.costPrice?.toString() || "",
         salePrice: initialData.salePrice?.toString() || "",
         saleStartDate: formatDate(initialData.saleStartDate),
         saleEndDate: formatDate(initialData.saleEndDate),
@@ -63,6 +64,7 @@ export const useProductForm = (initialData, onSubmit) => {
       isMultiItem: product.isMultiItem || false,
       multiItemQuantity: product.isMultiItem ? Number(product.multiItemQuantity || 1) : 1,
       price: Number(product.price),
+      costPrice: Number(product.costPrice || 0),
       salePrice: product.salePrice ? Number(product.salePrice) : undefined,
       saleStartDate: product.saleStartDate ? new Date(product.saleStartDate) : undefined,
       saleEndDate: product.saleEndDate ? new Date(product.saleEndDate) : undefined,
@@ -73,6 +75,7 @@ export const useProductForm = (initialData, onSubmit) => {
         values: v.values.map((val) => ({
           value: val.value,
           price: val.price ? Number(val.price) : undefined,
+          costPrice: val.costPrice ? Number(val.costPrice) : undefined,
           quantity: val.quantity !== undefined && val.quantity !== "" ? Number(val.quantity) : undefined,
           image: val.image || undefined,
         })),

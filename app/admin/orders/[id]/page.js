@@ -1,6 +1,7 @@
 "use client";
+import { useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check } from "lucide-react";
+import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine } from "lucide-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,11 +12,13 @@ import CustomerHistoryCard from "./sections/CustomerHistoryCard";
 import FraudBDCheckCard from "./sections/FraudBDCheckCard";
 import AdvancePaymentCard from "./sections/AdvancePaymentCard";
 import RequestAdvancePaymentModal from "./sections/RequestAdvancePaymentModal";
+import EditOrderModal from "./sections/EditOrderModal";
 import OrderHeader from "./sections/OrderHeader";
 import { useOrderManagement } from "./sections/useOrderManagement";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const {
     order, loading, isError, isCancelModalOpen, setIsCancelModalOpen,
     isAdvancePaymentModalOpen, setIsAdvancePaymentModalOpen,
@@ -68,6 +71,31 @@ export default function OrderDetailsPage() {
 
   const rawSubtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const delivery = order.shippingFee !== undefined ? order.shippingFee : Math.max(0, order.totalPrice - rawSubtotal);
+
+  // Compute bundle discount (10% when 2+ items share same bundleId)
+  const bundleGroups = {};
+  order.items.forEach((item) => {
+    const itemSubtotal = item.price * item.quantity;
+    if (item.bundleId) {
+      if (!bundleGroups[item.bundleId]) {
+        bundleGroups[item.bundleId] = { quantity: 0, subtotal: 0 };
+      }
+      bundleGroups[item.bundleId].quantity += item.quantity;
+      bundleGroups[item.bundleId].subtotal += itemSubtotal;
+    }
+  });
+  let bundleDiscountAmount = 0;
+  Object.values(bundleGroups).forEach((group) => {
+    if (group.quantity >= 2) {
+      bundleDiscountAmount += group.subtotal * 0.10;
+    }
+  });
+
+  // Compute coupon discount
+  const couponDiscountAmount = order.discount?.amount || 0;
+
+  // Compute total discount (bundle + coupon)
+  const totalDiscountAmount = bundleDiscountAmount + couponDiscountAmount;
 
   // Compute live pricing in edit mode
   const editedRawSubtotal = editedItems.reduce((acc, item) => acc + (Number(item.price) || 0) * item.quantity, 0);
@@ -293,10 +321,16 @@ export default function OrderDetailsPage() {
                     <span className="text-zinc-400 font-medium">Subtotal</span>
                     <span className="text-zinc-700 font-bold font-mono">৳{rawSubtotal.toLocaleString()}</span>
                   </div>
-                  {order.discount && (
+                  {bundleDiscountAmount > 0 && (
+                    <div className="flex justify-between text-[11px] text-green-600">
+                      <span className="font-medium">Bundle Discount (10%)</span>
+                      <span className="font-bold font-mono">-৳{bundleDiscountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {order.discount && couponDiscountAmount > 0 && (
                     <div className="flex justify-between text-[11px] text-green-600">
                       <span className="font-medium">Coupon ({order.discount.code})</span>
-                      <span className="font-bold font-mono">-৳{(order.discount.amount || 0).toLocaleString()}</span>
+                      <span className="font-bold font-mono">-৳{couponDiscountAmount.toLocaleString()}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-[11px]">
@@ -357,13 +391,14 @@ export default function OrderDetailsPage() {
             )}
           </div>
 
-          {/* Cancel only */}
-          {order.status === "pending" && (
+          {/* Actions */}
+          {["pending", "processing", "on-hold"].includes(order.status) && (
             <button
-              onClick={() => setIsCancelModalOpen(true)}
-              className="px-5 py-2.5 border border-zinc-200 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:border-rose-300 hover:text-rose-500 transition-colors"
+              onClick={() => setIsEditModalOpen(true)}
+              className="w-full px-5 py-2.5 bg-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
             >
-              Cancel Order
+              <PenLine size={12} />
+              Edit Order
             </button>
           )}
         </div>
@@ -438,6 +473,12 @@ export default function OrderDetailsPage() {
         setReason={setAdvancePaymentReason}
         isProcessing={isRequestingAdvancePayment}
         orderTotal={order.totalPrice}
+      />
+
+      <EditOrderModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        order={order}
       />
     </div>
   );

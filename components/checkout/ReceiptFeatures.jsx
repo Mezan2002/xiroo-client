@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Check, Copy, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
 
 export default function ReceiptFeatures({ order, receiptRef }) {
   const { toast } = useToast();
@@ -29,19 +27,21 @@ export default function ReceiptFeatures({ order, receiptRef }) {
     toast.info("Generating PDF Registry Record...");
 
     try {
-      const { toPng } = await import("html-to-image");
+      const [htmlToImage, jsPDFModule] = await Promise.all([
+        import("html-to-image"),
+        import("jspdf"),
+      ]);
+
       const element = receiptRef.current;
-      
-      // Small delay to ensure all nested images and fonts are fully settled
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const imgData = await toPng(element, { 
-        quality: 1, 
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const imgData = await htmlToImage.toPng(element, {
+        quality: 1,
         pixelRatio: 2,
         backgroundColor: "#ffffff",
       });
 
-      const pdf = new jsPDF({
+      const pdf = new jsPDFModule.jsPDF({
         orientation: "portrait",
         unit: "pt",
         format: "a4",
@@ -51,7 +51,54 @@ export default function ReceiptFeatures({ order, receiptRef }) {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      // A4 page dimensions in points
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 0;
+      const usablePageHeight = pageHeight - margin;
+
+      // If content fits on one page, add it directly
+      if (pdfHeight <= usablePageHeight) {
+        pdf.addImage(imgData, "PNG", 0, margin, pdfWidth, pdfHeight);
+      } else {
+        // Multi-page: slice the image across pages
+        const totalImgHeight = imgProps.height;
+        const totalImgWidth = imgProps.width;
+
+        // How many pixels of the source image fit on one page
+        const pixelsPerPage = (usablePageHeight / pdfHeight) * totalImgHeight;
+        const totalPages = Math.ceil(totalImgHeight / pixelsPerPage);
+
+        // Create a canvas to crop slices
+        const canvas = document.createElement("canvas");
+        canvas.width = totalImgWidth;
+        const ctx = canvas.getContext("2d");
+
+        // Load the full image onto an offscreen element
+        const img = new window.Image();
+        img.src = imgData;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+        });
+
+        for (let i = 0; i < totalPages; i++) {
+          const srcY = i * pixelsPerPage;
+          const srcSliceHeight = Math.min(pixelsPerPage, totalImgHeight - srcY);
+
+          // Set canvas to the slice height
+          canvas.height = srcSliceHeight;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, srcY, totalImgWidth, srcSliceHeight, 0, 0, totalImgWidth, srcSliceHeight);
+
+          const sliceData = canvas.toDataURL("image/png");
+          const slicePdfHeight = (srcSliceHeight / totalImgWidth) * pdfWidth;
+
+          if (i > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(sliceData, "PNG", 0, margin, pdfWidth, slicePdfHeight);
+        }
+      }
+
       pdf.save(`RECEIPT-${order.orderId}.pdf`);
       toast.success("PDF Registry Downloaded.");
     } catch (error) {

@@ -62,7 +62,7 @@ export default function OrderHeader({ order, isUpdatingStatus, handleStatusChang
       actions={
         <div className="flex items-center gap-3">
           {/* Status pill */}
-          <div className={`inline-flex items-center gap-2 px-3.5 py-2 ${styles.bg} border ${styles.border}`}>
+          <div className={`inline-flex items-center gap-2 px-4 h-10 ${styles.bg} border ${styles.border}`}>
             <span className={`w-2 h-2 rounded-full ${styles.dot}`} />
             <span className={`text-[11px] font-bold tracking-wide ${styles.text}`}>{label}</span>
           </div>
@@ -76,7 +76,7 @@ export default function OrderHeader({ order, isUpdatingStatus, handleStatusChang
               options={statusOptions}
               value={order.status}
               onChange={handleStatusChange}
-              size="sm"
+              className="!h-10"
               disabled={isUpdatingStatus || terminalStatuses.includes(order.status)}
             />
           </div>

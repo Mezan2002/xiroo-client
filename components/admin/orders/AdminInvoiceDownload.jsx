@@ -45,7 +45,54 @@ export default function AdminInvoiceDownload({ order }) {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      // A4 page dimensions in points
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 0;
+      const usablePageHeight = pageHeight - margin;
+
+      // If content fits on one page, add it directly
+      if (pdfHeight <= usablePageHeight) {
+        pdf.addImage(imgData, "PNG", 0, margin, pdfWidth, pdfHeight);
+      } else {
+        // Multi-page: slice the image across pages
+        const totalImgHeight = imgProps.height;
+        const totalImgWidth = imgProps.width;
+
+        // How many pixels of the source image fit on one page
+        const pixelsPerPage = (usablePageHeight / pdfHeight) * totalImgHeight;
+        const totalPages = Math.ceil(totalImgHeight / pixelsPerPage);
+
+        // Create a canvas to crop slices
+        const canvas = document.createElement("canvas");
+        canvas.width = totalImgWidth;
+        const ctx = canvas.getContext("2d");
+
+        // Load the full image onto an offscreen element
+        const img = new window.Image();
+        img.src = imgData;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+        });
+
+        for (let i = 0; i < totalPages; i++) {
+          const srcY = i * pixelsPerPage;
+          const srcSliceHeight = Math.min(pixelsPerPage, totalImgHeight - srcY);
+
+          // Set canvas to the slice height
+          canvas.height = srcSliceHeight;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, srcY, totalImgWidth, srcSliceHeight, 0, 0, totalImgWidth, srcSliceHeight);
+
+          const sliceData = canvas.toDataURL("image/png");
+          const slicePdfHeight = (srcSliceHeight / totalImgWidth) * pdfWidth;
+
+          if (i > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(sliceData, "PNG", 0, margin, pdfWidth, slicePdfHeight);
+        }
+      }
+
       pdf.save(`INVOICE-${order.orderId}.pdf`);
       toast.success("Invoice downloaded successfully.");
     } catch (error) {
@@ -65,7 +112,7 @@ export default function AdminInvoiceDownload({ order }) {
       <button
         onClick={handleDownloadInvoice}
         disabled={downloading}
-        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-zinc-200 text-zinc-700 text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-zinc-50 hover:border-zinc-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center justify-center gap-2 px-4 h-10 bg-white border border-zinc-200 text-zinc-700 text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-zinc-50 hover:border-zinc-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {downloading ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" />

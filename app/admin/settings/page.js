@@ -7,6 +7,7 @@ import OperationalSettings from "./sections/OperationalSettings";
 import BundleRulesSection from "./sections/BundleRulesSection";
 import LoyaltySection from "./sections/LoyaltySection";
 import PoliciesSection from "./sections/PoliciesSection";
+import BusinessCostsSection from "./sections/BusinessCostsSection";
 import { useAdminSettings } from "./sections/useAdminSettings";
 import { useToast } from "@/hooks/useToast";
 
@@ -59,6 +60,10 @@ export default function AdminSettings() {
 
         <PoliciesSection 
           policies={s.policies} setPolicies={s.setPolicies}
+        />
+
+        <BusinessCostsSection 
+          businessCosts={s.businessCosts} setBusinessCosts={s.setBusinessCosts}
         />
       </div>
     </div>

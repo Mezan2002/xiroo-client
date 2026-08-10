@@ -4,7 +4,7 @@ import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Select } from "@/components/ui/Select";
-import { Plus, ShoppingBag, Loader2, Search } from "lucide-react";
+import { Plus, ShoppingBag, Loader2, Search, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useOrders } from "@/hooks/api/useOrders";
 import { useToast } from "@/hooks/useToast";
@@ -139,6 +139,15 @@ export default function AdminOrders() {
         ]}
         title="Orders"
         icon={ShoppingBag}
+        actions={
+          <button
+            onClick={() => router.push("/admin/orders/trash")}
+            className="h-10 md:h-12 px-4 md:px-6 border border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 text-[10px] md:text-[11px] font-semibold rounded-none transition-all uppercase tracking-[0.2em] md:tracking-[0.3em] flex items-center gap-2"
+          >
+            <Trash2 size={12} />
+            Trash
+          </button>
+        }
         primaryAction={{
           label: "Create Order",
           icon: Plus,

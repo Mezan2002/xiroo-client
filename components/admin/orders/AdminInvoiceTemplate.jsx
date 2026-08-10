@@ -25,6 +25,29 @@ export default function AdminInvoiceTemplate({ order, invoiceRef }) {
     0
   );
   const shipping = order.shippingFee || 0;
+
+  // Compute bundle discount (10% when 2+ items share same bundleId)
+  const bundleGroups = {};
+  order.items.forEach((item) => {
+    const itemSubtotal = item.price * item.quantity;
+    if (item.bundleId) {
+      if (!bundleGroups[item.bundleId]) {
+        bundleGroups[item.bundleId] = { quantity: 0, subtotal: 0 };
+      }
+      bundleGroups[item.bundleId].quantity += item.quantity;
+      bundleGroups[item.bundleId].subtotal += itemSubtotal;
+    }
+  });
+  let bundleDiscountAmount = 0;
+  Object.values(bundleGroups).forEach((group) => {
+    if (group.quantity >= 2) {
+      bundleDiscountAmount += group.subtotal * 0.10;
+    }
+  });
+
+  const discount = order.discount || null;
+  const couponDiscountAmount = discount?.amount ? Math.round(discount.amount * 100) / 100 : 0;
+  const totalDiscount = bundleDiscountAmount + couponDiscountAmount;
   const total = order.totalPrice;
 
   const customerName =
@@ -229,6 +252,26 @@ export default function AdminInvoiceTemplate({ order, invoiceRef }) {
               <p style={{ fontSize: "11px", color: "#666", margin: 0, fontWeight: "500" }}>Subtotal:</p>
               <p style={{ fontSize: "11px", fontWeight: "700", margin: 0 }}>৳{subtotal.toLocaleString()}</p>
             </div>
+            {bundleDiscountAmount > 0 && (
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
+                <p style={{ fontSize: "11px", color: "#2a9d4e", margin: 0, fontWeight: "500" }}>
+                  Bundle Discount (10%):
+                </p>
+                <p style={{ fontSize: "11px", fontWeight: "700", margin: 0, color: "#2a9d4e" }}>
+                  -৳{bundleDiscountAmount.toLocaleString()}
+                </p>
+              </div>
+            )}
+            {discount && couponDiscountAmount > 0 && (
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
+                <p style={{ fontSize: "11px", color: "#2a9d4e", margin: 0, fontWeight: "500" }}>
+                  Discount ({discount.code || "Coupon"}):
+                </p>
+                <p style={{ fontSize: "11px", fontWeight: "700", margin: 0, color: "#2a9d4e" }}>
+                  -৳{couponDiscountAmount.toLocaleString()}
+                </p>
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
               <p style={{ fontSize: "11px", color: "#666", margin: 0, fontWeight: "500" }}>Tax:</p>
               <p style={{ fontSize: "11px", fontWeight: "700", margin: 0 }}>0</p>

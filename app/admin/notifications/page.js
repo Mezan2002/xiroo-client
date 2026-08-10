@@ -3,19 +3,19 @@ import React, { useState } from "react";
 import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import {
   AlertCircle,
-  ArrowRight,
   Bell,
-  CheckCircle2,
   Shield,
   ShoppingBag,
-  Trash2,
   Zap,
   Loader2,
-  Clock
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import { useNotifications } from "@/hooks/api/useNotifications";
 import Link from "next/link";
+
+const ITEMS_PER_PAGE = 20;
 
 const formatTimeAgo = (date) => {
   const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -35,7 +35,8 @@ const formatTimeAgo = (date) => {
 
 export default function AdminNotifications() {
   const [filter, setFilter] = useState("All");
-  const { notifications, markAsRead, markAllAsRead } = useNotifications();
+  const [page, setPage] = useState(1);
+  const { notifications, pagination, markAsRead, markAllAsRead, isLoading } = useNotifications({ page, limit: ITEMS_PER_PAGE });
 
   const filteredNotifications = notifications.filter((notif) => {
     if (filter === "All") return true;
@@ -45,6 +46,31 @@ export default function AdminNotifications() {
     if (filter === "Messages") return notif.type === "message";
     return true;
   });
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const { totalPages, page: currentPage } = pagination;
+    const pages = [];
+    
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+        pages.push(i);
+      }
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-12 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -63,7 +89,7 @@ export default function AdminNotifications() {
             {["All", "Orders", "Messages", "System", "Security"].map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f)}
+                onClick={() => { setFilter(f); setPage(1); }}
                 className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all shrink-0 ${
                   filter === f
                     ? "bg-black text-white"
@@ -83,7 +109,11 @@ export default function AdminNotifications() {
         </div>
 
         <div className="space-y-px bg-[#EDECE9] border border-[#EDECE9] rounded-none overflow-hidden shadow-2xl shadow-black/5">
-          {filteredNotifications.length === 0 ? (
+          {isLoading ? (
+            <div className="bg-white py-32 text-center">
+              <Loader2 size={32} className="animate-spin mx-auto text-zinc-300" />
+            </div>
+          ) : filteredNotifications.length === 0 ? (
             <div className="bg-white py-32 text-center">
               <div className="opacity-20 flex flex-col items-center gap-4">
                 <Bell size={48} strokeWidth={1} />
@@ -138,6 +168,50 @@ export default function AdminNotifications() {
             })
           )}
         </div>
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between pt-4 border-t border-[#EDECE9]">
+            <span className="text-[12px] text-[#37352F80]">
+              Showing {((pagination.page - 1) * pagination.limit) + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} notifications
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page <= 1}
+                className="p-2 text-[#37352F] border border-[#EDECE9] hover:bg-[#F7F7F5] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={14} />
+              </button>
+
+              {getPageNumbers().map((p, idx) =>
+                p === "..." ? (
+                  <span key={`ellipsis-${idx}`} className="px-2 text-[12px] text-[#37352F80]">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => handlePageChange(p)}
+                    className={`w-8 h-8 text-[12px] font-medium border transition-colors ${
+                      p === pagination.page
+                        ? "bg-[#37352F] text-white border-[#37352F]"
+                        : "text-[#37352F] border-[#EDECE9] hover:bg-[#F7F7F5]"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
+                className="p-2 text-[#37352F] border border-[#EDECE9] hover:bg-[#F7F7F5] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

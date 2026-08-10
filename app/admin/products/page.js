@@ -141,14 +141,23 @@ export default function AdminInventory() {
     { 
       key: "price", 
       label: "Price", 
-      width: "100px",
-      render: (row) => <span className="text-[13px] font-medium">৳{row.price?.toLocaleString()}</span>
-    },
-    { 
-      key: "salePrice", 
-      label: "Sale Price", 
-      width: "100px",
-      render: (row) => <span className="text-[13px] font-medium text-emerald-600">৳{(row.salePrice || 0).toLocaleString()}</span>
+      width: "120px",
+      render: (row) => {
+        const now = new Date();
+        const hasActiveSale = row.salePrice && row.salePrice > 0 && (!row.saleEndDate || new Date(row.saleEndDate) > now);
+        return (
+          <div className="flex flex-col">
+            {hasActiveSale ? (
+              <>
+                <span className="text-[13px] font-medium text-zinc-400 line-through">৳{row.price?.toLocaleString()}</span>
+                <span className="text-[13px] font-bold text-emerald-600">৳{row.salePrice?.toLocaleString()}</span>
+              </>
+            ) : (
+              <span className="text-[13px] font-medium">৳{row.price?.toLocaleString()}</span>
+            )}
+          </div>
+        );
+      }
     },
     { 
       key: "inventory", 

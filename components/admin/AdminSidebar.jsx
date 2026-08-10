@@ -14,6 +14,7 @@ import {
   Package,
   Palette,
   Quote,
+  Receipt,
   Search,
   Settings,
   Share2,
@@ -72,6 +73,7 @@ const NAV_GROUPS = [
     label: "Store",
     items: [
       { label: "Analytics", href: "/admin/analytics", icon: LineChart },
+      { label: "Expenses", href: "/admin/expenses", icon: Receipt },
       { label: "Navigation", href: "/admin/navigation", icon: Layers },
       { label: "Attributes", href: "/admin/attributes", icon: Hash },
       { label: "Branding", href: "/admin/branding", icon: Palette },

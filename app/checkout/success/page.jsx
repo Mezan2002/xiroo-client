@@ -128,9 +128,9 @@ function OrderSuccessContent() {
 
   // Calculate Breakdown using authoritative order data
   const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const delivery = order.shippingFee || (order.totalPrice - subtotal);
   const discount = order.discount || null;
   const discountAmount = discount?.amount ? Math.round(discount.amount * 100) / 100 : 0;
+  const delivery = order.shippingFee !== undefined ? order.shippingFee : Math.max(0, order.totalPrice - subtotal + discountAmount);
 
   // Group items by product ID and variant
   const groupedItems = order.items.reduce((acc, item) => {
