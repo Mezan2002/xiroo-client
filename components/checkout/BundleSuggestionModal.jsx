@@ -41,16 +41,16 @@ export default function BundleSuggestionModal({ items, onAccept, onDecline }) {
   const savings = subtotal - discountedTotal;
 
   useEffect(() => {
-    if (eligibleItems.length >= 2 && !isOpen) {
+    if (totalEligibleQuantity >= 2 && !isOpen) {
       const dismissed = sessionStorage.getItem("bundle_suggestion_dismissed");
       if (!dismissed) {
         const timer = setTimeout(() => setIsOpen(true), 800);
         return () => clearTimeout(timer);
       }
     }
-  }, [eligibleItems.length]);
+  }, [totalEligibleQuantity]);
 
-  if (!isOpen || eligibleItems.length < 2) return null;
+  if (!isOpen || totalEligibleQuantity < 2) return null;
 
   const handleAccept = () => {
     setIsOpen(false);
@@ -82,7 +82,7 @@ export default function BundleSuggestionModal({ items, onAccept, onDecline }) {
                 Create a Bundle & Save!
               </h3>
               <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                {totalEligibleQuantity} eligible items in your cart
+                {totalEligibleQuantity} eligible items in your cart ({eligibleItems.length} {eligibleItems.length === 1 ? 'product' : 'products'})
               </p>
             </div>
           </div>
