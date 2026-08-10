@@ -67,25 +67,27 @@ export default function RecentActivity({ orders = [], users = [] }) {
           <div
             key={`${activity.type}-${activity.id}`}
             onClick={() => router.push(activity.link)}
-            className="flex items-center justify-between py-3.5 border-b border-zinc-50 last:border-0 cursor-pointer hover:bg-zinc-50 transition-colors px-2 -mx-2 rounded"
+            className="flex items-start justify-between py-3.5 border-b border-zinc-50 last:border-0 cursor-pointer hover:bg-zinc-50 transition-colors px-2 -mx-2 rounded gap-3"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="w-9 h-9 bg-zinc-50 flex items-center justify-center flex-shrink-0">
                 <activity.icon size={15} strokeWidth={1.5} className="text-zinc-400" />
               </div>
-              <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-zinc-800 truncate">
-                  {activity.title}
-                  <span className="ml-2 text-[8px] font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-500 uppercase tracking-wider">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-[12px] font-semibold text-zinc-800 truncate">
+                    {activity.title}
+                  </p>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-500 uppercase tracking-wider flex-shrink-0">
                     {activity.badge}
                   </span>
-                </p>
+                </div>
                 <p className="text-[10px] text-zinc-400 truncate mt-0.5">
                   {activity.description}
                 </p>
               </div>
             </div>
-            <div className="text-right flex-shrink-0 ml-3">
+            <div className="text-right flex-shrink-0">
               <p className="text-[12px] font-bold text-zinc-700">
                 {activity.meta}
               </p>

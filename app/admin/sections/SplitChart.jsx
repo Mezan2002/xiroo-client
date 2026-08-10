@@ -27,7 +27,7 @@ export default function SplitChart({ title, subtitle, data = [] }) {
         <p className="text-[11px] text-zinc-400 mt-1">{subtitle}</p>
       </div>
       {chartData.length > 0 ? (
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="w-[100px] h-[100px] flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -49,14 +49,14 @@ export default function SplitChart({ title, subtitle, data = [] }) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex-1 space-y-2.5">
+          <div className="flex-1 space-y-2.5 w-full">
             {chartData.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                  <span className="text-[11px] text-zinc-500 capitalize">{d.name}</span>
+              <div key={d.name} className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                  <span className="text-[11px] text-zinc-500 capitalize truncate">{d.name}</span>
                 </div>
-                <span className="text-[12px] font-bold text-zinc-700">{d.value}</span>
+                <span className="text-[12px] font-bold text-zinc-700 flex-shrink-0">{d.value}</span>
               </div>
             ))}
           </div>

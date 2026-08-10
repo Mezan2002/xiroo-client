@@ -131,7 +131,7 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       <ModuleHeader
         breadcrumbs={[
           { label: "Admin", href: "/admin" },

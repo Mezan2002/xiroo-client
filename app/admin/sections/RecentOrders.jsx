@@ -46,24 +46,24 @@ export default function RecentOrders({ orders = [] }) {
             <div
               key={order._id}
               onClick={() => router.push(`/admin/orders/${order._id}`)}
-              className="flex items-center justify-between py-3 border-b border-zinc-50 last:border-0 cursor-pointer hover:bg-zinc-50 transition-colors px-2 -mx-2 rounded"
+              className="flex items-start justify-between py-3 border-b border-zinc-50 last:border-0 cursor-pointer hover:bg-zinc-50 transition-colors px-2 -mx-2 rounded gap-3"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-500">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-8 h-8 bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-500 flex-shrink-0">
                   {name.charAt(0)}
                 </div>
-                <div>
-                  <p className="text-[12px] font-semibold text-zinc-800">{name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-semibold text-zinc-800 truncate">{name}</p>
                   <p className="text-[9px] text-zinc-400 mt-0.5">{order.orderId}</p>
                 </div>
               </div>
-              <div className="text-right flex items-center gap-3">
-                <span className={`text-[9px] font-bold uppercase px-2 py-0.5 border ${STATUS_COLORS[order.status] || "bg-zinc-50 text-zinc-600 border-zinc-200"}`}>
-                  {order.status}
-                </span>
-                <p className="text-[12px] font-bold text-zinc-700 w-20 text-right">
+              <div className="text-right flex-shrink-0">
+                <p className="text-[12px] font-bold text-zinc-700">
                   ৳{order.totalPrice?.toLocaleString()}
                 </p>
+                <span className={`inline-block text-[8px] font-bold uppercase px-1.5 py-0.5 border mt-1 ${STATUS_COLORS[order.status] || "bg-zinc-50 text-zinc-600 border-zinc-200"}`}>
+                  {order.status}
+                </span>
               </div>
             </div>
           );

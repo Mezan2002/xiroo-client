@@ -79,29 +79,31 @@ export default function OrderHeader({ order, isUpdatingStatus, handleStatusChang
       title={`#${order.orderId}`}
       icon={ShoppingBag}
       actions={
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           {/* Status pill */}
-          <div className={`inline-flex items-center gap-2 px-4 h-10 ${styles.bg} border ${styles.border}`}>
+          <div className={`inline-flex items-center gap-2 px-4 h-10 ${styles.bg} border ${styles.border} justify-center sm:justify-start`}>
             <span className={`w-2 h-2 rounded-full ${styles.dot}`} />
-            <span className={`text-[11px] font-bold tracking-wide ${styles.text}`}>{label}</span>
+            <span className={`text-[11px] font-bold tracking-wide ${styles.text} whitespace-nowrap`}>{label}</span>
           </div>
 
-          {/* Status dropdown */}
-          <div className="w-52">
-            {isUpdatingStatus && (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400 absolute ml-[-20px] mt-2.5" />
-            )}
-            <Select
-              options={statusOptions}
-              value={order.status}
-              onChange={handleStatusChange}
-              className="!h-10"
-              disabled={isUpdatingStatus || terminalStatuses.includes(order.status)}
-            />
-          </div>
+          <div className="flex items-center gap-3">
+            {/* Status dropdown */}
+            <div className="flex-1 sm:flex-none sm:w-52">
+              {isUpdatingStatus && (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400 absolute ml-[-20px] mt-2.5" />
+              )}
+              <Select
+                options={statusOptions}
+                value={order.status}
+                onChange={handleStatusChange}
+                className="!h-10"
+                disabled={isUpdatingStatus || terminalStatuses.includes(order.status)}
+              />
+            </div>
 
-          {/* Invoice download */}
-          <AdminInvoiceDownload order={order} />
+            {/* Invoice download */}
+            <AdminInvoiceDownload order={order} />
+          </div>
         </div>
       }
     />
