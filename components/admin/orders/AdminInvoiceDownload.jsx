@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
+import { Download, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import AdminInvoiceTemplate from "./AdminInvoiceTemplate";
 
 export default function AdminInvoiceDownload({ order }) {
@@ -81,7 +81,17 @@ export default function AdminInvoiceDownload({ order }) {
           // Set canvas to the slice height
           canvas.height = srcSliceHeight;
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, srcY, totalImgWidth, srcSliceHeight, 0, 0, totalImgWidth, srcSliceHeight);
+          ctx.drawImage(
+            img,
+            0,
+            srcY,
+            totalImgWidth,
+            srcSliceHeight,
+            0,
+            0,
+            totalImgWidth,
+            srcSliceHeight,
+          );
 
           const sliceData = canvas.toDataURL("image/png");
           const slicePdfHeight = (srcSliceHeight / totalImgWidth) * pdfWidth;
@@ -112,12 +122,12 @@ export default function AdminInvoiceDownload({ order }) {
       <button
         onClick={handleDownloadInvoice}
         disabled={downloading}
-        className="inline-flex items-center justify-center gap-2 px-4 h-10 bg-white border border-zinc-200 text-zinc-700 text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-zinc-50 hover:border-zinc-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 h-9 sm:h-10 bg-white border border-zinc-200 text-zinc-700 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.12em] sm:tracking-[0.15em] hover:bg-zinc-50 hover:border-zinc-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
       >
         {downloading ? (
-          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
         ) : (
-          <Download className="w-3.5 h-3.5" />
+          <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         )}
         {downloading ? "Generating..." : "Download Invoice"}
       </button>

@@ -137,7 +137,7 @@ export default function OrderDetailsPage() {
   const editedTotal = Math.round((editedSubtotal - editedCouponDiscount + (Number(editedShippingFee) || 0)) * 100) / 100;
 
   return (
-    <div className="max-w-[1200px] mx-auto pb-16 animate-in fade-in duration-300 overflow-x-hidden">
+    <div className="max-w-[1200px] mx-auto pb-24 animate-in fade-in duration-300 overflow-x-hidden">
       <OrderHeader order={order} isUpdatingStatus={isUpdatingStatus} handleStatusChange={handleStatusChange} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-5">

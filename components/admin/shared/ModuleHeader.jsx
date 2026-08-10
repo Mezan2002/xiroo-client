@@ -45,7 +45,7 @@ export default function ModuleHeader({
 
         {/* Middle Tier: Title & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
-          <h1 className="text-2xl md:text-3xl font-light tracking-tight text-black truncate">
+          <h1 className="text-xl md:text-3xl font-light tracking-tight text-black truncate">
             {title}
           </h1>
 
