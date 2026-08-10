@@ -25,6 +25,9 @@ const actionConfig = {
   advance_payment_requested: { color: "bg-amber-500", icon: "●", label: "Payment Requested" },
   advance_payment_confirmed: { color: "bg-emerald-500", icon: "●", label: "Payment Confirmed" },
   advance_payment_waived: { color: "bg-zinc-400", icon: "●", label: "Payment Waived" },
+  return_note_added: { color: "bg-rose-500", icon: "●", label: "Return Note Added" },
+  return_note_updated: { color: "bg-amber-500", icon: "●", label: "Return Note Updated" },
+  return_note_removed: { color: "bg-zinc-400", icon: "●", label: "Return Note Removed" },
 };
 
 function getRoleBadge(role) {
@@ -146,6 +149,41 @@ function renderDetails(event) {
 
   if (action === 'order_updated' && details?.changes) {
     return renderFieldChanges(details.changes);
+  }
+
+  if (action === 'return_note_added' && details?.changes?.returnNote) {
+    const change = details.changes.returnNote;
+    return (
+      <div className="mt-2 p-2 bg-rose-50 border border-rose-100">
+        <p className="text-[10px] text-rose-600 font-bold uppercase tracking-wider mb-1">Return Reason</p>
+        <p className="text-[11px] text-rose-800">{change.new}</p>
+      </div>
+    );
+  }
+
+  if (action === 'return_note_updated' && details?.changes?.returnNote) {
+    const change = details.changes.returnNote;
+    return (
+      <div className="mt-2 space-y-1">
+        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Return Reason Updated</p>
+        <div className="text-[11px]">
+          <span className="text-zinc-400 line-through">{change.old}</span>
+        </div>
+        <div className="text-[11px]">
+          <span className="font-medium text-zinc-700">{change.new}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (action === 'return_note_removed' && details?.changes?.returnNote) {
+    const change = details.changes.returnNote;
+    return (
+      <div className="mt-2">
+        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Return Reason Removed</p>
+        <p className="text-[11px] text-zinc-400 line-through">{change.old}</p>
+      </div>
+    );
   }
 
   if (action === 'prices_updated' && details?.itemChanges) {

@@ -16,15 +16,21 @@ const statusConfig = {
 };
 
 const statusBadgeColors = {
-  pending: "bg-yellow-100 text-yellow-700",
+  pending: "bg-zinc-100 text-zinc-600",
   processing: "bg-blue-100 text-blue-700",
-  shipped: "bg-purple-100 text-purple-700",
+  "given-for-design": "bg-purple-100 text-purple-700",
+  "ready-to-pack": "bg-amber-100 text-amber-700",
+  "packed-for-delivery": "bg-orange-100 text-orange-700",
+  shipped: "bg-blue-100 text-blue-700",
+  "at-last-hub": "bg-cyan-100 text-cyan-700",
+  "assigned-for-delivery": "bg-indigo-100 text-indigo-700",
   delivered: "bg-green-100 text-green-700",
-  cancelled: "bg-gray-100 text-gray-700",
-  failed: "bg-red-100 text-red-700",
-  returned: "bg-orange-100 text-orange-700",
-  "on-hold": "bg-yellow-100 text-yellow-700",
-  refused: "bg-red-100 text-red-700",
+  returned: "bg-rose-100 text-rose-700",
+  "return-received": "bg-rose-100 text-rose-700",
+  "on-hold": "bg-amber-100 text-amber-700",
+  cancelled: "bg-rose-100 text-rose-700",
+  failed: "bg-zinc-100 text-zinc-600",
+  refused: "bg-rose-100 text-rose-600",
 };
 
 export default function CustomerDetailPage({ params }) {

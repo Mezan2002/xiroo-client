@@ -2,14 +2,20 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 const STATUS_COLORS = {
-  pending: "#eab308",
+  pending: "#a1a1aa",
   processing: "#3b82f6",
-  shipped: "#8b5cf6",
+  "given-for-design": "#a855f7",
+  "ready-to-pack": "#f59e0b",
+  "packed-for-delivery": "#f97316",
+  shipped: "#3b82f6",
+  "at-last-hub": "#06b6d4",
+  "assigned-for-delivery": "#6366f1",
   delivered: "#10b981",
+  returned: "#ef4444",
+  "return-received": "#dc2626",
+  "on-hold": "#f59e0b",
   cancelled: "#ef4444",
   failed: "#6b7280",
-  returned: "#f97316",
-  "on-hold": "#f59e0b",
   refused: "#dc2626",
 };
 

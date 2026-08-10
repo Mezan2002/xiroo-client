@@ -85,8 +85,8 @@ export const useOrders = () => {
 
   // 4. Admin Management protocols: Status synchronization
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }) => {
-      const response = await axiosInstance.patch(`/orders/${id}/status`, { status });
+    mutationFn: async ({ id, status, returnNote }) => {
+      const response = await axiosInstance.patch(`/orders/${id}/status`, { status, returnNote });
       return response;
     },
     onSuccess: (data, { id }) => {

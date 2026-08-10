@@ -2,15 +2,21 @@ import { useRouter } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 
 const STATUS_COLORS = {
-  pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  pending: "bg-zinc-100 text-zinc-600 border-zinc-200",
   processing: "bg-blue-50 text-blue-700 border-blue-200",
-  shipped: "bg-purple-50 text-purple-700 border-purple-200",
+  "given-for-design": "bg-purple-50 text-purple-700 border-purple-200",
+  "ready-to-pack": "bg-amber-50 text-amber-700 border-amber-200",
+  "packed-for-delivery": "bg-orange-50 text-orange-700 border-orange-200",
+  shipped: "bg-blue-50 text-blue-700 border-blue-200",
+  "at-last-hub": "bg-cyan-50 text-cyan-700 border-cyan-200",
+  "assigned-for-delivery": "bg-indigo-50 text-indigo-700 border-indigo-200",
   delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  cancelled: "bg-red-50 text-red-700 border-red-200",
-  failed: "bg-zinc-50 text-zinc-600 border-zinc-200",
-  returned: "bg-orange-50 text-orange-700 border-orange-200",
+  returned: "bg-rose-50 text-rose-700 border-rose-200",
+  "return-received": "bg-rose-50 text-rose-700 border-rose-200",
   "on-hold": "bg-amber-50 text-amber-700 border-amber-200",
-  refused: "bg-red-50 text-red-600 border-red-200",
+  cancelled: "bg-rose-50 text-rose-700 border-rose-200",
+  failed: "bg-zinc-50 text-zinc-600 border-zinc-200",
+  refused: "bg-rose-50 text-rose-600 border-rose-200",
 };
 
 export default function RecentOrders({ orders = [] }) {

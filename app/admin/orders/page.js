@@ -168,7 +168,7 @@ export default function AdminOrders() {
           />
         </div>
         <div className="flex gap-4">
-          <div className="w-40">
+          <div className="w-44">
             <Select
               value={statusFilter}
               onChange={(val) => { setStatusFilter(val); setPage(1); }}
@@ -177,11 +177,19 @@ export default function AdminOrders() {
                 { value: "all", label: "All Status" },
                 { value: "pending", label: "Pending" },
                 { value: "processing", label: "Processing" },
+                { value: "given-for-design", label: "Given for Design" },
+                { value: "ready-to-pack", label: "Ready to Pack" },
+                { value: "packed-for-delivery", label: "Packed for Delivery" },
                 { value: "shipped", label: "Shipped" },
+                { value: "at-last-hub", label: "At Last Hub" },
+                { value: "assigned-for-delivery", label: "Assigned for Delivery" },
                 { value: "delivered", label: "Delivered" },
-                { value: "cancelled", label: "Cancelled" },
                 { value: "returned", label: "Returned" },
+                { value: "return-received", label: "Return Received" },
+                { value: "on-hold", label: "On Hold" },
+                { value: "cancelled", label: "Cancelled" },
                 { value: "failed", label: "Failed" },
+                { value: "refused", label: "Refused" },
               ]}
             />
           </div>

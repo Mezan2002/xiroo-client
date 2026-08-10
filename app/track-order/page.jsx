@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Search, Package, Clock, Truck, CheckCircle2, AlertCircle } from "lucide-react";
+import { Search, Package, Clock, Truck, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
 import { useOrders } from "@/hooks/api/useOrders";
 import { useStoreSettings } from "@/hooks/api/useStoreSettings";
 import Image from "next/image";
@@ -33,10 +33,25 @@ export default function TrackOrderPage() {
         return <Clock className="w-5 h-5 text-yellow-500" />;
       case "processing":
         return <Package className="w-5 h-5 text-blue-500" />;
+      case "given-for-design":
+      case "ready-to-pack":
+      case "packed-for-delivery":
+        return <Package className="w-5 h-5 text-amber-500" />;
       case "shipped":
-        return <Truck className="w-5 h-5 text-purple-500" />;
+      case "at-last-hub":
+      case "assigned-for-delivery":
+        return <Truck className="w-5 h-5 text-blue-500" />;
       case "delivered":
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case "returned":
+      case "return-received":
+        return <AlertCircle className="w-5 h-5 text-red-500" />;
+      case "on-hold":
+        return <Clock className="w-5 h-5 text-amber-500" />;
+      case "cancelled":
+      case "failed":
+      case "refused":
+        return <XCircle className="w-5 h-5 text-red-500" />;
       default:
         return <Package className="w-5 h-5 text-gray-500" />;
     }
@@ -48,15 +63,38 @@ export default function TrackOrderPage() {
         return "Order Received";
       case "processing":
         return "Processing";
+      case "given-for-design":
+        return "Given for Design";
+      case "ready-to-pack":
+        return "Ready to Pack";
+      case "packed-for-delivery":
+        return "Packed for Delivery";
       case "shipped":
         return "Shipped";
+      case "at-last-hub":
+        return "At Delivery Hub";
+      case "assigned-for-delivery":
+        return "Out for Delivery";
       case "delivered":
         return "Delivered";
+      case "returned":
+        return "Returned";
+      case "return-received":
+        return "Return Received";
+      case "on-hold":
+        return "On Hold";
+      case "cancelled":
+        return "Cancelled";
+      case "failed":
+        return "Failed";
+      case "refused":
+        return "Refused";
       default:
         return status;
     }
   };
 
+  // Customer-friendly status flow (simplified)
   const statuses = ["pending", "processing", "shipped", "delivered"];
   const currentStatusIndex = order ? statuses.indexOf(order.status) : -1;
 

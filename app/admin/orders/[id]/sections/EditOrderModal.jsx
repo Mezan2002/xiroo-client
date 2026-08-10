@@ -123,7 +123,7 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
 
   if (!isOpen || !order) return null;
 
-  const editableStatuses = ["pending", "processing", "on-hold"];
+  const editableStatuses = ["pending", "processing", "given-for-design", "ready-to-pack", "on-hold"];
   const isEditable = editableStatuses.includes(order.status);
 
   return (

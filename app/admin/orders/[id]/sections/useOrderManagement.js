@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
-  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices } = useOrders();
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder } = useOrders();
   const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -20,6 +20,15 @@ export const useOrderManagement = (id) => {
   const [carrybeeCodAmount, setCarrybeeCodAmount] = useState("");
   const [carrybeeProductType, setCarrybeeProductType] = useState("1");
   const [carrybeeDeliveryType, setCarrybeeDeliveryType] = useState("1");
+
+  // Return note state
+  const [isReturnNoteModalOpen, setIsReturnNoteModalOpen] = useState(false);
+  const [returnNote, setReturnNote] = useState("");
+  const [pendingStatus, setPendingStatus] = useState(null);
+
+  // Edit return note state
+  const [isEditingReturnNote, setIsEditingReturnNote] = useState(false);
+  const [editedReturnNote, setEditedReturnNote] = useState("");
 
   // Price override editing state
   const [isEditingPrices, setIsEditingPrices] = useState(false);
@@ -45,10 +54,76 @@ export const useOrderManagement = (id) => {
   }, [order, isEditingPrices]);
 
   const handleStatusChange = async (newStatus) => {
+    // Show return note modal only when changing to "returned" status (not return-received)
+    if (newStatus === "returned") {
+      setPendingStatus(newStatus);
+      setReturnNote("");
+      setIsReturnNoteModalOpen(true);
+      return;
+    }
+
     updateStatus.mutate({ id, status: newStatus }, {
-      onSuccess: () => toast.success(`Order status updated to ${newStatus}`),
+      onSuccess: () => toast.success(`Order status updated to ${newStatus.replace(/-/g, " ")}`),
       onError: (err) => toast.error(err.message || "Failed to update status")
     });
+  };
+
+  const handleReturnNoteConfirm = async () => {
+    if (!returnNote.trim()) {
+      toast.error("Please enter a reason for the return");
+      return;
+    }
+    updateStatus.mutate({ id, status: pendingStatus, returnNote: returnNote.trim() }, {
+      onSuccess: () => {
+        toast.success(`Order status updated to ${pendingStatus.replace(/-/g, " ")}`);
+        setIsReturnNoteModalOpen(false);
+        setPendingStatus(null);
+        setReturnNote("");
+      },
+      onError: (err) => toast.error(err.message || "Failed to update status")
+    });
+  };
+
+  const handleReturnNoteCancel = () => {
+    setIsReturnNoteModalOpen(false);
+    setPendingStatus(null);
+    setReturnNote("");
+  };
+
+  // Edit return note handlers
+  const handleEditReturnNote = () => {
+    setEditedReturnNote(order?.returnNote || "");
+    setIsEditingReturnNote(true);
+  };
+
+  const handleSaveReturnNote = async () => {
+    if (!editedReturnNote.trim()) {
+      toast.error("Please enter a return reason");
+      return;
+    }
+    updateOrder.mutate({ id, data: { returnNote: editedReturnNote.trim() } }, {
+      onSuccess: () => {
+        toast.success("Return note updated");
+        setIsEditingReturnNote(false);
+      },
+      onError: (err) => toast.error(err.message || "Failed to update return note")
+    });
+  };
+
+  const handleRemoveReturnNote = async () => {
+    updateOrder.mutate({ id, data: { returnNote: "" } }, {
+      onSuccess: () => {
+        toast.success("Return note removed");
+        setIsEditingReturnNote(false);
+        setEditedReturnNote("");
+      },
+      onError: (err) => toast.error(err.message || "Failed to remove return note")
+    });
+  };
+
+  const handleCancelEditReturnNote = () => {
+    setIsEditingReturnNote(false);
+    setEditedReturnNote("");
   };
 
   const handleConfirmCancellation = async () => {
@@ -176,6 +251,15 @@ export const useOrderManagement = (id) => {
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
     isEditingPrices, setIsEditingPrices, editedItems, editedShippingFee, setEditedShippingFee,
     handleEditedItemChange, handlePriceOverrideSave, handleCancelPriceEdit,
+    // Return note modal
+    isReturnNoteModalOpen, setIsReturnNoteModalOpen,
+    returnNote, setReturnNote,
+    pendingStatus, setPendingStatus,
+    handleReturnNoteConfirm, handleReturnNoteCancel,
+    // Edit return note
+    isEditingReturnNote, setIsEditingReturnNote,
+    editedReturnNote, setEditedReturnNote,
+    handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
     isUpdatingStatus: updateStatus.isPending,
     isCancelling: cancelOrder.isPending,
     isDispatching: dispatchCourier.isPending,

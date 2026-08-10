@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine } from "lucide-react";
+import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine, AlertTriangle } from "lucide-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -36,6 +36,15 @@ export default function OrderDetailsPage() {
     isRequestingAdvancePayment, isConfirmingAdvancePayment, isWaivingAdvancePayment,
     isEditingPrices, setIsEditingPrices, editedItems, editedShippingFee, setEditedShippingFee,
     handleEditedItemChange, handlePriceOverrideSave, handleCancelPriceEdit, isSavingPrices,
+    // Return note
+    isReturnNoteModalOpen, setIsReturnNoteModalOpen,
+    returnNote, setReturnNote,
+    pendingStatus, setPendingStatus,
+    handleReturnNoteConfirm, handleReturnNoteCancel,
+    // Edit return note
+    isEditingReturnNote, setIsEditingReturnNote,
+    editedReturnNote, setEditedReturnNote,
+    handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
   } = useOrderManagement(id);
 
   if (loading) {
@@ -67,7 +76,7 @@ export default function OrderDetailsPage() {
 
   const phone = order.guestInfo?.phone || order.user?.phoneNumber;
   const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
-  const canEditPrices = ["pending", "processing", "on-hold"].includes(order.status);
+  const canEditPrices = ["pending", "processing", "given-for-design", "ready-to-pack", "on-hold"].includes(order.status);
 
   const rawSubtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const delivery = order.shippingFee !== undefined ? order.shippingFee : Math.max(0, order.totalPrice - rawSubtotal);
@@ -392,7 +401,7 @@ export default function OrderDetailsPage() {
           </div>
 
           {/* Actions */}
-          {["pending", "processing", "on-hold"].includes(order.status) && (
+          {["pending", "processing", "given-for-design", "ready-to-pack", "on-hold"].includes(order.status) && (
             <button
               onClick={() => setIsEditModalOpen(true)}
               className="w-full px-5 py-2.5 bg-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
@@ -406,6 +415,71 @@ export default function OrderDetailsPage() {
         {/* ── Right Column ── */}
         <div className="lg:col-span-5 space-y-5">
           <EventHistoryCard order={order} />
+
+          {/* Return Note Card - Show for returned/return-received orders */}
+          {["returned", "return-received"].includes(order.status) && (
+            <div className="bg-rose-50 border border-rose-200 overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-rose-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-rose-600" />
+                  <h3 className="text-[11px] font-bold text-rose-700 uppercase tracking-[0.15em]">Return Reason</h3>
+                </div>
+                {!isEditingReturnNote && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleEditReturnNote}
+                      className="text-[10px] font-bold text-rose-600 hover:text-rose-800 uppercase tracking-wider"
+                    >
+                      {order.returnNote ? "Edit" : "Add Note"}
+                    </button>
+                    {order.returnNote && (
+                      <>
+                        <span className="text-rose-300">|</span>
+                        <button
+                          onClick={handleRemoveReturnNote}
+                          className="text-[10px] font-bold text-zinc-400 hover:text-rose-600 uppercase tracking-wider"
+                        >
+                          Remove
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="p-5">
+                {isEditingReturnNote ? (
+                  <div className="space-y-3">
+                    <textarea
+                      value={editedReturnNote}
+                      onChange={(e) => setEditedReturnNote(e.target.value)}
+                      placeholder="Enter the reason for return..."
+                      rows={3}
+                      className="w-full px-4 py-3 border border-rose-200 bg-white text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-rose-400 resize-none"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleSaveReturnNote}
+                        disabled={!editedReturnNote.trim()}
+                        className="px-3 py-1.5 bg-rose-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-rose-700 transition-colors disabled:opacity-50"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancelEditReturnNote}
+                        className="px-3 py-1.5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest hover:text-zinc-700 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[13px] text-rose-800 leading-relaxed">
+                    {order.returnNote || <span className="italic text-rose-400">No return note added</span>}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           <CourierLogisticsCard
             deliveryInfo={order.deliveryInfo}
@@ -474,6 +548,53 @@ export default function OrderDetailsPage() {
         isProcessing={isRequestingAdvancePayment}
         orderTotal={order.totalPrice}
       />
+
+      {/* Return Note Modal */}
+      {isReturnNoteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleReturnNoteCancel} />
+          <div className="relative bg-white w-full max-w-md mx-4 shadow-2xl">
+            <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-[14px] font-bold text-zinc-900">Return Note Required</h3>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  Status will change to <span className="font-bold text-zinc-600">{pendingStatus?.replace(/-/g, " ")}</span>
+                </p>
+              </div>
+              <button onClick={handleReturnNoteCancel} className="p-2 text-zinc-400 hover:text-zinc-600">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="p-6">
+              <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2">
+                Why is this order being returned?
+              </label>
+              <textarea
+                value={returnNote}
+                onChange={(e) => setReturnNote(e.target.value)}
+                placeholder="Enter the reason for return..."
+                rows={4}
+                className="w-full px-4 py-3 border border-zinc-200 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-400 resize-none"
+              />
+            </div>
+            <div className="px-6 py-4 border-t border-zinc-100 flex items-center justify-end gap-3">
+              <button
+                onClick={handleReturnNoteCancel}
+                className="px-4 py-2 border border-zinc-200 text-[11px] font-bold uppercase tracking-widest text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReturnNoteConfirm}
+                disabled={!returnNote.trim()}
+                className="px-4 py-2 bg-black text-white text-[11px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Confirm Status Change
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <EditOrderModal
         isOpen={isEditModalOpen}

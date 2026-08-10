@@ -42,15 +42,51 @@ export default function DataTable({ columns, data, loading, onEdit, onDelete, on
         );
       case 'status':
         const status = row[col.key];
+        const getStatusStyle = (s) => {
+          const val = s?.toLowerCase();
+          switch (val) {
+            case 'pending':
+              return 'bg-zinc-100 text-zinc-600 border-zinc-200';
+            case 'processing':
+              return 'bg-blue-50 text-blue-600 border-blue-200';
+            case 'given-for-design':
+              return 'bg-purple-50 text-purple-600 border-purple-200';
+            case 'ready-to-pack':
+              return 'bg-amber-50 text-amber-600 border-amber-200';
+            case 'packed-for-delivery':
+              return 'bg-orange-50 text-orange-600 border-orange-200';
+            case 'shipped':
+              return 'bg-blue-50 text-blue-600 border-blue-200';
+            case 'at-last-hub':
+              return 'bg-cyan-50 text-cyan-600 border-cyan-200';
+            case 'assigned-for-delivery':
+              return 'bg-indigo-50 text-indigo-600 border-indigo-200';
+            case 'delivered':
+              return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+            case 'returned':
+              return 'bg-rose-50 text-rose-600 border-rose-200';
+            case 'return-received':
+              return 'bg-rose-50 text-rose-600 border-rose-200';
+            case 'on-hold':
+              return 'bg-amber-50 text-amber-600 border-amber-200';
+            case 'cancelled':
+            case 'failed':
+            case 'refused':
+              return 'bg-rose-50 text-rose-600 border-rose-200';
+            case 'active':
+            case 'completed':
+            case 'paid':
+            case 'approved':
+              return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+            case 'draft':
+              return 'bg-amber-50 text-amber-600 border-amber-200';
+            default:
+              return 'bg-zinc-50 text-zinc-600 border-zinc-200';
+          }
+        };
         return (
-          <span className={`text-[10px] font-bold px-2 py-[2px] rounded-none border uppercase tracking-widest ${
-            status?.toLowerCase() === 'active' || status?.toLowerCase() === 'completed' || status?.toLowerCase() === 'paid' || status?.toLowerCase() === 'delivered' || status?.toLowerCase() === 'approved'
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-              : status?.toLowerCase() === 'draft' || status?.toLowerCase() === 'processing' || status?.toLowerCase() === 'pending'
-              ? 'bg-amber-50 text-amber-700 border-amber-100'
-              : 'bg-rose-50 text-rose-700 border-rose-100'
-          }`}>
-            {status?.toUpperCase()}
+          <span className={`text-[10px] font-bold px-2 py-[2px] rounded-none border uppercase tracking-widest ${getStatusStyle(status)}`}>
+            {status?.toUpperCase()?.replace(/-/g, ' ')}
           </span>
         );
       case 'currency':
