@@ -16,11 +16,11 @@ const courierColors = {
   Pathao: { bg: "bg-violet-50", text: "text-violet-700", border: "border-violet-200" },
   Steadfast: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
   Redx: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
-  Paperfly: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
+  CarryBee: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
 };
 
 const CourierStatRow = ({ name, data }) => {
-  const colors = courierColors[name] || courierColors.Paperfly;
+  const colors = courierColors[name] || courierColors.CarryBee;
   const successRate = data.total > 0 ? ((data.success / data.total) * 100).toFixed(1) : 0;
 
   return (
@@ -65,7 +65,7 @@ const CourierStatRow = ({ name, data }) => {
   );
 };
 
-export default function FraudBDCheckCard({ phone }) {
+export default function CourierFraudCheckCard({ phone }) {
   const [showResults, setShowResults] = useState(false);
 
   const { mutate: checkCourier, data: fraudData, isPending, reset } = useMutation({
@@ -87,7 +87,7 @@ export default function FraudBDCheckCard({ phone }) {
       <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
         <h3 className="text-[13px] font-bold text-zinc-900 tracking-tight flex items-center gap-2">
           <Shield className="w-4 h-4 text-zinc-400" />
-          FraudBD Courier Check
+          Courier Fraud Check
         </h3>
         {result && risk && (
           <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 ${risk.bg} ${risk.text} border ${risk.border}`}>

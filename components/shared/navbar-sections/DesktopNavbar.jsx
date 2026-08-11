@@ -32,7 +32,7 @@ export default function DesktopNavbar({
   currentUser,
   isLoggedIn,
   itemCount,
-  pendingOrders,
+  notificationCount,
   setIsSearchOpen,
   setIsCartOpen,
   setIsUserOpen,
@@ -94,9 +94,9 @@ export default function DesktopNavbar({
               >
                 <LayoutGrid className="w-[18px] h-[18px] stroke-[1.5]" />
               </Button>
-              {pendingOrders > 0 && (
+              {notificationCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold text-white">
-                  {pendingOrders}
+                  {notificationCount}
                 </span>
               )}
             </Link>

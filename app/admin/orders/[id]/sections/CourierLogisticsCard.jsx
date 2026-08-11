@@ -1,11 +1,16 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import { useState, useEffect } from "react";
-import { Truck, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { fetchCarrybeeCities, fetchCarrybeeZones } from "@/lib/carrybeeLocations";
+import {
+  fetchCarrybeeCities,
+  fetchCarrybeeZones,
+} from "@/lib/carrybeeLocations";
+import { ExternalLink, Loader2, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const LABEL = "text-[10px] text-zinc-400 font-bold uppercase tracking-widest";
-const INPUT = "w-full h-10 px-3 bg-white border border-zinc-200 text-[11px] font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-black rounded-none";
+const INPUT =
+  "w-full h-10 px-3 bg-white border border-zinc-200 text-[11px] font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-black rounded-none";
 
 export default function CourierLogisticsCard({
   deliveryInfo,
@@ -25,6 +30,8 @@ export default function CourierLogisticsCard({
   setCarrybeeProductType,
   carrybeeDeliveryType,
   setCarrybeeDeliveryType,
+  carrybeeSecondaryPhone,
+  setCarrybeeSecondaryPhone,
   handleCourierDispatch,
   isDispatching,
   isCancelled,
@@ -59,7 +66,9 @@ export default function CourierLogisticsCard({
   return (
     <div className="bg-white border border-zinc-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-zinc-100">
-        <h3 className="text-[13px] font-bold text-zinc-900 tracking-tight">Courier Logistics</h3>
+        <h3 className="text-[13px] font-bold text-zinc-900 tracking-tight">
+          Courier Logistics
+        </h3>
       </div>
       <div className="p-6">
         {deliveryInfo?.trackingId ? (
@@ -71,25 +80,27 @@ export default function CourierLogisticsCard({
               </div>
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                 <span className="text-zinc-400">Tracking ID</span>
-                <span className="text-black font-mono">{deliveryInfo.trackingId}</span>
+                <span className="text-black font-mono">
+                  {deliveryInfo.trackingId}
+                </span>
               </div>
             </div>
             <Button
               variant="outline"
-              className="w-full h-10 text-[10px] font-bold uppercase tracking-widest border-zinc-200 flex items-center justify-center gap-2"
+              className="w-full h-10 text-[10px] font-bold uppercase tracking-widest border-zinc-200 flex items-center justify-center gap-2 group"
               onClick={() => {
                 const trackingUrls = {
                   steadfast: `https://portal.steadfast.com.bd/tracking/${deliveryInfo.trackingId}`,
                   pathao: `https://pathao.com/courier/tracking?tracking_id=${deliveryInfo.trackingId}`,
                   redx: `https://redx.com.bd/tracking/?trackingId=${deliveryInfo.trackingId}`,
-                  carrybee: `https://carrybee.com/track`,
+                  carrybee: `https://merchant.carrybee.com/order-track/${deliveryInfo.consignmentId}`,
                 };
                 const url = trackingUrls[deliveryInfo.provider];
                 if (url) window.open(url, "_blank");
               }}
+              icon={ExternalLink}
             >
               Track on {deliveryInfo.provider}
-              <ExternalLink className="w-3 h-3" />
             </Button>
           </div>
         ) : (
@@ -125,9 +136,13 @@ export default function CourierLogisticsCard({
                     }}
                     className={INPUT + " appearance-none"}
                   >
-                    <option value="">{loadingCities ? "Loading cities..." : "Select City"}</option>
+                    <option value="">
+                      {loadingCities ? "Loading cities..." : "Select City"}
+                    </option>
                     {cities.map((city) => (
-                      <option key={city.id} value={city.id}>{city.name}</option>
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -140,9 +155,13 @@ export default function CourierLogisticsCard({
                       onChange={(e) => setSelectedZoneId(e.target.value)}
                       className={INPUT + " appearance-none"}
                     >
-                      <option value="">{loadingZones ? "Loading zones..." : "Select Zone"}</option>
+                      <option value="">
+                        {loadingZones ? "Loading zones..." : "Select Zone"}
+                      </option>
                       {zones.map((zone) => (
-                        <option key={zone.id} value={zone.id}>{zone.name}</option>
+                        <option key={zone.id} value={zone.id}>
+                          {zone.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -150,12 +169,13 @@ export default function CourierLogisticsCard({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <label className={LABEL}>Weight (KG)</label>
+                    <label className={LABEL}>Weight (grams)</label>
                     <input
                       type="number"
-                      step="0.1"
-                      min="0.1"
-                      placeholder="0.5"
+                      step="50"
+                      min="1"
+                      max="25000"
+                      placeholder="500"
                       value={carrybeeWeight}
                       onChange={(e) => setCarrybeeWeight(e.target.value)}
                       className={INPUT}
@@ -173,6 +193,17 @@ export default function CourierLogisticsCard({
                       className={INPUT}
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL}>Secondary Phone (optional)</label>
+                  <input
+                    type="text"
+                    placeholder="01XXXXXXXXX"
+                    value={carrybeeSecondaryPhone}
+                    onChange={(e) => setCarrybeeSecondaryPhone(e.target.value)}
+                    className={INPUT}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -217,12 +248,20 @@ export default function CourierLogisticsCard({
             )}
 
             <Button
-              className="w-full h-11 bg-black text-white hover:bg-zinc-800 rounded-none text-[10px] font-bold uppercase tracking-widest mt-2 flex items-center justify-center gap-2"
+              className="w-full h-11 bg-black text-white hover:bg-zinc-800 rounded-none text-[10px] font-bold uppercase tracking-widest mt-2 flex items-center justify-center gap-2 group"
               onClick={handleCourierDispatch}
               disabled={isDispatching || isCancelled}
+              icon={isDispatching ? Loader2 : Truck}
+              isLoading={isDispatching}
             >
-              {isDispatching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
-              {selectedCourier === "manual" ? "Record Dispatch" : `Dispatch to ${selectedCourier}`}
+              {isDispatching ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Truck className="w-4 h-4 hidden group-hover:block" />
+              )}
+              {selectedCourier === "manual"
+                ? "Record Dispatch"
+                : `Dispatch to ${selectedCourier}`}
             </Button>
           </div>
         )}

@@ -20,6 +20,7 @@ export const useOrderManagement = (id) => {
   const [carrybeeCodAmount, setCarrybeeCodAmount] = useState("");
   const [carrybeeProductType, setCarrybeeProductType] = useState("1");
   const [carrybeeDeliveryType, setCarrybeeDeliveryType] = useState("1");
+  const [carrybeeSecondaryPhone, setCarrybeeSecondaryPhone] = useState("");
 
   // Return note state
   const [isReturnNoteModalOpen, setIsReturnNoteModalOpen] = useState(false);
@@ -157,10 +158,11 @@ export const useOrderManagement = (id) => {
       trackingId: selectedCourier === "manual" ? manualTrackingId : undefined,
       cityId: selectedCourier === "carrybee" ? Number(selectedCityId) : undefined,
       zoneId: selectedCourier === "carrybee" ? Number(selectedZoneId) : undefined,
-      itemWeight: selectedCourier === "carrybee" ? Number(carrybeeWeight) : undefined,
+      itemWeight: selectedCourier === "carrybee" ? Number(carrybeeWeight) || 500 : undefined,
       collectableAmount: selectedCourier === "carrybee" ? Number(carrybeeCodAmount) || 0 : undefined,
       productType: selectedCourier === "carrybee" ? Number(carrybeeProductType) : undefined,
       deliveryType: selectedCourier === "carrybee" ? Number(carrybeeDeliveryType) : undefined,
+      secondaryPhone: selectedCourier === "carrybee" && carrybeeSecondaryPhone ? carrybeeSecondaryPhone : undefined,
     }, {
       onSuccess: (res) => toast.success(res.message || `Dispatched to ${selectedCourier}`),
       onError: (err) => toast.error(err.message || "Dispatch failed")
@@ -247,6 +249,7 @@ export const useOrderManagement = (id) => {
     carrybeeCodAmount, setCarrybeeCodAmount,
     carrybeeProductType, setCarrybeeProductType,
     carrybeeDeliveryType, setCarrybeeDeliveryType,
+    carrybeeSecondaryPhone, setCarrybeeSecondaryPhone,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
     isEditingPrices, setIsEditingPrices, editedItems, editedShippingFee, setEditedShippingFee,

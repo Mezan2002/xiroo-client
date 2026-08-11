@@ -23,7 +23,7 @@ const courierColors = {
   Pathao: "bg-emerald-50 border-emerald-200",
   Steadfast: "bg-blue-50 border-blue-200",
   Redx: "bg-purple-50 border-purple-200",
-  Paperfly: "bg-amber-50 border-amber-200",
+  CarryBee: "bg-amber-50 border-amber-200",
 };
 
 const ratingLabels = {
@@ -54,7 +54,7 @@ export default function CourierCheckPage() {
     <div className="space-y-6">
       <ModuleHeader
         title="Courier Check"
-        subtitle="Check customer parcel acceptance data via FraudBD"
+        subtitle="Check customer delivery history across couriers"
       />
 
       {/* Search Form */}
@@ -250,7 +250,7 @@ export default function CourierCheckPage() {
           <Shield className="w-10 h-10 text-gray-300 mx-auto mb-3" />
           <p className="text-sm text-gray-400">Enter a phone number to check courier parcel acceptance data</p>
           <p className="text-[10px] text-gray-300 mt-1 uppercase tracking-wider">
-            Data sourced from Pathao, Steadfast, Redx & Paperfly
+            Data sourced from Steadfast, Pathao, RedX & CarryBee
           </p>
         </div>
       )}

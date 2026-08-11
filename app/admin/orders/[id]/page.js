@@ -9,7 +9,7 @@ import CourierLogisticsCard from "./sections/CourierLogisticsCard";
 import CustomerIdentityCard from "./sections/CustomerIdentityCard";
 import EventHistoryCard from "./sections/EventHistoryCard";
 import CustomerHistoryCard from "./sections/CustomerHistoryCard";
-import FraudBDCheckCard from "./sections/FraudBDCheckCard";
+import CourierFraudCheckCard from "./sections/CourierFraudCheckCard";
 import AdvancePaymentCard from "./sections/AdvancePaymentCard";
 import RequestAdvancePaymentModal from "./sections/RequestAdvancePaymentModal";
 import EditOrderModal from "./sections/EditOrderModal";
@@ -30,6 +30,7 @@ export default function OrderDetailsPage() {
     carrybeeCodAmount, setCarrybeeCodAmount,
     carrybeeProductType, setCarrybeeProductType,
     carrybeeDeliveryType, setCarrybeeDeliveryType,
+    carrybeeSecondaryPhone, setCarrybeeSecondaryPhone,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
     isUpdatingStatus, isCancelling, isDispatching,
@@ -499,6 +500,8 @@ export default function OrderDetailsPage() {
             setCarrybeeProductType={setCarrybeeProductType}
             carrybeeDeliveryType={carrybeeDeliveryType}
             setCarrybeeDeliveryType={setCarrybeeDeliveryType}
+            carrybeeSecondaryPhone={carrybeeSecondaryPhone}
+            setCarrybeeSecondaryPhone={setCarrybeeSecondaryPhone}
             handleCourierDispatch={handleCourierDispatch}
             isDispatching={isDispatching}
             isCancelled={order.status === "cancelled"}
@@ -523,7 +526,7 @@ export default function OrderDetailsPage() {
           )}
 
           {phone && <CustomerHistoryCard phone={phone} />}
-          {phone && <FraudBDCheckCard phone={phone} />}
+          {phone && <CourierFraudCheckCard phone={phone} />}
         </div>
       </div>
 
