@@ -5,6 +5,7 @@ import { useNotifications } from "@/hooks/api/useNotifications";
 import { useSocket } from "@/context/SocketContext";
 import { useUser } from "@/hooks/api/useUser";
 import { useInbox } from "@/hooks/api/useInbox";
+import { useDashboard } from "@/hooks/api/useDashboard";
 
 export const useAdminSidebar = (onClose) => {
   const pathname = usePathname();
@@ -14,6 +15,9 @@ export const useAdminSidebar = (onClose) => {
   const { socket } = useSocket();
   const { useConversations } = useInbox();
   const { data: conversations, refetch: refetchInbox } = useConversations({ status: "active" });
+  const { useSidebarBadges } = useDashboard();
+  const { data: sidebarBadgesResponse } = useSidebarBadges();
+  const sidebarBadges = sidebarBadgesResponse?.data || {};
 
   useEffect(() => {
     if (socket) {
@@ -36,5 +40,13 @@ export const useAdminSidebar = (onClose) => {
     onClose?.();
   };
 
-  return { pathname, notificationUnread, inboxUnread, handleOpenSearch };
+  return {
+    pathname,
+    notificationUnread,
+    inboxUnread,
+    handleOpenSearch,
+    pendingOrders: sidebarBadges?.pendingOrders || 0,
+    pendingReviews: sidebarBadges?.pendingReviews || 0,
+    pendingTestimonials: sidebarBadges?.pendingTestimonials || 0,
+  };
 };

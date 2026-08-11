@@ -13,5 +13,17 @@ export const useDashboard = () => {
     });
   };
 
-  return { useDashboardStats };
+  const useSidebarBadges = () => {
+    return useQuery({
+      queryKey: ["sidebar-badges"],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/dashboard/sidebar-badges");
+        return response;
+      },
+      staleTime: 1 * 60 * 1000,
+      refetchInterval: 2 * 60 * 1000,
+    });
+  };
+
+  return { useDashboardStats, useSidebarBadges };
 };

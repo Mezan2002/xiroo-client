@@ -31,62 +31,62 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAdminSidebar } from "./sidebar-sections/useAdminSidebar";
 
-const NAV_GROUPS = [
-  {
-    label: "Commerce",
-    items: [
-      { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-      { label: "Products", href: "/admin/products", icon: Package },
-      { label: "Categories", href: "/admin/categories", icon: LayoutGrid },
-      { label: "Customers", href: "/admin/customers", icon: UserCheck },
-    ],
-  },
-  {
-    label: "Logistics",
-    items: [
-      { label: "Courier Check", href: "/admin/courier-check", icon: Truck },
-      {
-        label: "Fraud Review",
-        href: "/admin/fraud-review",
-        icon: AlertTriangle,
-      },
-    ],
-  },
-  {
-    label: "Engagement",
-    items: [
-      { label: "Reviews", href: "/admin/reviews", icon: MessageSquare },
-      { label: "Testimonials", href: "/admin/testimonials", icon: Quote },
-      { label: "Social Feed", href: "/admin/social-posts", icon: Share2 },
-      { label: "Newsletters", href: "/admin/newsletters", icon: Mail },
-    ],
-  },
-  {
-    label: "People",
-    items: [
-      { label: "Users", href: "/admin/users", icon: Users },
-      { label: "Loyalty Matrix", href: "/admin/loyalty", icon: Shield },
-      { label: "Discounts", href: "/admin/discounts", icon: Tag },
-    ],
-  },
-  {
-    label: "Store",
-    items: [
-      { label: "Analytics", href: "/admin/analytics", icon: LineChart },
-      { label: "Expenses", href: "/admin/expenses", icon: Receipt },
-      { label: "Navigation", href: "/admin/navigation", icon: Layers },
-      { label: "Attributes", href: "/admin/attributes", icon: Hash },
-      { label: "Branding", href: "/admin/branding", icon: Palette },
-      { label: "Landing Pages", href: "/admin/landing-pages", icon: FileText },
-      { label: "Store Layout", href: "/admin/layout", icon: Layers },
-      { label: "Settings", href: "/admin/settings", icon: Settings },
-    ],
-  },
-];
-
 export default function AdminSidebar({ isOpen, onClose }) {
-  const { pathname, notificationUnread, inboxUnread, handleOpenSearch } =
+  const { pathname, notificationUnread, inboxUnread, handleOpenSearch, pendingOrders, pendingReviews, pendingTestimonials } =
     useAdminSidebar(onClose);
+
+  const NAV_GROUPS = [
+    {
+      label: "Commerce",
+      items: [
+        { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+        { label: "Products", href: "/admin/products", icon: Package },
+        { label: "Categories", href: "/admin/categories", icon: LayoutGrid },
+        { label: "Customers", href: "/admin/customers", icon: UserCheck },
+      ],
+    },
+    {
+      label: "Logistics",
+      items: [
+        { label: "Courier Check", href: "/admin/courier-check", icon: Truck },
+        {
+          label: "Fraud Review",
+          href: "/admin/fraud-review",
+          icon: AlertTriangle,
+        },
+      ],
+    },
+    {
+      label: "Engagement",
+      items: [
+        { label: "Reviews", href: "/admin/reviews", icon: MessageSquare, badge: pendingReviews },
+        { label: "Testimonials", href: "/admin/testimonials", icon: Quote, badge: pendingTestimonials },
+        { label: "Social Feed", href: "/admin/social-posts", icon: Share2 },
+        { label: "Newsletters", href: "/admin/newsletters", icon: Mail },
+      ],
+    },
+    {
+      label: "People",
+      items: [
+        { label: "Users", href: "/admin/users", icon: Users },
+        { label: "Loyalty Matrix", href: "/admin/loyalty", icon: Shield },
+        { label: "Discounts", href: "/admin/discounts", icon: Tag },
+      ],
+    },
+    {
+      label: "Store",
+      items: [
+        { label: "Analytics", href: "/admin/analytics", icon: LineChart },
+        { label: "Expenses", href: "/admin/expenses", icon: Receipt },
+        { label: "Navigation", href: "/admin/navigation", icon: Layers },
+        { label: "Attributes", href: "/admin/attributes", icon: Hash },
+        { label: "Branding", href: "/admin/branding", icon: Palette },
+        { label: "Landing Pages", href: "/admin/landing-pages", icon: FileText },
+        { label: "Store Layout", href: "/admin/layout", icon: Layers },
+        { label: "Settings", href: "/admin/settings", icon: Settings },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -216,7 +216,12 @@ export default function AdminSidebar({ isOpen, onClose }) {
                           isActive ? "text-[#37352F]" : "text-[#37352F80]"
                         }
                       />
-                      <span>{item.label}</span>
+                      <span className="flex-1">{item.label}</span>
+                      {item.badge > 0 && (
+                        <span className="text-[9px] font-bold bg-[#37352F] text-white px-1.5 py-0.5 rounded-full min-w-[16px] text-center">
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}

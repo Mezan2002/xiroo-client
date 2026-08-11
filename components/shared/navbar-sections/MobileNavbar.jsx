@@ -25,6 +25,7 @@ export default function MobileNavbar({
   currentUser,
   setIsCartOpen,
   itemCount,
+  pendingOrders,
   setIsUserOpen,
   isLoggedIn,
 }) {
@@ -74,10 +75,15 @@ export default function MobileNavbar({
           <Reveal>
             <Link
               href="/admin"
-              className="p-2"
+              className="p-2 relative"
               aria-label="Admin Dashboard"
             >
               <LayoutGrid className="w-5 h-5 stroke-[1.5]" />
+              {pendingOrders > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold text-white">
+                  {pendingOrders}
+                </span>
+              )}
             </Link>
           </Reveal>
         ) : (

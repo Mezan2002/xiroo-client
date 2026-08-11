@@ -32,6 +32,7 @@ export default function DesktopNavbar({
   currentUser,
   isLoggedIn,
   itemCount,
+  pendingOrders,
   setIsSearchOpen,
   setIsCartOpen,
   setIsUserOpen,
@@ -83,7 +84,7 @@ export default function DesktopNavbar({
       <div className="flex items-center justify-end gap-3 w-[350px]">
         {mounted && currentUser?.role === "admin" && (
           <Reveal>
-            <Link href="/admin">
+            <Link href="/admin" className="relative">
               <Button
                 variant="ghost"
                 size="icon"
@@ -93,6 +94,11 @@ export default function DesktopNavbar({
               >
                 <LayoutGrid className="w-[18px] h-[18px] stroke-[1.5]" />
               </Button>
+              {pendingOrders > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold text-white">
+                  {pendingOrders}
+                </span>
+              )}
             </Link>
           </Reveal>
         )}

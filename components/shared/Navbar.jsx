@@ -2,6 +2,7 @@
 "use client";
 import { useUser } from "@/hooks/api/useUser";
 import { useCart } from "@/hooks/useCart";
+import { useDashboard } from "@/hooks/api/useDashboard";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
@@ -45,6 +46,9 @@ export function Navbar() {
   const { navItems, menusData } = useNavbarData();
   const { user: currentUser } = useUser();
   const { itemCount } = useCart();
+  const { useSidebarBadges } = useDashboard();
+  const { data: sidebarBadgesResponse } = useSidebarBadges();
+  const pendingOrders = sidebarBadgesResponse?.data?.pendingOrders || 0;
   const isLoggedIn = !!currentUser;
 
   useEffect(() => {
@@ -63,6 +67,7 @@ export function Navbar() {
     currentUser,
     isLoggedIn,
     itemCount,
+    pendingOrders,
     setIsSearchOpen,
     setIsCartOpen,
     setIsUserOpen,
