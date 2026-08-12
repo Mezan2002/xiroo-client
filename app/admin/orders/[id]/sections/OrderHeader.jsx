@@ -18,6 +18,7 @@ import {
   Undo2,
   UserCheck,
   XCircle,
+  ArrowRightLeft,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -117,9 +118,33 @@ const statusStyles = {
     bg: "bg-rose-50",
     border: "border-rose-200",
   },
+  "exchange-requested": {
+    dot: "bg-violet-500",
+    text: "text-violet-600",
+    bg: "bg-violet-50",
+    border: "border-violet-200",
+  },
+  "exchange-accepted": {
+    dot: "bg-blue-500",
+    text: "text-blue-600",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+  },
+  "exchange-shipped": {
+    dot: "bg-cyan-500",
+    text: "text-cyan-600",
+    bg: "bg-cyan-50",
+    border: "border-cyan-200",
+  },
+  "exchange-delivered": {
+    dot: "bg-emerald-500",
+    text: "text-emerald-600",
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+  },
 };
 
-const terminalStatuses = ["delivered", "cancelled", "failed", "refused"];
+const terminalStatuses = ["delivered", "cancelled", "failed", "refused", "exchange-delivered"];
 
 // Status flow order for the dropdown
 const statusOptions = [

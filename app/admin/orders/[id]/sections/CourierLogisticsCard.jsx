@@ -254,11 +254,6 @@ export default function CourierLogisticsCard({
               icon={isDispatching ? Loader2 : Truck}
               isLoading={isDispatching}
             >
-              {isDispatching ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Truck className="w-4 h-4 hidden group-hover:block" />
-              )}
               {selectedCourier === "manual"
                 ? "Record Dispatch"
                 : `Dispatch to ${selectedCourier}`}

@@ -37,7 +37,7 @@ export default function CourierFraudCheckCard({ phone }) {
   const RiskIcon = risk?.icon || Shield;
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-lg overflow-hidden">
+    <div className="bg-white border border-zinc-200 overflow-hidden">
       <div className="px-5 py-4 flex items-center justify-between">
         <h3 className="text-sm font-medium text-zinc-900 flex items-center gap-2">
           <Shield className="w-4 h-4 text-zinc-400" />

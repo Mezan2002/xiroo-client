@@ -231,6 +231,30 @@ export const useOrders = () => {
     },
   });
 
+  const requestExchange = useMutation({
+    mutationFn: async ({ id, reason, items, adminNote }) => {
+      const response = await axiosInstance.post(`/orders/${id}/exchange`, { reason, items, adminNote });
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
+  const updateExchangeStatus = useMutation({
+    mutationFn: async ({ id, status, adminNote }) => {
+      const response = await axiosInstance.patch(`/orders/${id}/exchange/status`, { status, adminNote });
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
   return {
     placeOrder,
     placeGuestOrder,
@@ -250,5 +274,7 @@ export const useOrders = () => {
     waiveAdvancePayment,
     updateOrderPrices,
     updateOrder,
+    requestExchange,
+    updateExchangeStatus,
   };
 };

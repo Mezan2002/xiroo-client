@@ -98,6 +98,14 @@ export default function DataTable({
             case "failed":
             case "refused":
               return "bg-rose-50 text-rose-600 border-rose-200";
+            case "exchange-requested":
+              return "bg-violet-50 text-violet-600 border-violet-200";
+            case "exchange-accepted":
+              return "bg-blue-50 text-blue-600 border-blue-200";
+            case "exchange-shipped":
+              return "bg-cyan-50 text-cyan-600 border-cyan-200";
+            case "exchange-delivered":
+              return "bg-emerald-50 text-emerald-600 border-emerald-200";
             case "active":
             case "completed":
             case "paid":

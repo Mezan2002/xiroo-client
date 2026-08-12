@@ -190,6 +190,10 @@ export default function AdminOrders() {
                 { value: "cancelled", label: "Cancelled" },
                 { value: "failed", label: "Failed" },
                 { value: "refused", label: "Refused" },
+                { value: "exchange-requested", label: "Exchange Requested" },
+                { value: "exchange-accepted", label: "Exchange Accepted" },
+                { value: "exchange-shipped", label: "Exchange Shipped" },
+                { value: "exchange-delivered", label: "Exchange Delivered" },
               ]}
             />
           </div>

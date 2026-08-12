@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine, AlertTriangle } from "lucide-react";
+import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine, AlertTriangle, ArrowRightLeft } from "lucide-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,8 @@ import AdvancePaymentCard from "./sections/AdvancePaymentCard";
 import RequestAdvancePaymentModal from "./sections/RequestAdvancePaymentModal";
 import EditOrderModal from "./sections/EditOrderModal";
 import OrderHeader from "./sections/OrderHeader";
+import ExchangeCard from "./sections/ExchangeCard";
+import RequestExchangeModal from "./sections/RequestExchangeModal";
 import { useOrderManagement } from "./sections/useOrderManagement";
 
 export default function OrderDetailsPage() {
@@ -46,6 +48,13 @@ export default function OrderDetailsPage() {
     isEditingReturnNote, setIsEditingReturnNote,
     editedReturnNote, setEditedReturnNote,
     handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
+    // Exchange
+    isExchangeModalOpen, setIsExchangeModalOpen,
+    exchangeReason, setExchangeReason,
+    exchangeItems, setExchangeItems,
+    exchangeAdminNote, setExchangeAdminNote,
+    handleRequestExchange, handleUpdateExchangeStatus,
+    isRequestingExchange, isUpdatingExchangeStatus,
   } = useOrderManagement(id);
 
   if (loading) {
@@ -401,6 +410,15 @@ export default function OrderDetailsPage() {
             )}
           </div>
 
+          {/* Exchange Card */}
+          {order.exchange && (
+            <ExchangeCard
+              exchange={order.exchange}
+              onUpdateStatus={handleUpdateExchangeStatus}
+              isUpdating={isUpdatingExchangeStatus}
+            />
+          )}
+
           {/* Actions */}
           {["pending", "processing", "given-for-design", "ready-to-pack", "on-hold"].includes(order.status) && (
             <button
@@ -525,6 +543,16 @@ export default function OrderDetailsPage() {
             </button>
           )}
 
+          {/* Exchange Request Button - Show for delivered orders without existing exchange */}
+          {order.status === "delivered" && !order.exchange && (
+            <button
+              onClick={() => setIsExchangeModalOpen(true)}
+              className="w-full py-2.5 border border-dashed border-violet-200 hover:border-violet-400 text-violet-500 hover:text-violet-700 text-[10px] font-bold uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2"
+            >
+              <ArrowRightLeft className="w-3.5 h-3.5" /> Request Exchange
+            </button>
+          )}
+
           {phone && <CustomerHistoryCard phone={phone} />}
           {phone && <CourierFraudCheckCard phone={phone} />}
         </div>
@@ -603,6 +631,20 @@ export default function OrderDetailsPage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         order={order}
+      />
+
+      <RequestExchangeModal
+        isOpen={isExchangeModalOpen}
+        onClose={() => !isRequestingExchange && setIsExchangeModalOpen(false)}
+        onConfirm={handleRequestExchange}
+        order={order}
+        exchangeReason={exchangeReason}
+        setExchangeReason={setExchangeReason}
+        exchangeItems={exchangeItems}
+        setExchangeItems={setExchangeItems}
+        exchangeAdminNote={exchangeAdminNote}
+        setExchangeAdminNote={setExchangeAdminNote}
+        isProcessing={isRequestingExchange}
       />
     </div>
   );

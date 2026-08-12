@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
-  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder } = useOrders();
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchangeStatus } = useOrders();
   const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -35,6 +35,12 @@ export const useOrderManagement = (id) => {
   const [isEditingPrices, setIsEditingPrices] = useState(false);
   const [editedItems, setEditedItems] = useState([]);
   const [editedShippingFee, setEditedShippingFee] = useState(0);
+
+  // Exchange state
+  const [isExchangeModalOpen, setIsExchangeModalOpen] = useState(false);
+  const [exchangeReason, setExchangeReason] = useState("");
+  const [exchangeItems, setExchangeItems] = useState([]);
+  const [exchangeAdminNote, setExchangeAdminNote] = useState("");
 
   // Initialize edited items when order loads or edit mode is entered
   useEffect(() => {
@@ -238,6 +244,68 @@ export const useOrderManagement = (id) => {
     setEditedItems([]);
   };
 
+  const handleRequestExchange = async () => {
+    if (!exchangeReason.trim()) {
+      toast.error("Please enter a reason for the exchange");
+      return;
+    }
+    if (exchangeItems.length === 0) {
+      toast.error("Please add at least one item to exchange");
+      return;
+    }
+    for (const item of exchangeItems) {
+      if (!item.originalProduct || !item.replacementProduct) {
+        toast.error("Please select both original and replacement products for each item");
+        return;
+      }
+    }
+
+    requestExchange.mutate({ id, reason: exchangeReason, items: exchangeItems, adminNote: exchangeAdminNote }, {
+      onSuccess: () => {
+        toast.success("Exchange request submitted");
+        setIsExchangeModalOpen(false);
+        setExchangeReason("");
+        setExchangeItems([]);
+        setExchangeAdminNote("");
+      },
+      onError: (err) => toast.error(err.message || "Failed to request exchange"),
+    });
+  };
+
+  const handleUpdateExchangeStatus = async (status) => {
+    updateExchangeStatus.mutate({ id, status, adminNote: exchangeAdminNote }, {
+      onSuccess: () => {
+        toast.success(`Exchange ${status}`);
+        setExchangeAdminNote("");
+      },
+      onError: (err) => toast.error(err.message || `Failed to update exchange status`),
+    });
+  };
+
+  const handleAddExchangeItem = () => {
+    setExchangeItems((prev) => [
+      ...prev,
+      {
+        originalProduct: "",
+        originalVariant: "",
+        originalQuantity: 1,
+        replacementProduct: "",
+        replacementVariant: "",
+        replacementQuantity: 1,
+      },
+    ]);
+  };
+
+  const handleExchangeItemChange = (index, field, value) => {
+    setExchangeItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const handleRemoveExchangeItem = (index) => {
+    setExchangeItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return {
     order, loading, error, isError, isCancelModalOpen, setIsCancelModalOpen,
     isAdvancePaymentModalOpen, setIsAdvancePaymentModalOpen,
@@ -263,6 +331,13 @@ export const useOrderManagement = (id) => {
     isEditingReturnNote, setIsEditingReturnNote,
     editedReturnNote, setEditedReturnNote,
     handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
+    // Exchange
+    isExchangeModalOpen, setIsExchangeModalOpen,
+    exchangeReason, setExchangeReason,
+    exchangeItems, setExchangeItems,
+    exchangeAdminNote, setExchangeAdminNote,
+    handleRequestExchange, handleUpdateExchangeStatus,
+    handleAddExchangeItem, handleExchangeItemChange, handleRemoveExchangeItem,
     isUpdatingStatus: updateStatus.isPending,
     isCancelling: cancelOrder.isPending,
     isDispatching: dispatchCourier.isPending,
@@ -270,5 +345,7 @@ export const useOrderManagement = (id) => {
     isConfirmingAdvancePayment: confirmAdvancePayment.isPending,
     isWaivingAdvancePayment: waiveAdvancePayment.isPending,
     isSavingPrices: updateOrderPrices.isPending,
+    isRequestingExchange: requestExchange.isPending,
+    isUpdatingExchangeStatus: updateExchangeStatus.isPending,
   };
 };
