@@ -15,6 +15,7 @@ import RequestAdvancePaymentModal from "./sections/RequestAdvancePaymentModal";
 import EditOrderModal from "./sections/EditOrderModal";
 import OrderHeader from "./sections/OrderHeader";
 import ExchangeCard from "./sections/ExchangeCard";
+import ReturnRequestCard from "./sections/ReturnRequestCard";
 import RequestExchangeModal from "./sections/RequestExchangeModal";
 import { useOrderManagement } from "./sections/useOrderManagement";
 
@@ -426,7 +427,12 @@ export default function OrderDetailsPage() {
             )}
           </div>
 
-          {/* Exchange Card */}
+          {/* Customer Return / Exchange Request Card */}
+          {order.returnRequest && (
+            <ReturnRequestCard returnRequest={order.returnRequest} orderId={order._id} />
+          )}
+
+          {/* Admin Exchange Card */}
           {order.exchange && (
             <ExchangeCard
               exchange={order.exchange}

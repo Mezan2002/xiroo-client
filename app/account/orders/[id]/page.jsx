@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, RotateCcw, ArrowRightLeft } from "lucide-react";
 import Link from "next/link";
 import { use } from "react";
 import OrderDetailHero from "./sections/OrderDetailHero";
@@ -36,6 +36,9 @@ export default function OrderDetailsPage({ params: paramsPromise }) {
     );
   }
 
+  const isDelivered = order?.status === "delivered";
+  const hasExistingRequest = order?.returnRequest && order.returnRequest.status !== "rejected";
+
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center justify-between">
@@ -59,8 +62,15 @@ export default function OrderDetailsPage({ params: paramsPromise }) {
       <div className="mt-10 pt-10 border-t border-gray-100 text-center">
         <p className="text-[11px] text-gray-400 uppercase tracking-widest mb-6 italic">Experiencing issues with your order?</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
+          {isDelivered && !hasExistingRequest && (
+            <Link href="/return-exchange">
+              <Button variant="outline" className="w-full sm:w-auto text-[10px] px-8 tracking-[0.2em] h-12 gap-2">
+                <RotateCcw className="w-3.5 h-3.5" />
+                RETURN / EXCHANGE
+              </Button>
+            </Link>
+          )}
           <Button variant="outline" className="w-full sm:w-auto text-[10px] px-8 tracking-[0.2em] h-12">CONTACT BOUTIQUE</Button>
-          <Button variant="outline" className="w-full sm:w-auto text-[10px] px-8 tracking-[0.2em] h-12">RAISE DISPUTE</Button>
         </div>
       </div>
     </div>

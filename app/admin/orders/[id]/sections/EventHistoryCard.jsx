@@ -28,6 +28,7 @@ const actionConfig = {
   return_note_added: { color: "bg-rose-500", icon: "●", label: "Return Note Added" },
   return_note_updated: { color: "bg-amber-500", icon: "●", label: "Return Note Updated" },
   return_note_removed: { color: "bg-zinc-400", icon: "●", label: "Return Note Removed" },
+  return_exchange_requested: { color: "bg-purple-600", icon: "●", label: "Return/Exchange Requested" },
 };
 
 function getRoleBadge(role) {

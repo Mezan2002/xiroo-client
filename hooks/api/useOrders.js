@@ -266,6 +266,28 @@ export const useOrders = () => {
     },
   });
 
+  const requestReturnExchange = useMutation({
+    mutationFn: async ({ orderId, type, reason, items, note, attachments, guestEmail, guestPhone }) => {
+      const response = await axiosInstance.post(`/orders/${orderId}/return-request`, { type, reason, items, note, attachments, guestEmail, guestPhone });
+      return response;
+    },
+    onSuccess: (data, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["my-orders"] });
+    },
+  });
+
+  const updateReturnRequestStatus = useMutation({
+    mutationFn: async ({ orderId, status, adminNote }) => {
+      const response = await axiosInstance.patch(`/orders/${orderId}/return-request/status`, { status, adminNote });
+      return response;
+    },
+    onSuccess: (data, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
   return {
     placeOrder,
     placeGuestOrder,
@@ -288,5 +310,7 @@ export const useOrders = () => {
     requestExchange,
     updateExchange,
     updateExchangeStatus,
+    requestReturnExchange,
+    updateReturnRequestStatus,
   };
 };

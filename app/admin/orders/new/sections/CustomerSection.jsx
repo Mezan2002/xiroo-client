@@ -282,8 +282,8 @@ export default function CustomerSection({ order, setOrder }) {
 
   const handleSelectSuggestion = (suggestion) => {
     const defaultAddress = suggestion.defaultAddress;
-    const district = defaultAddress?.city || "";
-    const thana = defaultAddress?.state || "";
+    const district = defaultAddress?.state || "";  // state = district
+    const thana = defaultAddress?.city || "";       // city = thana/upazila
     const addressLine = [defaultAddress?.addressLine1, defaultAddress?.addressLine2].filter(Boolean).join(", ");
     const postcode = defaultAddress?.postalCode || "";
 
@@ -336,8 +336,8 @@ export default function CustomerSection({ order, setOrder }) {
       }
 
       const defaultAddress = customer.addresses?.find((a) => a.isDefault) || customer.addresses?.[0];
-      const district = defaultAddress?.city || "";
-      const thana = defaultAddress?.state || "";
+      const district = defaultAddress?.state || "";  // state = district
+      const thana = defaultAddress?.city || "";       // city = thana/upazila
       const addressLine = [defaultAddress?.addressLine1, defaultAddress?.addressLine2].filter(Boolean).join(", ");
       const postcode = defaultAddress?.postalCode || "";
 

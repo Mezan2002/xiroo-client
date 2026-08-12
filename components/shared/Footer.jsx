@@ -91,15 +91,15 @@ export default function Footer() {
                 </h4>
               </FadeIn>
               <div className="flex flex-col gap-5">
-                <FadeIn delay={0.25}>
+                <FadeIn delay={0.3}>
                   <Link
-                    href="/about-us"
+                    href="/return-exchange"
                     className="text-[11px] text-white/50 hover:text-white transition-colors"
                   >
-                    Our Story
+                    Return / Exchange
                   </Link>
                 </FadeIn>
-                <FadeIn delay={0.3}>
+                <FadeIn delay={0.32}>
                   <Link
                     href="/contact"
                     className="text-[11px] text-white/50 hover:text-white transition-colors"
@@ -172,10 +172,10 @@ export default function Footer() {
                 Shipping
               </Link>
               <Link
-                href="/return-policy"
+                href="/return-exchange"
                 className="text-[9px] text-white/40 tracking-[0.2em] uppercase hover:text-white transition-colors"
               >
-                Returns
+                Return / Exchange
               </Link>
               <Link
                 href="/privacy"
