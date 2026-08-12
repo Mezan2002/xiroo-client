@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
-  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchangeStatus } = useOrders();
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchange, updateExchangeStatus } = useOrders();
   const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -38,9 +38,12 @@ export const useOrderManagement = (id) => {
 
   // Exchange state
   const [isExchangeModalOpen, setIsExchangeModalOpen] = useState(false);
+  const [isEditingExchange, setIsEditingExchange] = useState(false);
   const [exchangeReason, setExchangeReason] = useState("");
   const [exchangeItems, setExchangeItems] = useState([]);
   const [exchangeAdminNote, setExchangeAdminNote] = useState("");
+  const [exchangeAttachments, setExchangeAttachments] = useState([]);
+  const [exchangeFee, setExchangeFee] = useState(0);
 
   // Initialize edited items when order loads or edit mode is entered
   useEffect(() => {
@@ -60,12 +63,27 @@ export const useOrderManagement = (id) => {
     }
   }, [order, isEditingPrices]);
 
+  const handleUpdateExchangeStatus = async (status) => {
+    updateExchangeStatus.mutate({ id, status, adminNote: exchangeAdminNote }, {
+      onSuccess: () => {
+        toast.success(`Exchange ${status}`);
+        setExchangeAdminNote("");
+      },
+      onError: (err) => toast.error(err.message || `Failed to update exchange status`),
+    });
+  };
+
   const handleStatusChange = async (newStatus) => {
-    // Show return note modal only when changing to "returned" status (not return-received)
     if (newStatus === "returned") {
       setPendingStatus(newStatus);
       setReturnNote("");
       setIsReturnNoteModalOpen(true);
+      return;
+    }
+
+    if (newStatus.startsWith("exchange-")) {
+      const exchangeStatus = newStatus.replace("exchange-", "");
+      handleUpdateExchangeStatus(exchangeStatus);
       return;
     }
 
@@ -260,25 +278,69 @@ export const useOrderManagement = (id) => {
       }
     }
 
-    requestExchange.mutate({ id, reason: exchangeReason, items: exchangeItems, adminNote: exchangeAdminNote }, {
+    requestExchange.mutate({ id, reason: exchangeReason, items: exchangeItems, adminNote: exchangeAdminNote, attachments: exchangeAttachments, exchangeFee }, {
       onSuccess: () => {
         toast.success("Exchange request submitted");
         setIsExchangeModalOpen(false);
         setExchangeReason("");
         setExchangeItems([]);
         setExchangeAdminNote("");
+        setExchangeAttachments([]);
+        setExchangeFee(0);
       },
       onError: (err) => toast.error(err.message || "Failed to request exchange"),
     });
   };
 
-  const handleUpdateExchangeStatus = async (status) => {
-    updateExchangeStatus.mutate({ id, status, adminNote: exchangeAdminNote }, {
+  const handleStartEditExchange = () => {
+    if (order?.exchange) {
+      setExchangeReason(order.exchange.reason || "");
+      setExchangeItems(
+        order.exchange.items?.map((item) => ({
+          originalProduct: item.originalProduct?._id || item.originalProduct,
+          originalVariant: Array.isArray(item.originalVariant) ? item.originalVariant : item.originalVariant ? [item.originalVariant] : [],
+          originalQuantity: item.originalQuantity,
+          replacementProduct: item.replacementProduct?._id || item.replacementProduct,
+          replacementVariant: Array.isArray(item.replacementVariant) ? item.replacementVariant : item.replacementVariant ? [item.replacementVariant] : [],
+          replacementQuantity: item.replacementQuantity,
+        })) || []
+      );
+      setExchangeAdminNote(order.exchange.adminNote || "");
+      setExchangeAttachments(order.exchange.attachments || []);
+      setExchangeFee(order.exchange.exchangeFee || 0);
+      setIsEditingExchange(true);
+      setIsExchangeModalOpen(true);
+    }
+  };
+
+  const handleEditExchange = async () => {
+    if (!exchangeReason.trim()) {
+      toast.error("Please enter a reason for the exchange");
+      return;
+    }
+    if (exchangeItems.length === 0) {
+      toast.error("Please add at least one item to exchange");
+      return;
+    }
+    for (const item of exchangeItems) {
+      if (!item.originalProduct || !item.replacementProduct) {
+        toast.error("Please select both original and replacement products for each item");
+        return;
+      }
+    }
+
+    updateExchange.mutate({ id, reason: exchangeReason, items: exchangeItems, adminNote: exchangeAdminNote, attachments: exchangeAttachments, exchangeFee }, {
       onSuccess: () => {
-        toast.success(`Exchange ${status}`);
+        toast.success("Exchange updated successfully");
+        setIsExchangeModalOpen(false);
+        setIsEditingExchange(false);
+        setExchangeReason("");
+        setExchangeItems([]);
         setExchangeAdminNote("");
+        setExchangeAttachments([]);
+        setExchangeFee(0);
       },
-      onError: (err) => toast.error(err.message || `Failed to update exchange status`),
+      onError: (err) => toast.error(err.message || "Failed to update exchange"),
     });
   };
 
@@ -333,10 +395,13 @@ export const useOrderManagement = (id) => {
     handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
     // Exchange
     isExchangeModalOpen, setIsExchangeModalOpen,
+    isEditingExchange, setIsEditingExchange,
     exchangeReason, setExchangeReason,
     exchangeItems, setExchangeItems,
     exchangeAdminNote, setExchangeAdminNote,
-    handleRequestExchange, handleUpdateExchangeStatus,
+    exchangeAttachments, setExchangeAttachments,
+    exchangeFee, setExchangeFee,
+    handleRequestExchange, handleEditExchange, handleStartEditExchange, handleUpdateExchangeStatus,
     handleAddExchangeItem, handleExchangeItemChange, handleRemoveExchangeItem,
     isUpdatingStatus: updateStatus.isPending,
     isCancelling: cancelOrder.isPending,
@@ -346,6 +411,7 @@ export const useOrderManagement = (id) => {
     isWaivingAdvancePayment: waiveAdvancePayment.isPending,
     isSavingPrices: updateOrderPrices.isPending,
     isRequestingExchange: requestExchange.isPending,
+    isEditingExchangePending: updateExchange.isPending,
     isUpdatingExchangeStatus: updateExchangeStatus.isPending,
   };
 };

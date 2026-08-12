@@ -232,8 +232,8 @@ export const useOrders = () => {
   });
 
   const requestExchange = useMutation({
-    mutationFn: async ({ id, reason, items, adminNote }) => {
-      const response = await axiosInstance.post(`/orders/${id}/exchange`, { reason, items, adminNote });
+    mutationFn: async ({ id, reason, items, adminNote, attachments, exchangeFee }) => {
+      const response = await axiosInstance.post(`/orders/${id}/exchange`, { reason, items, adminNote, attachments, exchangeFee });
       return response;
     },
     onSuccess: (data, { id }) => {
@@ -252,6 +252,17 @@ export const useOrders = () => {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["order-stats"] });
+    },
+  });
+
+  const updateExchange = useMutation({
+    mutationFn: async ({ id, reason, items, adminNote, attachments, exchangeFee }) => {
+      const response = await axiosInstance.patch(`/orders/${id}/exchange`, { reason, items, adminNote, attachments, exchangeFee });
+      return response;
+    },
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
   });
 
@@ -275,6 +286,7 @@ export const useOrders = () => {
     updateOrderPrices,
     updateOrder,
     requestExchange,
+    updateExchange,
     updateExchangeStatus,
   };
 };

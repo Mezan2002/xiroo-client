@@ -178,10 +178,27 @@ export default function OrderHeader({
   isUpdatingStatus,
   handleStatusChange,
 }) {
-  const styles = statusStyles[order.status] || statusStyles.pending;
+  const hasActiveExchange = order.exchange && ["requested", "accepted", "shipped"].includes(order.exchange.status);
+
+  const displayStatus = hasActiveExchange
+    ? `exchange-${order.exchange.status}`
+    : order.status;
+
+  const styles = statusStyles[displayStatus] || statusStyles.pending;
   const label =
-    order.status?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
+    displayStatus?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
     "Unknown";
+
+  const exchangeStatusOptions = hasActiveExchange
+    ? [
+        { value: "exchange-requested", label: "Exchange Requested", icon: ArrowRightLeft },
+        { value: "exchange-accepted", label: "Exchange Accepted", icon: CheckCircle2 },
+        { value: "exchange-shipped", label: "Exchange Shipped", icon: Truck },
+        { value: "exchange-delivered", label: "Exchange Delivered", icon: PackageCheck },
+      ]
+    : [];
+
+  const activeStatusOptions = hasActiveExchange ? exchangeStatusOptions : statusOptions;
 
   return (
     <ModuleHeader
@@ -214,11 +231,11 @@ export default function OrderHeader({
               <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400 absolute ml-[-20px] mt-2.5" />
             )}
             <Select
-              options={statusOptions}
-              value={order.status}
+              options={activeStatusOptions}
+              value={displayStatus}
               onChange={handleStatusChange}
               className="!h-9 sm:!h-10"
-              disabled={isUpdatingStatus || terminalStatuses.includes(order.status)}
+              disabled={isUpdatingStatus || terminalStatuses.includes(displayStatus)}
             />
           </div>
 

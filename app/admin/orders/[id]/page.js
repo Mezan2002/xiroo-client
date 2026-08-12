@@ -50,11 +50,14 @@ export default function OrderDetailsPage() {
     handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
     // Exchange
     isExchangeModalOpen, setIsExchangeModalOpen,
+    isEditingExchange, setIsEditingExchange,
     exchangeReason, setExchangeReason,
     exchangeItems, setExchangeItems,
     exchangeAdminNote, setExchangeAdminNote,
-    handleRequestExchange, handleUpdateExchangeStatus,
-    isRequestingExchange, isUpdatingExchangeStatus,
+    exchangeAttachments, setExchangeAttachments,
+    exchangeFee, setExchangeFee,
+    handleRequestExchange, handleEditExchange, handleStartEditExchange, handleUpdateExchangeStatus,
+    isRequestingExchange, isEditingExchangePending, isUpdatingExchangeStatus,
   } = useOrderManagement(id);
 
   if (loading) {
@@ -303,34 +306,47 @@ export default function OrderDetailsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
-                    {order.items.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
-                        <td className="px-5 py-3 max-w-[300px]">
-                          <div className="flex items-center gap-3">
-                            <div className="relative w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
-                              {item.product?.images?.[0] ? (
-                                <Image fill src={item.product.images[0]} alt="" sizes="40px" className="object-cover" />
-                              ) : (
-                                <Package size={14} strokeWidth={1} className="text-zinc-200" />
-                              )}
+                    {order.items.map((item, idx) => {
+                      const exchangeItem = order.exchange?.items?.find(
+                        (ei) => (ei.originalProduct?._id || ei.originalProduct) === (item.product?._id || item.product)
+                      );
+                      return (
+                        <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
+                          <td className="px-5 py-3 max-w-[300px]">
+                            <div className="flex items-center gap-3">
+                              <div className="relative w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
+                                {item.product?.images?.[0] ? (
+                                  <Image fill src={item.product.images[0]} alt="" sizes="40px" className="object-cover" />
+                                ) : (
+                                  <Package size={14} strokeWidth={1} className="text-zinc-200" />
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-[12px] font-bold text-zinc-900 truncate">{item.product?.title || "Unknown"}</p>
+                                  {exchangeItem && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-violet-50 border border-violet-200 shrink-0">
+                                      <ArrowRightLeft size={8} className="text-violet-600" />
+                                      <span className="text-[8px] font-bold text-violet-600 uppercase tracking-wider">Exchange</span>
+                                    </span>
+                                  )}
+                                </div>
+                                {item.variant && item.variant !== "Standard" && (
+                                  <p className="text-[10px] text-zinc-400">{item.variant}</p>
+                                )}
+                                {item.originalPrice && item.price !== item.originalPrice && (
+                                  <p className="text-[9px] text-amber-500 font-medium">
+                                    orig: ৳{item.originalPrice.toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                            <div className="min-w-0">
-                              <p className="text-[12px] font-bold text-zinc-900 truncate">{item.product?.title || "Unknown"}</p>
-                              {item.variant && item.variant !== "Standard" && (
-                                <p className="text-[10px] text-zinc-400">{item.variant}</p>
-                              )}
-                              {item.originalPrice && item.price !== item.originalPrice && (
-                                <p className="text-[9px] text-amber-500 font-medium">
-                                  orig: ৳{item.originalPrice.toLocaleString()}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3 text-center text-[12px] font-bold text-zinc-500 font-mono">x{item.quantity}</td>
-                        <td className="px-5 py-3 text-right text-[12px] font-black text-zinc-900 font-mono">৳{(item.price * item.quantity).toLocaleString()}</td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="px-5 py-3 text-center text-[12px] font-bold text-zinc-500 font-mono">x{item.quantity}</td>
+                          <td className="px-5 py-3 text-right text-[12px] font-black text-zinc-900 font-mono">৳{(item.price * item.quantity).toLocaleString()}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
 
@@ -415,6 +431,7 @@ export default function OrderDetailsPage() {
             <ExchangeCard
               exchange={order.exchange}
               onUpdateStatus={handleUpdateExchangeStatus}
+              onEdit={handleStartEditExchange}
               isUpdating={isUpdatingExchangeStatus}
             />
           )}
@@ -543,8 +560,8 @@ export default function OrderDetailsPage() {
             </button>
           )}
 
-          {/* Exchange Request Button - Show for delivered orders without existing exchange */}
-          {order.status === "delivered" && !order.exchange && (
+          {/* Exchange Request Button - Show for delivered orders without existing exchange or rejected exchange */}
+          {order.status === "delivered" && (!order.exchange || order.exchange?.status === "rejected") && (
             <button
               onClick={() => setIsExchangeModalOpen(true)}
               className="w-full py-2.5 border border-dashed border-violet-200 hover:border-violet-400 text-violet-500 hover:text-violet-700 text-[10px] font-bold uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2"
@@ -635,16 +652,28 @@ export default function OrderDetailsPage() {
 
       <RequestExchangeModal
         isOpen={isExchangeModalOpen}
-        onClose={() => !isRequestingExchange && setIsExchangeModalOpen(false)}
-        onConfirm={handleRequestExchange}
+        onClose={() => {
+          if (isEditingExchange) {
+            setIsEditingExchange(false);
+          }
+          if (!isRequestingExchange && !isEditingExchangePending) {
+            setIsExchangeModalOpen(false);
+          }
+        }}
+        onConfirm={isEditingExchange ? handleEditExchange : handleRequestExchange}
         order={order}
+        isEditing={isEditingExchange}
         exchangeReason={exchangeReason}
         setExchangeReason={setExchangeReason}
         exchangeItems={exchangeItems}
         setExchangeItems={setExchangeItems}
         exchangeAdminNote={exchangeAdminNote}
         setExchangeAdminNote={setExchangeAdminNote}
-        isProcessing={isRequestingExchange}
+        exchangeAttachments={exchangeAttachments}
+        setExchangeAttachments={setExchangeAttachments}
+        exchangeFee={exchangeFee}
+        setExchangeFee={setExchangeFee}
+        isProcessing={isRequestingExchange || isEditingExchangePending}
       />
     </div>
   );

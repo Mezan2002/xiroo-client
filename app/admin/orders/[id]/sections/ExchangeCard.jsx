@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRightLeft, CheckCircle2, Truck, PackageCheck, XCircle, Loader2, Package } from "lucide-react";
+import { ArrowRightLeft, CheckCircle2, Truck, PackageCheck, XCircle, Loader2, Package, Pencil, DollarSign, ImageIcon, Video } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -47,6 +47,7 @@ const exchangeStatusIcon = {
 export default function ExchangeCard({
   exchange,
   onUpdateStatus,
+  onEdit,
   isUpdating,
 }) {
   const [adminNote, setAdminNote] = useState("");
@@ -71,7 +72,7 @@ export default function ExchangeCard({
   };
 
   const actions = nextActions[exchange.status] || [];
-  const totalPriceDiff = exchange.items?.reduce((sum, item) => sum + (item.priceDifference || 0), 0) || 0;
+  const totalPriceDiff = (exchange.items?.reduce((sum, item) => sum + (item.priceDifference || 0), 0) || 0) + (exchange.exchangeFee || 0);
 
   return (
     <div className="bg-white border border-zinc-200 overflow-hidden">
@@ -80,11 +81,21 @@ export default function ExchangeCard({
           <ArrowRightLeft size={14} className="text-violet-600" />
           <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.15em]">Exchange Details</h3>
         </div>
-        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 border ${styles.badge}`}>
-          <Icon size={10} className={styles.icon} />
-          <span className={`text-[9px] font-bold uppercase tracking-widest ${styles.label}`}>
-            {styles.text}
-          </span>
+        <div className="flex items-center gap-2">
+          {exchange.status === "requested" && onEdit && (
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-1.5 px-2.5 py-1 border border-zinc-200 text-[9px] font-bold uppercase tracking-widest text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
+            >
+              <Pencil size={9} /> Edit
+            </button>
+          )}
+          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 border ${styles.badge}`}>
+            <Icon size={10} className={styles.icon} />
+            <span className={`text-[9px] font-bold uppercase tracking-widest ${styles.label}`}>
+              {styles.text}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -111,7 +122,11 @@ export default function ExchangeCard({
                     </div>
                     <div className="min-w-0">
                       <p className="text-[11px] font-bold text-zinc-900 truncate">{item.originalProduct?.title || "Unknown"}</p>
-                      {item.originalVariant && <p className="text-[9px] text-zinc-400">{item.originalVariant}</p>}
+                      {item.originalVariant && (
+                        <p className="text-[9px] text-zinc-400">
+                          {Array.isArray(item.originalVariant) ? item.originalVariant.join(", ") : item.originalVariant}
+                        </p>
+                      )}
                       <p className="text-[9px] text-zinc-400">Qty: {item.originalQuantity}</p>
                     </div>
                   </div>
@@ -131,7 +146,11 @@ export default function ExchangeCard({
                     </div>
                     <div className="min-w-0">
                       <p className="text-[11px] font-bold text-zinc-900 truncate">{item.replacementProduct?.title || "Unknown"}</p>
-                      {item.replacementVariant && <p className="text-[9px] text-zinc-400">{item.replacementVariant}</p>}
+                      {item.replacementVariant && (
+                        <p className="text-[9px] text-zinc-400">
+                          {Array.isArray(item.replacementVariant) ? item.replacementVariant.join(", ") : item.replacementVariant}
+                        </p>
+                      )}
                       <p className="text-[9px] text-zinc-400">Qty: {item.replacementQuantity}</p>
                     </div>
                   </div>
@@ -142,13 +161,34 @@ export default function ExchangeCard({
         </div>
 
         {totalPriceDiff !== 0 && (
-          <div className={`flex items-center justify-between px-4 py-2.5 ${totalPriceDiff > 0 ? "bg-amber-50 border border-amber-200" : "bg-emerald-50 border border-emerald-200"}`}>
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${totalPriceDiff > 0 ? "text-amber-600" : "text-emerald-600"}`}>
-              {totalPriceDiff > 0 ? "Customer Pays Extra" : "Customer Gets Refund"}
-            </span>
-            <span className={`text-[13px] font-black font-mono ${totalPriceDiff > 0 ? "text-amber-700" : "text-emerald-700"}`}>
-              {totalPriceDiff > 0 ? "+" : ""}৳{Math.abs(totalPriceDiff).toLocaleString()}
-            </span>
+          <div className={`px-5 py-3.5 ${totalPriceDiff > 0 ? "bg-amber-50 border border-amber-200" : "bg-emerald-50 border border-emerald-200"}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <DollarSign size={14} className={totalPriceDiff > 0 ? "text-amber-600" : "text-emerald-600"} />
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${totalPriceDiff > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                  {totalPriceDiff > 0 ? "Customer Pays Extra" : "Customer Gets Refund"}
+                </span>
+              </div>
+              <span className={`text-[16px] font-black font-mono ${totalPriceDiff > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                {totalPriceDiff > 0 ? "+" : ""}৳{Math.abs(totalPriceDiff).toLocaleString()}
+              </span>
+            </div>
+            {exchange.exchangeFee > 0 && (
+              <div className="mt-2 pt-2 border-t border-dashed flex justify-between text-[10px]">
+                <span className={totalPriceDiff > 0 ? "text-amber-600" : "text-emerald-600"}>Product Difference</span>
+                <span className={`font-bold font-mono ${totalPriceDiff > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                  ৳{Math.abs(totalPriceDiff - exchange.exchangeFee).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {exchange.exchangeFee > 0 && (
+              <div className="flex justify-between text-[10px]">
+                <span className={totalPriceDiff > 0 ? "text-amber-600" : "text-emerald-600"}>Exchange / Shipping Fee</span>
+                <span className={`font-bold font-mono ${totalPriceDiff > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                  ৳{exchange.exchangeFee.toLocaleString()}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
@@ -156,6 +196,23 @@ export default function ExchangeCard({
           <div className="px-4 py-3 bg-violet-50 border border-violet-200">
             <p className="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-1">Admin Note</p>
             <p className="text-[11px] text-violet-800">{exchange.adminNote}</p>
+          </div>
+        )}
+
+        {exchange.attachments?.length > 0 && (
+          <div>
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Attachments</p>
+            <div className="grid grid-cols-4 gap-2">
+              {exchange.attachments.map((att, idx) => (
+                <div key={idx} className="aspect-square bg-zinc-100 border border-zinc-200 flex items-center justify-center overflow-hidden">
+                  {att.type === "image" ? (
+                    <img src={att.url} alt={att.name || ""} className="w-full h-full object-cover" />
+                  ) : (
+                    <Video size={20} className="text-zinc-400" />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
