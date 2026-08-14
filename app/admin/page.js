@@ -204,8 +204,8 @@ export default function AdminDashboard() {
           )}
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Charts Row - Full Width for better visibility */}
+      <div className="space-y-4">
         {isLoading ? (
           <>
             <SkeletonChart />
