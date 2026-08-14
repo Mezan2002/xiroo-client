@@ -12,7 +12,7 @@ export const useOrderManagement = (id) => {
   const [isAdvancePaymentModalOpen, setIsAdvancePaymentModalOpen] = useState(false);
   const [advancePaymentAmount, setAdvancePaymentAmount] = useState("");
   const [advancePaymentReason, setAdvancePaymentReason] = useState("");
-  const [selectedCourier, setSelectedCourier] = useState("carrybee");
+  const [selectedCourier, setSelectedCourier] = useState("steadfast");
   const [manualTrackingId, setManualTrackingId] = useState("");
   const [selectedCityId, setSelectedCityId] = useState("");
   const [selectedZoneId, setSelectedZoneId] = useState("");
@@ -21,6 +21,16 @@ export const useOrderManagement = (id) => {
   const [carrybeeProductType, setCarrybeeProductType] = useState("1");
   const [carrybeeDeliveryType, setCarrybeeDeliveryType] = useState("1");
   const [carrybeeSecondaryPhone, setCarrybeeSecondaryPhone] = useState("");
+
+  // Steadfast-specific fields
+  const [steadfastAlternativePhone, setSteadfastAlternativePhone] = useState("");
+  const [steadfastRecipientEmail, setSteadfastRecipientEmail] = useState("");
+  const [steadfastItemDescription, setSteadfastItemDescription] = useState("");
+  const [steadfastTotalLot, setSteadfastTotalLot] = useState("");
+  const [steadfastDeliveryType, setSteadfastDeliveryType] = useState("0");
+  const [steadfastNote, setSteadfastNote] = useState("");
+  const [steadfastWeight, setSteadfastWeight] = useState("");
+  const [steadfastCodAmount, setSteadfastCodAmount] = useState("");
 
   // Return note state
   const [isReturnNoteModalOpen, setIsReturnNoteModalOpen] = useState(false);
@@ -187,6 +197,14 @@ export const useOrderManagement = (id) => {
       productType: selectedCourier === "carrybee" ? Number(carrybeeProductType) : undefined,
       deliveryType: selectedCourier === "carrybee" ? Number(carrybeeDeliveryType) : undefined,
       secondaryPhone: selectedCourier === "carrybee" && carrybeeSecondaryPhone ? carrybeeSecondaryPhone : undefined,
+      alternativePhone: selectedCourier === "steadfast" && steadfastAlternativePhone ? steadfastAlternativePhone : undefined,
+      recipientEmail: selectedCourier === "steadfast" && steadfastRecipientEmail ? steadfastRecipientEmail : undefined,
+      itemDescription: selectedCourier === "steadfast" && steadfastItemDescription ? steadfastItemDescription : undefined,
+      totalLot: selectedCourier === "steadfast" && steadfastTotalLot ? Number(steadfastTotalLot) : undefined,
+      steadfastDeliveryType: selectedCourier === "steadfast" ? Number(steadfastDeliveryType) : undefined,
+      steadfastNote: selectedCourier === "steadfast" && steadfastNote ? steadfastNote : undefined,
+      steadfastWeight: selectedCourier === "steadfast" && steadfastWeight ? Number(steadfastWeight) : undefined,
+      steadfastCodAmount: selectedCourier === "steadfast" && steadfastCodAmount ? Number(steadfastCodAmount) : undefined,
     }, {
       onSuccess: (res) => toast.success(res.message || `Dispatched to ${selectedCourier}`),
       onError: (err) => toast.error(err.message || "Dispatch failed")
@@ -380,6 +398,14 @@ export const useOrderManagement = (id) => {
     carrybeeProductType, setCarrybeeProductType,
     carrybeeDeliveryType, setCarrybeeDeliveryType,
     carrybeeSecondaryPhone, setCarrybeeSecondaryPhone,
+    steadfastAlternativePhone, setSteadfastAlternativePhone,
+    steadfastRecipientEmail, setSteadfastRecipientEmail,
+    steadfastItemDescription, setSteadfastItemDescription,
+    steadfastTotalLot, setSteadfastTotalLot,
+    steadfastDeliveryType, setSteadfastDeliveryType,
+    steadfastNote, setSteadfastNote,
+    steadfastWeight, setSteadfastWeight,
+    steadfastCodAmount, setSteadfastCodAmount,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
     isEditingPrices, setIsEditingPrices, editedItems, editedShippingFee, setEditedShippingFee,

@@ -32,6 +32,22 @@ export default function CourierLogisticsCard({
   setCarrybeeDeliveryType,
   carrybeeSecondaryPhone,
   setCarrybeeSecondaryPhone,
+  steadfastAlternativePhone,
+  setSteadfastAlternativePhone,
+  steadfastRecipientEmail,
+  setSteadfastRecipientEmail,
+  steadfastItemDescription,
+  setSteadfastItemDescription,
+  steadfastTotalLot,
+  setSteadfastTotalLot,
+  steadfastDeliveryType,
+  setSteadfastDeliveryType,
+  steadfastNote,
+  setSteadfastNote,
+  steadfastWeight,
+  setSteadfastWeight,
+  steadfastCodAmount,
+  setSteadfastCodAmount,
   handleCourierDispatch,
   isDispatching,
   isCancelled,
@@ -123,6 +139,123 @@ export default function CourierLogisticsCard({
                 <option value="manual">SA Paribahan (Manual)</option>
               </select>
             </div>
+
+            {selectedCourier === "steadfast" && (
+              <>
+                <div className="space-y-2">
+                  <label className={LABEL}>Delivery Type</label>
+                  <div className="flex items-center gap-4 h-10">
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="steadfastDeliveryType"
+                        value="0"
+                        checked={steadfastDeliveryType === "0"}
+                        onChange={(e) => setSteadfastDeliveryType(e.target.value)}
+                        className="w-3.5 h-3.5 accent-black"
+                      />
+                      <span className="text-[11px] font-bold text-zinc-700">Home Delivery</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="steadfastDeliveryType"
+                        value="1"
+                        checked={steadfastDeliveryType === "1"}
+                        onChange={(e) => setSteadfastDeliveryType(e.target.value)}
+                        className="w-3.5 h-3.5 accent-black"
+                      />
+                      <span className="text-[11px] font-bold text-zinc-700">Point Delivery</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL}>COD Amount (&#2547;)</label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="0"
+                    placeholder="0"
+                    value={steadfastCodAmount}
+                    onChange={(e) => setSteadfastCodAmount(e.target.value)}
+                    className={INPUT}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL}>Item Description (optional)</label>
+                  <textarea
+                    placeholder="Type Item description (max 400 chars)"
+                    maxLength={400}
+                    rows={2}
+                    value={steadfastItemDescription}
+                    onChange={(e) => setSteadfastItemDescription(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-zinc-200 text-[11px] font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-black rounded-none resize-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL}>Note (optional)</label>
+                  <textarea
+                    placeholder="Type Note (max 400 chars)"
+                    maxLength={400}
+                    rows={2}
+                    value={steadfastNote}
+                    onChange={(e) => setSteadfastNote(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-zinc-200 text-[11px] font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-black rounded-none resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className={LABEL}>Weight (KG)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      placeholder="0"
+                      value={steadfastWeight}
+                      onChange={(e) => setSteadfastWeight(e.target.value)}
+                      className={INPUT}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={LABEL}>Total Lot (optional)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="1"
+                      value={steadfastTotalLot}
+                      onChange={(e) => setSteadfastTotalLot(e.target.value)}
+                      className={INPUT}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL}>Alternative Phone (optional)</label>
+                  <input
+                    type="text"
+                    placeholder="01XXXXXXXXX"
+                    value={steadfastAlternativePhone}
+                    onChange={(e) => setSteadfastAlternativePhone(e.target.value)}
+                    className={INPUT}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL}>Recipient Email (optional)</label>
+                  <input
+                    type="email"
+                    placeholder="recipient@email.com"
+                    value={steadfastRecipientEmail}
+                    onChange={(e) => setSteadfastRecipientEmail(e.target.value)}
+                    className={INPUT}
+                  />
+                </div>
+              </>
+            )}
 
             {selectedCourier === "carrybee" && (
               <>

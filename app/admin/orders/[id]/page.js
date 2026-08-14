@@ -34,6 +34,14 @@ export default function OrderDetailsPage() {
     carrybeeProductType, setCarrybeeProductType,
     carrybeeDeliveryType, setCarrybeeDeliveryType,
     carrybeeSecondaryPhone, setCarrybeeSecondaryPhone,
+    steadfastAlternativePhone, setSteadfastAlternativePhone,
+    steadfastRecipientEmail, setSteadfastRecipientEmail,
+    steadfastItemDescription, setSteadfastItemDescription,
+    steadfastTotalLot, setSteadfastTotalLot,
+    steadfastDeliveryType, setSteadfastDeliveryType,
+    steadfastNote, setSteadfastNote,
+    steadfastWeight, setSteadfastWeight,
+    steadfastCodAmount, setSteadfastCodAmount,
     handleStatusChange, handleConfirmCancellation, handleCourierDispatch,
     handleRequestAdvancePayment, handleConfirmAdvancePayment, handleWaiveAdvancePayment,
     isUpdatingStatus, isCancelling, isDispatching,
@@ -543,6 +551,22 @@ export default function OrderDetailsPage() {
             setCarrybeeDeliveryType={setCarrybeeDeliveryType}
             carrybeeSecondaryPhone={carrybeeSecondaryPhone}
             setCarrybeeSecondaryPhone={setCarrybeeSecondaryPhone}
+            steadfastAlternativePhone={steadfastAlternativePhone}
+            setSteadfastAlternativePhone={setSteadfastAlternativePhone}
+            steadfastRecipientEmail={steadfastRecipientEmail}
+            setSteadfastRecipientEmail={setSteadfastRecipientEmail}
+            steadfastItemDescription={steadfastItemDescription}
+            setSteadfastItemDescription={setSteadfastItemDescription}
+            steadfastTotalLot={steadfastTotalLot}
+            setSteadfastTotalLot={setSteadfastTotalLot}
+            steadfastDeliveryType={steadfastDeliveryType}
+            setSteadfastDeliveryType={setSteadfastDeliveryType}
+            steadfastNote={steadfastNote}
+            setSteadfastNote={setSteadfastNote}
+            steadfastWeight={steadfastWeight}
+            setSteadfastWeight={setSteadfastWeight}
+            steadfastCodAmount={steadfastCodAmount}
+            setSteadfastCodAmount={setSteadfastCodAmount}
             handleCourierDispatch={handleCourierDispatch}
             isDispatching={isDispatching}
             isCancelled={order.status === "cancelled"}

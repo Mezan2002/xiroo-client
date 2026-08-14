@@ -97,7 +97,7 @@ export const useOrders = () => {
   });
 
   const dispatchCourier = useMutation({
-    mutationFn: async ({ id, provider, trackingId, cityId, zoneId, itemWeight, collectableAmount, productType, deliveryType, secondaryPhone }) => {
+    mutationFn: async ({ id, provider, trackingId, cityId, zoneId, itemWeight, collectableAmount, productType, deliveryType, secondaryPhone, alternativePhone, recipientEmail, itemDescription, totalLot, steadfastDeliveryType, steadfastNote, steadfastWeight, steadfastCodAmount }) => {
       const response = await axiosInstance.post(`/orders/${id}/dispatch`, {
         provider,
         trackingId,
@@ -108,6 +108,14 @@ export const useOrders = () => {
         productType,
         deliveryType,
         secondaryPhone,
+        alternativePhone,
+        recipientEmail,
+        itemDescription,
+        totalLot,
+        steadfastDeliveryType,
+        steadfastNote,
+        steadfastWeight,
+        steadfastCodAmount,
       });
       return response;
     },
