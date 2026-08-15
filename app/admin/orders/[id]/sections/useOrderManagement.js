@@ -37,6 +37,9 @@ export const useOrderManagement = (id) => {
   const [returnNote, setReturnNote] = useState("");
   const [pendingStatus, setPendingStatus] = useState(null);
 
+  // Partial delivery state
+  const [isPartialDeliveryModalOpen, setIsPartialDeliveryModalOpen] = useState(false);
+
   // Edit return note state
   const [isEditingReturnNote, setIsEditingReturnNote] = useState(false);
   const [editedReturnNote, setEditedReturnNote] = useState("");
@@ -91,6 +94,11 @@ export const useOrderManagement = (id) => {
       return;
     }
 
+    if (newStatus === "partially-delivered") {
+      setIsPartialDeliveryModalOpen(true);
+      return;
+    }
+
     if (newStatus.startsWith("exchange-")) {
       const exchangeStatus = newStatus.replace("exchange-", "");
       handleUpdateExchangeStatus(exchangeStatus);
@@ -101,6 +109,19 @@ export const useOrderManagement = (id) => {
       onSuccess: () => toast.success(`Order status updated to ${newStatus.replace(/-/g, " ")}`),
       onError: (err) => toast.error(err.message || "Failed to update status")
     });
+  };
+
+  const handlePartialDeliveryConfirm = async (selectedIndices, { priceOverrides, shippingFee }) => {
+    updateStatus.mutate(
+      { id, status: "partially-delivered", deliveredItemIndices: selectedIndices, priceOverrides, shippingFee },
+      {
+        onSuccess: () => {
+          toast.success("Partial delivery recorded successfully");
+          setIsPartialDeliveryModalOpen(false);
+        },
+        onError: (err) => toast.error(err.message || "Failed to record partial delivery"),
+      }
+    );
   };
 
   const handleReturnNoteConfirm = async () => {
@@ -419,6 +440,9 @@ export const useOrderManagement = (id) => {
     isEditingReturnNote, setIsEditingReturnNote,
     editedReturnNote, setEditedReturnNote,
     handleEditReturnNote, handleSaveReturnNote, handleRemoveReturnNote, handleCancelEditReturnNote,
+    // Partial delivery
+    isPartialDeliveryModalOpen, setIsPartialDeliveryModalOpen,
+    handlePartialDeliveryConfirm,
     // Exchange
     isExchangeModalOpen, setIsExchangeModalOpen,
     isEditingExchange, setIsEditingExchange,

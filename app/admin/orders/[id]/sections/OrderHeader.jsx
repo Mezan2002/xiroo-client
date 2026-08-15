@@ -82,6 +82,12 @@ const statusStyles = {
     bg: "bg-emerald-50",
     border: "border-emerald-200",
   },
+  "partially-delivered": {
+    dot: "bg-teal-500",
+    text: "text-teal-600",
+    bg: "bg-teal-50",
+    border: "border-teal-200",
+  },
   returned: {
     dot: "bg-rose-500",
     text: "text-rose-600",
@@ -165,6 +171,7 @@ const statusOptions = [
     icon: UserCheck,
   },
   { value: "delivered", label: "Delivered", icon: CheckCircle2 },
+  { value: "partially-delivered", label: "Partially Delivered", icon: Truck },
   { value: "returned", label: "Returned", icon: Undo2 },
   { value: "return-received", label: "Return Received", icon: RotateCcw },
   { value: "on-hold", label: "On Hold", icon: PauseCircle },

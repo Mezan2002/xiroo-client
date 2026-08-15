@@ -43,6 +43,8 @@ export default function TrackOrderPage() {
         return <Truck className="w-5 h-5 text-blue-500" />;
       case "delivered":
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case "partially-delivered":
+        return <CheckCircle2 className="w-5 h-5 text-teal-500" />;
       case "returned":
       case "return-received":
         return <AlertCircle className="w-5 h-5 text-red-500" />;
@@ -77,6 +79,8 @@ export default function TrackOrderPage() {
         return "Out for Delivery";
       case "delivered":
         return "Delivered";
+      case "partially-delivered":
+        return "Partially Delivered";
       case "returned":
         return "Returned";
       case "return-received":

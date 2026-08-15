@@ -184,6 +184,7 @@ export default function AdminOrders() {
                 { value: "at-last-hub", label: "At Last Hub" },
                 { value: "assigned-for-delivery", label: "Assigned for Delivery" },
                 { value: "delivered", label: "Delivered" },
+                { value: "partially-delivered", label: "Partially Delivered" },
                 { value: "returned", label: "Returned" },
                 { value: "return-received", label: "Return Received" },
                 { value: "on-hold", label: "On Hold" },

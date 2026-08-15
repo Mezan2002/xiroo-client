@@ -88,6 +88,8 @@ export default function DataTable({
               return "bg-indigo-50 text-indigo-600 border-indigo-200";
             case "delivered":
               return "bg-emerald-50 text-emerald-600 border-emerald-200";
+            case "partially-delivered":
+              return "bg-teal-50 text-teal-600 border-teal-200";
             case "returned":
               return "bg-rose-50 text-rose-600 border-rose-200";
             case "return-received":

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine, AlertTriangle, ArrowRightLeft } from "lucide-react";
+import { Loader2, FileX, ArrowLeft, DollarSign, MapPin, Truck, Package, Pencil, X, Check, PenLine, AlertTriangle, ArrowRightLeft, CheckCircle2, XCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,6 +17,7 @@ import OrderHeader from "./sections/OrderHeader";
 import ExchangeCard from "./sections/ExchangeCard";
 import ReturnRequestCard from "./sections/ReturnRequestCard";
 import RequestExchangeModal from "./sections/RequestExchangeModal";
+import PartialDeliveryModal from "./sections/PartialDeliveryModal";
 import { useOrderManagement } from "./sections/useOrderManagement";
 
 export default function OrderDetailsPage() {
@@ -67,6 +68,9 @@ export default function OrderDetailsPage() {
     exchangeFee, setExchangeFee,
     handleRequestExchange, handleEditExchange, handleStartEditExchange, handleUpdateExchangeStatus,
     isRequestingExchange, isEditingExchangePending, isUpdatingExchangeStatus,
+    // Partial delivery
+    isPartialDeliveryModalOpen, setIsPartialDeliveryModalOpen,
+    handlePartialDeliveryConfirm,
   } = useOrderManagement(id);
 
   if (loading) {
@@ -99,6 +103,17 @@ export default function OrderDetailsPage() {
   const phone = order.guestInfo?.phone || order.user?.phoneNumber;
   const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
   const canEditPrices = ["pending", "processing", "given-for-design", "ready-to-pack", "on-hold"].includes(order.status);
+  const isPartialDelivered = order.status === "partially-delivered";
+  const deliveredProductIds = isPartialDelivered
+    ? (order.partiallyDeliveredItems || []).map((item) => `${item.product?._id || item.product}-${item.variant || ""}`)
+    : [];
+  const partialDeliveredMap = {};
+  if (isPartialDelivered && order.partiallyDeliveredItems) {
+    order.partiallyDeliveredItems.forEach((pdi) => {
+      const key = `${pdi.product?._id || pdi.product}-${pdi.variant || ""}`;
+      partialDeliveredMap[key] = pdi;
+    });
+  }
 
   const rawSubtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const delivery = order.shippingFee !== undefined ? order.shippingFee : Math.max(0, order.totalPrice - rawSubtotal);
@@ -319,8 +334,20 @@ export default function OrderDetailsPage() {
                       const exchangeItem = order.exchange?.items?.find(
                         (ei) => (ei.originalProduct?._id || ei.originalProduct) === (item.product?._id || item.product)
                       );
+                      const itemKey = `${item.product?._id || item.product}-${item.variant || ""}`;
+                      const isDelivered = !isPartialDelivered || deliveredProductIds.includes(itemKey);
+                      const deliveredItem = partialDeliveredMap[itemKey];
+                      const displayPrice = deliveredItem ? deliveredItem.price : item.price;
+                      const isPriceOverridden = deliveredItem && deliveredItem.price !== item.price;
                       return (
-                        <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
+                        <tr
+                          key={idx}
+                          className={`transition-colors ${
+                            isPartialDelivered && !isDelivered
+                              ? "bg-zinc-50/80 opacity-50"
+                              : "hover:bg-zinc-50/50"
+                          }`}
+                        >
                           <td className="px-5 py-3 max-w-[300px]">
                             <div className="flex items-center gap-3">
                               <div className="relative w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
@@ -332,11 +359,29 @@ export default function OrderDetailsPage() {
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <p className="text-[12px] font-bold text-zinc-900 truncate">{item.product?.title || "Unknown"}</p>
+                                  <p className={`text-[12px] font-bold truncate ${
+                                    isPartialDelivered && !isDelivered
+                                      ? "text-zinc-400 line-through"
+                                      : "text-zinc-900"
+                                  }`}>
+                                    {item.product?.title || "Unknown"}
+                                  </p>
                                   {exchangeItem && (
                                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-violet-50 border border-violet-200 shrink-0">
                                       <ArrowRightLeft size={8} className="text-violet-600" />
                                       <span className="text-[8px] font-bold text-violet-600 uppercase tracking-wider">Exchange</span>
+                                    </span>
+                                  )}
+                                  {isPartialDelivered && isDelivered && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 shrink-0">
+                                      <CheckCircle2 size={8} className="text-emerald-600" />
+                                      <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-wider">Delivered</span>
+                                    </span>
+                                  )}
+                                  {isPartialDelivered && !isDelivered && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 shrink-0">
+                                      <XCircle size={8} className="text-zinc-400" />
+                                      <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-wider">Pending</span>
                                     </span>
                                   )}
                                 </div>
@@ -348,11 +393,28 @@ export default function OrderDetailsPage() {
                                     orig: ৳{item.originalPrice.toLocaleString()}
                                   </p>
                                 )}
+                                {isPriceOverridden && (
+                                  <p className="text-[9px] text-amber-500 font-medium">
+                                    orig: ৳{item.price.toLocaleString()}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </td>
-                          <td className="px-5 py-3 text-center text-[12px] font-bold text-zinc-500 font-mono">x{item.quantity}</td>
-                          <td className="px-5 py-3 text-right text-[12px] font-black text-zinc-900 font-mono">৳{(item.price * item.quantity).toLocaleString()}</td>
+                          <td className={`px-5 py-3 text-center text-[12px] font-bold font-mono ${
+                            isPartialDelivered && !isDelivered ? "text-zinc-300 line-through" : "text-zinc-500"
+                          }`}>
+                            x{item.quantity}
+                          </td>
+                          <td className={`px-5 py-3 text-right text-[12px] font-black font-mono ${
+                            isPartialDelivered && !isDelivered
+                              ? "text-zinc-300 line-through"
+                              : isPriceOverridden
+                                ? "text-amber-600"
+                                : "text-zinc-900"
+                          }`}>
+                            ৳{(displayPrice * item.quantity).toLocaleString()}
+                          </td>
                         </tr>
                       );
                     })}
@@ -361,37 +423,58 @@ export default function OrderDetailsPage() {
 
                 {/* Pricing */}
                 <div className="px-5 py-4 bg-zinc-50 border-t border-zinc-100 space-y-2">
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-zinc-400 font-medium">Subtotal</span>
-                    <span className="text-zinc-700 font-bold font-mono">৳{rawSubtotal.toLocaleString()}</span>
-                  </div>
-                  {bundleDiscountAmount > 0 && (
-                    <div className="flex justify-between text-[11px] text-green-600">
-                      <span className="font-medium">Bundle Discount (10%)</span>
-                      <span className="font-bold font-mono">-৳{bundleDiscountAmount.toLocaleString()}</span>
-                    </div>
-                  )}
-                  {order.discount && couponDiscountAmount > 0 && (
-                    <div className="flex justify-between text-[11px] text-green-600">
-                      <span className="font-medium">Coupon ({order.discount.code})</span>
-                      <span className="font-bold font-mono">-৳{couponDiscountAmount.toLocaleString()}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-zinc-400 font-medium">Shipping</span>
-                    <span className="text-zinc-700 font-bold font-mono">৳{delivery.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-zinc-200">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total</span>
-                    <span className="text-[16px] font-black text-zinc-900 font-mono">৳{order.totalPrice.toLocaleString()}</span>
-                  </div>
-                  {order.isAdminOverride && (
-                    <div className="flex items-center gap-2 pt-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
-                        Admin Price Override Active
-                      </span>
-                    </div>
+                  {isPartialDelivered ? (
+                    <>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-zinc-400 font-medium">Delivered Items Subtotal</span>
+                        <span className="text-zinc-700 font-bold font-mono">
+                          ৳{(order.partiallyDeliveredItems || []).reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-zinc-400 font-medium">Shipping</span>
+                        <span className="text-zinc-700 font-bold font-mono">৳{order.shippingFee.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between pt-2 border-t border-zinc-200">
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total (Delivered)</span>
+                        <span className="text-[16px] font-black text-emerald-600 font-mono">৳{order.totalPrice.toLocaleString()}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-zinc-400 font-medium">Subtotal</span>
+                        <span className="text-zinc-700 font-bold font-mono">৳{rawSubtotal.toLocaleString()}</span>
+                      </div>
+                      {bundleDiscountAmount > 0 && (
+                        <div className="flex justify-between text-[11px] text-green-600">
+                          <span className="font-medium">Bundle Discount (10%)</span>
+                          <span className="font-bold font-mono">-৳{bundleDiscountAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {order.discount && couponDiscountAmount > 0 && (
+                        <div className="flex justify-between text-[11px] text-green-600">
+                          <span className="font-medium">Coupon ({order.discount.code})</span>
+                          <span className="font-bold font-mono">-৳{couponDiscountAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-zinc-400 font-medium">Shipping</span>
+                        <span className="text-zinc-700 font-bold font-mono">৳{delivery.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between pt-2 border-t border-zinc-200">
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total</span>
+                        <span className="text-[16px] font-black text-zinc-900 font-mono">৳{order.totalPrice.toLocaleString()}</span>
+                      </div>
+                      {order.isAdminOverride && (
+                        <div className="flex items-center gap-2 pt-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
+                            Admin Price Override Active
+                          </span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </>
@@ -581,7 +664,7 @@ export default function OrderDetailsPage() {
           />
 
           {(!order.advancePayment?.required || order.advancePayment?.status === "waived") &&
-           order.status !== "delivered" && order.status !== "cancelled" && (
+           order.status !== "delivered" && order.status !== "partially-delivered" && order.status !== "cancelled" && (
             <button
               onClick={() => setIsAdvancePaymentModalOpen(true)}
               className="w-full py-2.5 border border-dashed border-zinc-200 hover:border-zinc-400 text-zinc-500 hover:text-zinc-700 text-[10px] font-bold uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2"
@@ -590,8 +673,8 @@ export default function OrderDetailsPage() {
             </button>
           )}
 
-          {/* Exchange Request Button - Show for delivered orders without existing exchange or rejected exchange */}
-          {order.status === "delivered" && (!order.exchange || order.exchange?.status === "rejected") && (
+          {/* Exchange Request Button - Show for delivered/partially-delivered orders without existing exchange or rejected exchange */}
+          {(order.status === "delivered" || order.status === "partially-delivered") && (!order.exchange || order.exchange?.status === "rejected") && (
             <button
               onClick={() => setIsExchangeModalOpen(true)}
               className="w-full py-2.5 border border-dashed border-violet-200 hover:border-violet-400 text-violet-500 hover:text-violet-700 text-[10px] font-bold uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2"
@@ -673,6 +756,15 @@ export default function OrderDetailsPage() {
           </div>
         </div>
       )}
+
+      <PartialDeliveryModal
+        isOpen={isPartialDeliveryModalOpen}
+        onClose={() => setIsPartialDeliveryModalOpen(false)}
+        onConfirm={handlePartialDeliveryConfirm}
+        items={order.items}
+        isProcessing={isUpdatingStatus}
+        currentShippingFee={order.shippingFee || 0}
+      />
 
       <EditOrderModal
         isOpen={isEditModalOpen}
