@@ -219,7 +219,7 @@ export default function OrderDetailsPage() {
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
                     {editedItems.map((item, idx) => {
-                      const isOverridden = item.originalPrice && Number(item.price) !== item.originalPrice;
+                      const isOverridden = item.originalPrice > 0 && Number(item.price) !== item.originalPrice;
                       return (
                         <tr key={idx} className="hover:bg-zinc-50/50 transition-colors">
                           <td className="px-5 py-3 max-w-[300px]">
@@ -294,7 +294,7 @@ export default function OrderDetailsPage() {
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Total</span>
                     <span className="text-[16px] font-black text-zinc-900 font-mono">৳{editedTotal.toLocaleString()}</span>
                   </div>
-                  {editedItems.some((item) => item.originalPrice && Number(item.price) !== item.originalPrice) && (
+                  {editedItems.some((item) => item.originalPrice > 0 && Number(item.price) !== item.originalPrice) && (
                     <div className="flex items-center gap-2 pt-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                       <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">
@@ -343,7 +343,7 @@ export default function OrderDetailsPage() {
                                 {item.variant && item.variant !== "Standard" && (
                                   <p className="text-[10px] text-zinc-400">{item.variant}</p>
                                 )}
-                                {item.originalPrice && item.price !== item.originalPrice && (
+                                {item.originalPrice > 0 && item.price !== item.originalPrice && (
                                   <p className="text-[9px] text-amber-500 font-medium">
                                     orig: ৳{item.originalPrice.toLocaleString()}
                                   </p>

@@ -52,7 +52,7 @@ export default function NewOrderPage() {
       shippingFee: metrics.shipping,
       status: "pending",
       paymentStatus: "pending",
-      isAdminOverride: order.items.some(item => item.originalPrice && item.price !== item.originalPrice),
+      isAdminOverride: order.items.some(item => item.originalPrice > 0 && item.price !== item.originalPrice),
     };
 
     placeOrder.mutate(payload, {

@@ -617,9 +617,27 @@ export default function ItemsSection({
 
   const handleVariantConfirm = (product, variant) => {
     const id = variantSelectingItemId;
+
+    // Look up variant-specific price from product's variant groups
+    let variantPrice = null;
+    if (variant && variant !== "Standard" && product.variants?.length > 0) {
+      const parts = variant.split(" / ");
+      for (const part of parts) {
+        for (const group of product.variants) {
+          const match = group.values?.find((v) => v.value === part);
+          if (match && match.price != null) {
+            variantPrice = match.price;
+            break;
+          }
+        }
+        if (variantPrice != null) break;
+      }
+    }
+
     updateItem(id, "product", product._id);
     updateItem(id, "name", product.title);
-    updateItem(id, "price", product.salePrice || product.price);
+    updateItem(id, "price", variantPrice ?? (product.salePrice || product.price));
+    updateItem(id, "originalPrice", variantPrice ?? (product.salePrice || product.price));
     updateItem(id, "variant", variant);
     updateItem(id, "image", product.images?.[0] || "");
     setVariantSelectingProduct(null);
@@ -783,12 +801,12 @@ export default function ItemsSection({
                           )
                         }
                         className={`w-24 bg-transparent border-b text-right text-[13px] font-medium py-1 outline-none ${
-                          item.originalPrice && item.price !== item.originalPrice
+                          item.originalPrice > 0 && item.price !== item.originalPrice
                             ? "border-amber-300 text-amber-600"
                             : "border-zinc-100"
                         }`}
                       />
-                      {item.originalPrice && item.price !== item.originalPrice && (
+                      {item.originalPrice > 0 && item.price !== item.originalPrice && (
                         <span className="text-[9px] font-medium text-zinc-400 line-through">
                           orig: ৳{item.originalPrice}
                         </span>
@@ -861,7 +879,7 @@ export default function ItemsSection({
                   ৳{total.toLocaleString()}
                 </span>
               </div>
-              {items.some(item => item.originalPrice && item.price !== item.originalPrice) && (
+              {items.some(item => item.originalPrice > 0 && item.price !== item.originalPrice) && (
                 <div className="flex items-center gap-2 pt-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                   <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">

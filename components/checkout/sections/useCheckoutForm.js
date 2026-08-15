@@ -76,8 +76,8 @@ export const useCheckoutForm = (
         address: defaultAddress
           ? `${defaultAddress.addressLine1}${defaultAddress.addressLine2 ? ", " + defaultAddress.addressLine2 : ""}`
           : prev.address,
-        district: defaultAddress?.state || prev.district,
-        upazila: defaultAddress?.city || prev.upazila,
+        district: defaultAddress?.district || prev.district,
+        upazila: defaultAddress?.thana || prev.upazila,
         postalCode: defaultAddress?.postalCode || prev.postalCode,
       }));
       if (defaultAddress?.state && setProductDistrict) {
@@ -105,12 +105,12 @@ export const useCheckoutForm = (
           lastName: prev.lastName || result.lastName || "",
           email: prev.email || result.emails?.[0] || "",
           address: prev.address || result.addresses?.[0]?.addressLine1 || "",
-          district: prev.district || result.addresses?.[0]?.state || "",
-          upazila: prev.upazila || result.addresses?.[0]?.city || "",
+          district: prev.district || result.addresses?.[0]?.district || "",
+          upazila: prev.upazila || result.addresses?.[0]?.thana || "",
           postalCode: prev.postalCode || result.addresses?.[0]?.postalCode || "",
         }));
         // Update district for shipping calculation
-        const district = result.addresses?.[0]?.state;
+        const district = result.addresses?.[0]?.district;
         if (district && setProductDistrict) {
           setProductDistrict(district);
         }
