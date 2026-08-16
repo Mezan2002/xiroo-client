@@ -216,17 +216,24 @@ export default function AdminAnalytics() {
           <div className="flex flex-wrap items-center gap-3">
             {/* Days filter */}
             <div className="flex items-center gap-1 bg-zinc-50 border border-zinc-100 p-1">
-              {[3, 7, 14, 30].map((d) => (
+              {[
+                { value: "today", label: "Today" },
+                { value: "yesterday", label: "Yesterday" },
+                { value: 3, label: "3D" },
+                { value: 7, label: "7D" },
+                { value: 14, label: "14D" },
+                { value: 30, label: "30D" },
+              ].map((opt) => (
                 <button
-                  key={d}
-                  onClick={() => setDays(d)}
+                  key={opt.value}
+                  onClick={() => setDays(opt.value)}
                   className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                    days === d
+                    days === opt.value
                       ? "bg-black text-white"
                       : "text-zinc-400 hover:text-black"
                   }`}
                 >
-                  {d}d
+                  {opt.label}
                 </button>
               ))}
             </div>

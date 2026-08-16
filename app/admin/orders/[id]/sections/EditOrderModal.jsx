@@ -113,6 +113,65 @@ function ProductSearchDropdown({ onSelect, onClose }) {
   );
 }
 
+function VariantButtonPicker({ variants, selectedVariant, onSelect, disabled }) {
+  const selectedMap = {};
+  if (selectedVariant && selectedVariant !== "Standard") {
+    const parts = selectedVariant.split(" / ").map((s) => s.trim());
+    let i = 0;
+    for (const group of variants) {
+      if (i < parts.length) {
+        selectedMap[group.name] = parts[i];
+        i++;
+      }
+    }
+  }
+
+  const handleSelect = (groupName, value) => {
+    selectedMap[groupName] = value;
+    const combined = variants
+      .map((g) => selectedMap[g.name] || "")
+      .filter(Boolean)
+      .join(" / ");
+    onSelect(combined || "Standard");
+  };
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      {variants.map((variant) => (
+        <div key={variant.name}>
+          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
+            Select {variant.name}
+            {!selectedMap[variant.name] && (
+              <span className="text-red-400 ml-1">Required</span>
+            )}
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {variant.values.map((vObj) => {
+              const val = typeof vObj === "string" ? vObj : vObj.value;
+              const isSelected = selectedMap[variant.name] === val;
+              return (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleSelect(variant.name, val)}
+                  disabled={disabled}
+                  className={`px-2 py-1 text-[10px] font-bold border transition-all ${
+                    isSelected
+                      ? "bg-black text-white border-black"
+                      : "border-zinc-200 text-zinc-500 hover:border-black"
+                  } ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  {val}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function BundleCreator({ items, onBundle, onUnbundle, onClose }) {
   const [selectedIndices, setSelectedIndices] = useState([]);
 
@@ -254,6 +313,7 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
   const [activeTab, setActiveTab] = useState("details");
   const [showProductSearch, setShowProductSearch] = useState(false);
   const [showBundleCreator, setShowBundleCreator] = useState(false);
+  const [productVariants, setProductVariants] = useState({});
 
   const [form, setForm] = useState({
     shippingAddress: "",
@@ -269,6 +329,26 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
   });
 
   const [editedItems, setEditedItems] = useState([]);
+  const [productData, setProductData] = useState({});
+
+  const fetchProductVariants = async (productId) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products/${productId}`);
+      const data = await response.json();
+      if (data?.data) {
+        setProductVariants((prev) => ({
+          ...prev,
+          [productId]: data.data.variants || [],
+        }));
+        setProductData((prev) => ({
+          ...prev,
+          [productId]: data.data,
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to fetch product variants:", error);
+    }
+  };
 
   useEffect(() => {
     if (order && isOpen) {
@@ -301,6 +381,18 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
       setActiveTab("details");
       setShowProductSearch(false);
       setShowBundleCreator(false);
+      
+      // Fetch full product data for variants
+      const productIds = [...new Set(
+        order.items
+          .map((item) => item.product?._id || item.product)
+          .filter(Boolean)
+      )];
+      productIds.forEach((id) => {
+        if (!productVariants[id]) {
+          fetchProductVariants(id);
+        }
+      });
     }
   }, [order, isOpen]);
 
@@ -328,6 +420,16 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
       isNew: true,
     };
     setEditedItems((prev) => [...prev, newItem]);
+    if (product.variants) {
+      setProductVariants((prev) => ({
+        ...prev,
+        [product._id]: product.variants,
+      }));
+    }
+    setProductData((prev) => ({
+      ...prev,
+      [product._id]: product,
+    }));
     setShowProductSearch(false);
     toast.success(`Added "${product.title}" to order`);
   };
@@ -741,52 +843,125 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2">
-                        <input
-                          type="text"
-                          value={item.variant}
-                          onChange={(e) =>
-                            handleItemChange(idx, "variant", e.target.value)
-                          }
-                          disabled={!isEditable}
-                          placeholder="Variant"
-                          className={INPUT + " text-[11px] py-1.5 px-2"}
-                        />
-                        <input
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            handleItemChange(
-                              idx,
-                              "quantity",
-                              parseInt(e.target.value) || 1
-                            )
-                          }
-                          disabled={!isEditable}
-                          className={
-                            INPUT +
-                            " text-[11px] py-1.5 px-2 font-mono text-center"
-                          }
-                        />
-                        <input
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={item.price}
-                          onChange={(e) =>
-                            handleItemChange(
-                              idx,
-                              "price",
-                              parseFloat(e.target.value) || 0
-                            )
-                          }
-                          disabled={!isEditable}
-                          className={
-                            INPUT + " text-[11px] py-1.5 px-2 font-mono"
-                          }
-                        />
-                      </div>
+                      {(() => {
+                        const variants = item.product?.variants || productVariants[item.productId];
+                        return variants?.length > 0 ? (
+                          <div className="space-y-2">
+                            <VariantButtonPicker
+                              variants={variants}
+                              selectedVariant={item.variant}
+                              onSelect={(v) => {
+                                handleItemChange(idx, "variant", v);
+                                // Update price based on variant selection
+                                const pdata = productData[item.productId] || item.product;
+                                if (pdata?.variants && v !== "Standard") {
+                                  const parts = v.split(" / ").map((s) => s.trim());
+                                  let variantPrice = null;
+                                  for (const part of parts) {
+                                    for (const group of pdata.variants) {
+                                      const match = group.values?.find(
+                                        (val) => (typeof val === "string" ? val : val.value) === part
+                                      );
+                                      if (match?.price) {
+                                        variantPrice = match.price;
+                                        break;
+                                      }
+                                    }
+                                    if (variantPrice) break;
+                                  }
+                                  if (variantPrice != null) {
+                                    handleItemChange(idx, "price", variantPrice);
+                                  }
+                                }
+                              }}
+                              disabled={!isEditable}
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="number"
+                                min="1"
+                                value={item.quantity}
+                                onChange={(e) =>
+                                  handleItemChange(
+                                    idx,
+                                    "quantity",
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                disabled={!isEditable}
+                                className={
+                                  INPUT +
+                                  " text-[11px] py-1.5 px-2 font-mono text-center"
+                                }
+                              />
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={item.price}
+                                onChange={(e) =>
+                                  handleItemChange(
+                                    idx,
+                                    "price",
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                                disabled={!isEditable}
+                                className={
+                                  INPUT + " text-[11px] py-1.5 px-2 font-mono"
+                                }
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-3 gap-2">
+                            <input
+                              type="text"
+                              value={item.variant}
+                              onChange={(e) =>
+                                handleItemChange(idx, "variant", e.target.value)
+                              }
+                              disabled={!isEditable}
+                              placeholder="Variant"
+                              className={INPUT + " text-[11px] py-1.5 px-2"}
+                            />
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.quantity}
+                              onChange={(e) =>
+                                handleItemChange(
+                                  idx,
+                                  "quantity",
+                                  parseInt(e.target.value) || 1
+                                )
+                              }
+                              disabled={!isEditable}
+                              className={
+                                INPUT +
+                                " text-[11px] py-1.5 px-2 font-mono text-center"
+                              }
+                            />
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={item.price}
+                              onChange={(e) =>
+                                handleItemChange(
+                                  idx,
+                                  "price",
+                                  parseFloat(e.target.value) || 0
+                                )
+                              }
+                              disabled={!isEditable}
+                              className={
+                                INPUT + " text-[11px] py-1.5 px-2 font-mono"
+                              }
+                            />
+                          </div>
+                        );
+                      })()}
 
                       <div className="flex justify-between text-[10px]">
                         <span className="text-zinc-400">Qty &times; Price</span>

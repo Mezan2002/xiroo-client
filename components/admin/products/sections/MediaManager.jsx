@@ -47,7 +47,7 @@ const MediaManager = ({ product, setProduct }) => {
                 src={img}
                 alt={`Product image ${idx + 1}`}
                 fill
-                className={`object-cover transition-all duration-700 ${isMain ? "grayscale-0" : "grayscale hover:grayscale-0"}`}
+                className="object-cover transition-all duration-700"
               />
 
               {/* Overlay Actions */}
