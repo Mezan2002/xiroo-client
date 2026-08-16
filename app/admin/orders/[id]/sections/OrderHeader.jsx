@@ -184,6 +184,8 @@ export default function OrderHeader({
   order,
   isUpdatingStatus,
   handleStatusChange,
+  handleTogglePaid,
+  isTogglingPaid,
 }) {
   const hasActiveExchange = order.exchange && ["requested", "accepted", "shipped"].includes(order.exchange.status);
 
@@ -232,6 +234,24 @@ export default function OrderHeader({
       icon={ShoppingBag}
       actions={
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Paid/Unpaid Toggle */}
+          <button
+            onClick={() => handleTogglePaid(!order.isPaid)}
+            disabled={isTogglingPaid}
+            className={`h-9 sm:h-10 px-3 sm:px-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.15em] border transition-all flex items-center gap-2 ${
+              order.isPaid
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+            } ${isTogglingPaid ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          >
+            {isTogglingPaid ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <span className={`w-2 h-2 rounded-full ${order.isPaid ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+            )}
+            {order.isPaid ? 'Paid' : 'Unpaid'}
+          </button>
+
           {/* Status dropdown */}
           <div className="w-36 sm:w-52">
             {isUpdatingStatus && (

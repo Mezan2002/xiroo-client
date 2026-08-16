@@ -204,6 +204,31 @@ export default function AdminDashboard() {
           )}
       </div>
 
+      {/* Paid/Unpaid Cards (Delivered Orders) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {isLoading
+          ? [1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)
+          : (
+            <>
+              <StatCard
+                label="Paid (Delivered)"
+                count={(stats?.orderStatus?.paidCount || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.paidAmount || 0).toLocaleString()}`}
+                icon={CheckCircle}
+                trendLabel="collected"
+                accent
+              />
+              <StatCard
+                label="Unpaid (Delivered)"
+                count={(stats?.orderStatus?.unpaidCount || 0).toLocaleString()}
+                value={`৳${(stats?.orderStatus?.unpaidAmount || 0).toLocaleString()}`}
+                icon={DollarSign}
+                trendLabel="pending collection"
+              />
+            </>
+          )}
+      </div>
+
       {/* Charts Row - Full Width for better visibility */}
       <div className="space-y-4">
         {isLoading ? (

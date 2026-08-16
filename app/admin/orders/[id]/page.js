@@ -71,6 +71,8 @@ export default function OrderDetailsPage() {
     // Partial delivery
     isPartialDeliveryModalOpen, setIsPartialDeliveryModalOpen,
     handlePartialDeliveryConfirm,
+    // Paid status
+    handleTogglePaid, isTogglingPaid,
   } = useOrderManagement(id);
 
   if (loading) {
@@ -175,7 +177,7 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="max-w-[1200px] mx-auto pb-24 animate-in fade-in duration-300 overflow-x-hidden">
-      <OrderHeader order={order} isUpdatingStatus={isUpdatingStatus} handleStatusChange={handleStatusChange} />
+      <OrderHeader order={order} isUpdatingStatus={isUpdatingStatus} handleStatusChange={handleStatusChange} handleTogglePaid={handleTogglePaid} isTogglingPaid={isTogglingPaid} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-5">
 

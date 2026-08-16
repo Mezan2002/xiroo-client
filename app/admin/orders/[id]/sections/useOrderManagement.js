@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
-  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchange, updateExchangeStatus } = useOrders();
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchange, updateExchangeStatus, togglePaidStatus } = useOrders();
   const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -83,6 +83,13 @@ export const useOrderManagement = (id) => {
         setExchangeAdminNote("");
       },
       onError: (err) => toast.error(err.message || `Failed to update exchange status`),
+    });
+  };
+
+  const handleTogglePaid = async (newPaidStatus) => {
+    togglePaidStatus.mutate({ id, isPaid: newPaidStatus }, {
+      onSuccess: () => toast.success(`Order marked as ${newPaidStatus ? 'Paid' : 'Unpaid'}`),
+      onError: (err) => toast.error(err.message || "Failed to update payment status")
     });
   };
 
@@ -463,5 +470,7 @@ export const useOrderManagement = (id) => {
     isRequestingExchange: requestExchange.isPending,
     isEditingExchangePending: updateExchange.isPending,
     isUpdatingExchangeStatus: updateExchangeStatus.isPending,
+    handleTogglePaid,
+    isTogglingPaid: togglePaidStatus.isPending,
   };
 };

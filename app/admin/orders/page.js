@@ -77,6 +77,19 @@ export default function AdminOrders() {
     { key: "createdAt", label: "Date", type: "date" },
     { key: "totalPrice", label: "Total", type: "currency" },
     { key: "status", label: "Status", type: "status" },
+    {
+      key: "isPaid",
+      label: "Payment",
+      render: (row) => (
+        <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-[2px] rounded-none border uppercase tracking-wider sm:tracking-widest whitespace-nowrap ${
+          row.isPaid
+            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+            : 'bg-rose-50 text-rose-600 border-rose-200'
+        }`}>
+          {row.isPaid ? 'PAID' : 'UNPAID'}
+        </span>
+      )
+    },
     { key: "actions", label: "Actions", type: "actions", align: "right" },
   ], []);
 
