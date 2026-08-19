@@ -197,9 +197,7 @@ export const useProductActions = (product, externalVariants, externalSetVariants
         toast.info("Please select all options before adding to bag.");
         return;
       }
-      const variantString = Object.entries(selectedVariants)
-        .map(([k, v]) => `${k}: ${v}`)
-        .join(", ");
+      const variantString = Object.values(selectedVariants).join(" / ");
 
       addItem({
         product: {
@@ -307,9 +305,7 @@ export const useProductActions = (product, externalVariants, externalSetVariants
         toast.info("Please select all options before ordering.");
         return;
       }
-      const variantString = Object.entries(selectedVariants)
-        .map(([k, v]) => `${k}: ${v}`)
-        .join(", ");
+      const variantString = Object.values(selectedVariants).join(" / ");
 
       addItem({
         product: {

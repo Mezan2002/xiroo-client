@@ -618,26 +618,24 @@ export default function ItemsSection({
   const handleVariantConfirm = (product, variant) => {
     const id = variantSelectingItemId;
 
-    // Look up variant-specific price from product's variant groups
-    let variantPrice = null;
+    // Look up variant-specific price from product's variant groups (max-match like server)
+    let variantPrice = 0;
     if (variant && variant !== "Standard" && product.variants?.length > 0) {
       const parts = variant.split(" / ");
       for (const part of parts) {
         for (const group of product.variants) {
           const match = group.values?.find((v) => v.value === part);
-          if (match && match.price != null) {
+          if (match?.price && match.price > variantPrice) {
             variantPrice = match.price;
-            break;
           }
         }
-        if (variantPrice != null) break;
       }
     }
 
     updateItem(id, "product", product._id);
     updateItem(id, "name", product.title);
-    updateItem(id, "price", variantPrice ?? (product.salePrice || product.price));
-    updateItem(id, "originalPrice", variantPrice ?? (product.salePrice || product.price));
+    updateItem(id, "price", variantPrice > 0 ? variantPrice : (product.salePrice || product.price));
+    updateItem(id, "originalPrice", variantPrice > 0 ? variantPrice : (product.salePrice || product.price));
     updateItem(id, "variant", variant);
     updateItem(id, "image", product.images?.[0] || "");
     setVariantSelectingProduct(null);

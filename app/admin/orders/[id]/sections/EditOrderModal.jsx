@@ -856,20 +856,18 @@ export default function EditOrderModal({ isOpen, onClose, order }) {
                                 const pdata = productData[item.productId] || item.product;
                                 if (pdata?.variants && v !== "Standard") {
                                   const parts = v.split(" / ").map((s) => s.trim());
-                                  let variantPrice = null;
+                                  let variantPrice = 0;
                                   for (const part of parts) {
                                     for (const group of pdata.variants) {
                                       const match = group.values?.find(
                                         (val) => (typeof val === "string" ? val : val.value) === part
                                       );
-                                      if (match?.price) {
+                                      if (match?.price && match.price > variantPrice) {
                                         variantPrice = match.price;
-                                        break;
                                       }
                                     }
-                                    if (variantPrice) break;
                                   }
-                                  if (variantPrice != null) {
+                                  if (variantPrice > 0) {
                                     handleItemChange(idx, "price", variantPrice);
                                   }
                                 }
