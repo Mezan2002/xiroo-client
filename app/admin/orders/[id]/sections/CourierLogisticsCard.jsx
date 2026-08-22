@@ -51,6 +51,7 @@ export default function CourierLogisticsCard({
   handleCourierDispatch,
   isDispatching,
   isCancelled,
+  orderId,
 }) {
   const [cities, setCities] = useState([]);
   const [zones, setZones] = useState([]);
@@ -88,7 +89,7 @@ export default function CourierLogisticsCard({
       </div>
       <div className="p-6">
         {deliveryInfo?.trackingId ? (
-          <div className="space-y-4">
+            <div className="space-y-4">
             <div className="p-3 bg-zinc-50 border border-zinc-100 space-y-2">
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                 <span className="text-zinc-400">Provider</span>
@@ -100,6 +101,20 @@ export default function CourierLogisticsCard({
                   {deliveryInfo.trackingId}
                 </span>
               </div>
+              {deliveryInfo.deliveryCharge > 0 && (
+                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-zinc-400">Courier Charge</span>
+                  <span className="text-rose-600 font-mono">
+                    &#2547;{deliveryInfo.deliveryCharge.toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {deliveryInfo.status && (
+                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-zinc-400">Status</span>
+                  <span className="text-zinc-900 capitalize">{deliveryInfo.status}</span>
+                </div>
+              )}
             </div>
             <Button
               variant="outline"

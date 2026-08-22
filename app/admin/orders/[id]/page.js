@@ -19,6 +19,7 @@ import ReturnRequestCard from "./sections/ReturnRequestCard";
 import RequestExchangeModal from "./sections/RequestExchangeModal";
 import PartialDeliveryModal from "./sections/PartialDeliveryModal";
 import { useOrderManagement } from "./sections/useOrderManagement";
+import OrderProfitSummary from "./sections/OrderProfitSummary";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -520,6 +521,9 @@ export default function OrderDetailsPage() {
             )}
           </div>
 
+          {/* Order Profit Summary */}
+          <OrderProfitSummary order={order} />
+
           {/* Customer Return / Exchange Request Card */}
           {order.returnRequest && (
             <ReturnRequestCard returnRequest={order.returnRequest} orderId={order._id} />
@@ -652,9 +656,10 @@ export default function OrderDetailsPage() {
             setSteadfastWeight={setSteadfastWeight}
             steadfastCodAmount={steadfastCodAmount}
             setSteadfastCodAmount={setSteadfastCodAmount}
-            handleCourierDispatch={handleCourierDispatch}
-            isDispatching={isDispatching}
-            isCancelled={order.status === "cancelled"}
+          handleCourierDispatch={handleCourierDispatch}
+          isDispatching={isDispatching}
+          isCancelled={order.status === "cancelled"}
+          orderId={order._id}
           />
 
           <AdvancePaymentCard

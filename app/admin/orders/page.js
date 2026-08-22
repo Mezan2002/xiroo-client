@@ -4,7 +4,7 @@ import ModuleHeader from "@/components/admin/shared/ModuleHeader";
 import DataTable from "@/components/admin/shared/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Select } from "@/components/ui/Select";
-import { Plus, ShoppingBag, Loader2, Search, Trash2 } from "lucide-react";
+import { Plus, ShoppingBag, Loader2, Search, Trash2, Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useOrders } from "@/hooks/api/useOrders";
 import { useToast } from "@/hooks/useToast";
@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/useToast";
 export default function AdminOrders() {
   const router = useRouter();
   const { toast } = useToast();
-  const { useOrderHistory, deleteOrder } = useOrders();
+  const { useOrderHistory, deleteOrder, bulkFetchDeliveryCharges } = useOrders();
 
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +35,16 @@ export default function AdminOrders() {
   const pagination = response?.pagination || response?.data?.pagination;
 
   const confirming = deleteOrder.isPending;
+
+  const handleBulkFetchDeliveryCharges = async () => {
+    bulkFetchDeliveryCharges.mutate(undefined, {
+      onSuccess: (res) => {
+        const data = res?.data || res;
+        toast.success(`Fetched delivery charges: ${data.updated || 0} updated, ${data.failed || 0} failed, ${data.skipped || 0} skipped`);
+      },
+      onError: (err) => toast.error(err.message || "Failed to fetch delivery charges"),
+    });
+  };
 
   const COLUMNS = useMemo(() => [
     { key: "orderId", label: "Order ID", type: "text", mono: true },
@@ -153,13 +163,27 @@ export default function AdminOrders() {
         title="Orders"
         icon={ShoppingBag}
         actions={
-          <button
-            onClick={() => router.push("/admin/orders/trash")}
-            className="h-10 md:h-12 px-4 md:px-6 border border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 text-[10px] md:text-[11px] font-semibold rounded-none transition-all uppercase tracking-[0.2em] md:tracking-[0.3em] flex items-center gap-2"
-          >
-            <Trash2 size={12} />
-            Trash
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleBulkFetchDeliveryCharges}
+              disabled={bulkFetchDeliveryCharges.isPending}
+              className="h-10 md:h-12 px-4 md:px-6 border border-zinc-200 text-zinc-500 hover:border-blue-400 hover:text-blue-600 text-[10px] md:text-[11px] font-semibold rounded-none transition-all uppercase tracking-[0.2em] md:tracking-[0.3em] flex items-center gap-2 disabled:opacity-50"
+            >
+              {bulkFetchDeliveryCharges.isPending ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Truck size={12} />
+              )}
+              {bulkFetchDeliveryCharges.isPending ? "Fetching..." : "Fetch Charges"}
+            </button>
+            <button
+              onClick={() => router.push("/admin/orders/trash")}
+              className="h-10 md:h-12 px-4 md:px-6 border border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 text-[10px] md:text-[11px] font-semibold rounded-none transition-all uppercase tracking-[0.2em] md:tracking-[0.3em] flex items-center gap-2"
+            >
+              <Trash2 size={12} />
+              Trash
+            </button>
+          </div>
         }
         primaryAction={{
           label: "Create Order",

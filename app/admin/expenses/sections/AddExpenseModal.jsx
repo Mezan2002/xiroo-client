@@ -8,6 +8,7 @@ const CATEGORIES = [
   { value: "shipping", label: "Shipping" },
   { value: "platform_fees", label: "Platform Fees" },
   { value: "operations", label: "Operations" },
+  { value: "product_sourcing", label: "Product Sourcing Cost" },
   { value: "other", label: "Other" },
 ];
 

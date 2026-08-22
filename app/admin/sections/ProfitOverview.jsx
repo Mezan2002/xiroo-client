@@ -1,8 +1,8 @@
 "use client";
-import { DollarSign, TrendingUp, TrendingDown, ShoppingBag, BarChart3 } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, ShoppingBag, BarChart3, Truck } from "lucide-react";
 import StatCard from "./StatCard";
 
-const formatCurrency = (value) => `৳${(value || 0).toLocaleString()}`;
+const formatCurrency = (value) => `\u09F3${(value || 0).toLocaleString()}`;
 
 const ProfitOverview = ({ profit }) => {
   if (!profit) return null;
@@ -13,6 +13,11 @@ const ProfitOverview = ({ profit }) => {
     grossProfit = 0,
     grossMargin = 0,
     totalExpenses = 0,
+    totalDeliveryCharges = 0,
+    totalCodFees = 0,
+    totalCourierCost = 0,
+    totalShippingFees = 0,
+    courierChargeOrders = 0,
     netProfit = 0,
     netMargin = 0,
     expenseByCategory = [],
@@ -49,6 +54,30 @@ const ProfitOverview = ({ profit }) => {
           value={formatCurrency(totalExpenses)}
           icon={BarChart3}
           trendLabel={`${expenseByCategory.length} categories`}
+        />
+        <StatCard
+          label="Courier Charges"
+          value={formatCurrency(totalCourierCost)}
+          icon={Truck}
+          trendLabel={`${courierChargeOrders} orders`}
+        />
+        <StatCard
+          label="Delivery Fees"
+          value={formatCurrency(totalDeliveryCharges)}
+          icon={Truck}
+          trendLabel="courier delivery"
+        />
+        <StatCard
+          label="COD Fees"
+          value={formatCurrency(totalCodFees)}
+          icon={DollarSign}
+          trendLabel="cash collection"
+        />
+        <StatCard
+          label="Shipping Fees"
+          value={formatCurrency(totalShippingFees)}
+          icon={DollarSign}
+          trendLabel="collected from customers"
         />
         <StatCard
           label="Net Profit"

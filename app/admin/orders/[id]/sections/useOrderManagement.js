@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 export const useOrderManagement = (id) => {
   const { toast } = useToast();
-  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchange, updateExchangeStatus, togglePaidStatus } = useOrders();
+  const { useOrderDetail, updateStatus, cancelOrder, dispatchCourier, requestAdvancePayment, confirmAdvancePayment, waiveAdvancePayment, updateOrderPrices, updateOrder, requestExchange, updateExchange, updateExchangeStatus, togglePaidStatus, fetchDeliveryCharge } = useOrders();
   const { data: order, isLoading: loading, error, isError } = useOrderDetail(id);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -472,5 +472,7 @@ export const useOrderManagement = (id) => {
     isUpdatingExchangeStatus: updateExchangeStatus.isPending,
     handleTogglePaid,
     isTogglingPaid: togglePaidStatus.isPending,
+    fetchDeliveryCharge,
+    isFetchingCharge: fetchDeliveryCharge.isPending,
   };
 };

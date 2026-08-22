@@ -308,6 +308,38 @@ export const useOrders = () => {
     },
   });
 
+  const fetchDeliveryCharge = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.get(`/orders/${id}/delivery-charge`);
+      return response.data;
+    },
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+    },
+  });
+
+  const bulkFetchDeliveryCharges = useMutation({
+    mutationFn: async () => {
+      const response = await axiosInstance.post("/orders/bulk-fetch-delivery-charges");
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  const useCourierDetails = (orderId, options = {}) => {
+    return useQuery({
+      queryKey: ["courier-details", orderId],
+      queryFn: async () => {
+        const response = await axiosInstance.get(`/orders/${orderId}/courier-details`);
+        return response.data;
+      },
+      enabled: !!orderId,
+      ...options,
+    });
+  };
+
   return {
     placeOrder,
     placeGuestOrder,
@@ -333,5 +365,8 @@ export const useOrders = () => {
     updateExchangeStatus,
     requestReturnExchange,
     updateReturnRequestStatus,
+    fetchDeliveryCharge,
+    bulkFetchDeliveryCharges,
+    useCourierDetails,
   };
 };
